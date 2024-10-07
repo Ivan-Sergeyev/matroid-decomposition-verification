@@ -20,6 +20,7 @@ Ingredients from minimal violation matrices:
   \item MVMs are square and have determinant not equal to $0, \pm 1$.
   \item In particular, a $2 \times 2$ violation matrix has four $\pm 1$'s.
   \item Cosider a MVM of order $\ge 3$. Perform a pivot in it, then delete the pivot row and column. Then the resulting matrix is also MVM ("by a simple cofactor argument").
+  % Note: pivots are defined in Chapter 2.3, page 20. Also in Chapter 3.2, page 34 for graphic matroids.
 \end{itemize}
 
 \begin{lemma}[11.2.1]
@@ -89,6 +90,21 @@ Ingredients from minimal violation matrices:
 
 \subsection{Chapter 11.3}
 
+\begin{proposition}[11.3.3]
+  \label{prop:11.3.3}
+  \todo[inline]{add prop}
+\end{proposition}
+
+\begin{proposition}[11.3.5]
+  \label{prop:11.3.5}
+  \todo[inline]{add prop}
+\end{proposition}
+
+\begin{proposition}[11.3.11]
+  \label{prop:11.3.11}
+  \todo[inline]{add prop}
+\end{proposition}
+
 The goal of the chapter is to prove the ``hard'' direction of the regular matroid decomposition theorem.
 
 \begin{theorem}[11.3.2]
@@ -100,7 +116,7 @@ The goal of the chapter is to prove the ``hard'' direction of the regular matroi
 \end{theorem}
 
 \begin{proof}[Proof sketch]
-  \uses{thm:7.2.1.a.splitter_nonwheel,prop:11.3.3,def:isomorphism,def:1_elem_ext,prop:11.3.5,def:F7,def:contraction}
+  \uses{thm:7.2.1.a,prop:11.3.3,def:isomorphism,def:1_elem_ext,prop:11.3.5,def:F7,def:contraction}
   \begin{itemize}
     \item Splitter theorem case (a)
     \item $R_{10}$ is self-dual, so it suffices to consider $1$-element additions.
@@ -127,7 +143,7 @@ The goal of the chapter is to prove the ``hard'' direction of the regular matroi
 \end{theorem}
 
 \begin{proof}[Proof sketch]
-  \uses{def:1_elem_ext,prop:10.2.9,thm:11.3.10,case:11.3.7,case:11.3.9}
+  \uses{def:1_elem_ext,prop:10.2.9,thm:11.3.10}
   \begin{itemize}
     \item Preparation: calculate all $3$-connected regular $1$-element additions of $R_{12}$. This involves somewhat tedious case checking. (Representation of $R_{12}$ in (10.2.9) helps a lot.) By the symmetry of $B^{12}$ and thus by duality, this effectively gives all $3$-connected $1$-element extensions as well.
     \item Verify conditions of theorem 11.3.10 (which implies the result).

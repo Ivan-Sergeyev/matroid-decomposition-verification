@@ -7,23 +7,91 @@
 \end{definition}
 
 \begin{theorem}[7.2.1.a splitter for nonwheels]
-  \label{thm:7.2.1.a.splitter_nonwheel}
+  \label{thm:7.2.1.a}
   \uses{def:splitter,def:wheel}
   Let $\M$ be a class of binary matroids closed under isomorphism and under taking minors. Let $N$ be a $3$-connected minor of $\M$ on at least $6$ elements.
   If $N$ is not a wheel, then $N$ is a splitter of $\M$ iff $\M$ does not contain a $3$-connected $1$-element extension of $N$.
 \end{theorem}
 
-\begin{proof}
-  \todo[inline]{todo: add proof sketch}
+\begin{proof}[Proof sketch]
+  \uses{thm:6.4.1,def:splitter,def:k_conn,def:1_elem_ext,def:minor,def:k_sep}
+  \begin{itemize}
+    \item If $N$ is a splitter of $\M$, then clearly $\M$ does not contain a $3$-connected $1$-element extension of $N$.
+    \item Prove the converse by contradiction. To this end, suppose that $\M$ does not contain a $3$-connected $1$-element extension of $N$ and that $N$ is not a splitter of $\M$.
+    \item Thus, $\M$ contains a $3$-connected matroid $M$ with a proper $N$ minor and no $2$-separation.
+    \item Since $\M$ is closed under isomorphism, we may assume $N$ itself to be that $N$ minor.
+    \item By Theorem 6.4.1 (applied to $M$ and $N$), $M$ has a $3$-connected minor $N'$ that is a $3$-connected $1$- or $2$-element extension of an $N$ minor.
+    \item The $1$-extension case has been ruled out.
+    \item In the $2$-element extension case, $N'$ is derived from the $N$ minor by one addition and one expansion. Again, since $\M$ is closed under isomorphism and minor taking, we may take $N$ itself to be that $N$ minor. Thus, $N'$ is derived from $N$ by one addition and one expansion.
+    \item Let $C$ be a binary matrix representing $N'$ and displaying $N$. By investigating the structure of $C$, one can show that $N'$ contains a $3$-connected $1$-element extension of an $N$ minor, which has been ruled out.
+  \end{itemize}
 \end{proof}
 
 \begin{theorem}[7.2.1.b splitter for wheels]
-  \label{thm:7.2.1.b.splitter_wheel}
+  \label{thm:7.2.1.b}
   \uses{def:splitter,def:wheel}
   Let $\M$ be a class of binary matroids closed under isomorphism and under taking minors. Let $N$ be a $3$-connected minor of $\M$ on at least $6$ elements.
   If $N$ is a wheel, then $N$ is a splitter of $\M$ iff $\M$ does not contain a $3$-connected $1$-element extension of $N$ and does not contain the next larger wheel.
 \end{theorem}
 
-\begin{proof}
-  \todo[inline]{todo: add proof sketch}
+\begin{proof}[Proof sketch]
+  \uses{thm:6.4.1,def:splitter,def:k_conn,def:1_elem_ext,def:minor,def:k_sep}
+  Similar to proof of Theorem 7.2.1.a. The analysis of the matrix $C$ can be done in one go for both cases.
 \end{proof}
+
+\begin{corollary}[7.2.10.a]
+  \label{cor:7.2.10.a}
+  Theorem 7.2.1.a specialized to graphs.
+\end{corollary}
+
+\begin{proof}[Proof sketch]
+  \uses{thm:7.2.1.a}
+  Consider the corresponding graphic matroids, apply splitter theorem, extensions in graphic matroids correspond to extensions in graphs.
+\end{proof}
+
+\begin{corollary}[7.2.10.b]
+  \label{cor:7.2.10.b}
+  Theorem 7.2.1.b specialized to graphs.
+\end{corollary}
+
+\begin{proof}[Proof sketch]
+  \uses{thm:7.2.1.b}
+  Consider the corresponding graphic matroids, apply splitter theorem, extensions in graphic matroids correspond to extensions in graphs.
+\end{proof}
+
+\begin{theorem}[7.2.11.a]
+  \label{thm:7.2.11.a}
+  \uses{def:M_K_5,def:M_K_3_3,def:splitter,def:minor,def:graphic_matroid}
+  $K_{5}$ is a splitter of the graphs without $K_{3,3}$ minors.
+\end{theorem}
+
+\begin{proof}[Proof sketch]
+  \uses{cor:7.2.10.a,def:k_conn,def:1_elem_ext}
+  Up to isomorphism, there is just one $3$-connected $1$-edge extension of $K_5$. To obtain it, one partitions one vertex of $K_5$ into two vertices of degree $2$ and connects the two vertices by a new edge. The resulting graph has a $K_{3,3}$ minor. Thus, the theorem follows fromCorollary 7.2.10.a.
+\end{proof}
+
+\begin{theorem}[7.2.11.b]
+  \label{thm:7.2.11.b}
+  \uses{def:M_W_3,def:M_W_4,def:splitter,def:minor,def:graphic_matroid}
+  $W_{3}$ is a splitter of the graphs without $W_{4}$ minors.
+\end{theorem}
+
+\begin{proof}[Proof sketch]
+  \uses{cor:7.2.10.b,def:k_conn,def:1_elem_ext}
+  There is no $3$-connected $1$-edge extension of $W_{3}$, so the theorem follows from Corollary 7.2.10.b.
+\end{proof}
+
+\begin{theorem}[7.3.3]
+  \label{thm:7.3.3}
+  \todo[inline]{add}
+\end{theorem}
+
+\begin{theorem}[7.3.4]
+  \label{thm:7.3.4}
+  \todo[inline]{add}
+\end{theorem}
+
+\begin{theorem}[7.4.1]
+  \label{thm:7.4.1}
+  \todo[inline]{add}
+\end{theorem}

@@ -53,38 +53,60 @@
 
 \subsection{Specific Matroids (Constructions)}
 
+\subsubsection{Wheels}
+
 \begin{definition}[wheel]
   \label{def:wheel}
   \todo[inline]{todo: add definition}
 \end{definition}
+
+\begin{definition}[$W_{3}$]
+  \label{def:M_W_3}
+  \todo[inline]{todo: add definition}
+\end{definition}
+
+\begin{definition}[$W_{4}$]
+  \label{def:M_W_4}
+  \todo[inline]{todo: add definition}
+\end{definition}
+
+\subsubsection{$R_{10}$}
 
 \begin{definition}[$R_{10}$]
   \label{def:R10}
   \todo[inline]{todo: add definition}
 \end{definition}
 
+\subsubsection{$R_{12}$}
+
 \begin{definition}[$R_{12}$]
   \label{def:R12}
   \todo[inline]{todo: add definition}
 \end{definition}
+
+\subsubsection{Fano matroid}
 
 \begin{definition}[$F_{7}$]
   \label{def:F7}
   \todo[inline]{todo: add definition}
 \end{definition}
 
+\subsubsection{$K_{3,3}$}
+
 \begin{definition}[$M(K_{3,3})$]
   \label{def:M_K_3_3}
   \todo[inline]{todo: add definition}
 \end{definition}
 
-\begin{definition}[$M(K_{5})$]
-  \label{def:M_K_5}
+\begin{definition}[$M(K_{3,3})^{*}$]
+  \label{def:M_K_3_3_dual}
   \todo[inline]{todo: add definition}
 \end{definition}
 
-\begin{definition}[$M(K_{3,3})^{*}$]
-  \label{def:M_K_3_3_dual}
+\subsubsection{$K_{5}$}
+
+\begin{definition}[$M(K_{5})$]
+  \label{def:M_K_5}
   \todo[inline]{todo: add definition}
 \end{definition}
 
@@ -107,7 +129,7 @@
 \end{definition}
 
 
-\subsection{Taking Minors}
+\subsection{Reductions}
 
 \begin{definition}[deletion]
   \label{def:deletion}
@@ -119,8 +141,25 @@
   \todo[inline]{todo: add definition}
 \end{definition}
 
+% reduction = deletion or contraction
+
 \begin{definition}[minor]
   \label{def:minor}
+  \todo[inline]{todo: add definition}
+\end{definition}
+
+
+\subsection{Extensions}
+
+% extension = addition or expansion, inverse to resp. deletion and contraction
+
+\begin{definition}[$1$-element extension]
+  \label{def:1_elem_ext}
+  \todo[inline]{todo: add definition}
+\end{definition}
+
+\begin{definition}[$2$-element extension]
+  \label{def:2_elem_ext}
   \todo[inline]{todo: add definition}
 \end{definition}
 
@@ -153,19 +192,6 @@
 \end{definition}
 
 
-\subsection{Extensions}
-
-\begin{definition}[$1$-element extension]
-  \label{def:1_elem_ext}
-  \todo[inline]{todo: add definition}
-\end{definition}
-
-\begin{definition}[$2$-element extension]
-  \label{def:2_elem_ext}
-  \todo[inline]{todo: add definition}
-\end{definition}
-
-
 \subsection{Total Unimodularity}
 
 \begin{definition}[TU matrix]
@@ -177,5 +203,18 @@
 
 \begin{theorem}[Menger's theorem]
   \label{thm:Menger}
-  \todo[inline]{todo: add theorem}
+  A connected graph $G$ is vertex $k$-connected if and only if every two nodes are connected by $k$ internally node-disjoint paths.
+  Equivalent is the following statement. $G$ is vertex $k$-connected if and only if any $m \leq k$ nodes are joined to any $n \leq k$ nodes by $k$ internally node-disjoint paths.
+  One may demand that the $m$ nodes are disjoint from the $n$ nodes, but need not do so.
+  Also, the $k$ paths can be so chosen that each of the specified nodes is an endpoint of at least one of the paths.
+\end{theorem}
+
+\begin{definition}[$\Delta Y$ exchange]
+  \label{def:Delta_Y_exchange}
+  \todo[inline]{add}
+\end{definition}
+
+\begin{theorem}[census from Secion 3.3]
+  \label{census sec 3.3}
+  \todo[inline]{add}
 \end{theorem}
