@@ -4,13 +4,14 @@
 
 \begin{definition}[splitter]
   \label{def:splitter}
+  \uses{def:binary_matroid,def:minor,def:isomorphism,def:k_conn}
   Let $\M$ be a class of binary matroids closed under isomorphism and under taking minors. Let $N$ be a $3$-connected minor of $\M$ on at least $6$ elements.
   If every $M \in \M$ with a proper $N$ minor has a $2$-separation, then $N$ is called a splitter of $\M$.
 \end{definition}
 
 \begin{theorem}[7.2.1.a splitter for nonwheels]
   \label{thm:7.2.1.a}
-  \uses{def:splitter,def:wheel}
+  \uses{def:binary_matroid,def:minor,def:isomorphism,def:k_conn,def:wheel,def:splitter}
   Let $\M$ be a class of binary matroids closed under isomorphism and under taking minors. Let $N$ be a $3$-connected minor of $\M$ on at least $6$ elements.
   If $N$ is not a wheel, then $N$ is a splitter of $\M$ iff $\M$ does not contain a $3$-connected $1$-element extension of $N$.
 \end{theorem}
@@ -31,7 +32,7 @@
 
 \begin{theorem}[7.2.1.b splitter for wheels]
   \label{thm:7.2.1.b}
-  \uses{def:splitter,def:wheel}
+  \uses{def:binary_matroid,def:minor,def:isomorphism,def:k_conn,def:wheel,def:splitter}
   Let $\M$ be a class of binary matroids closed under isomorphism and under taking minors. Let $N$ be a $3$-connected minor of $\M$ on at least $6$ elements.
   If $N$ is a wheel, then $N$ is a splitter of $\M$ iff $\M$ does not contain a $3$-connected $1$-element extension of $N$ and does not contain the next larger wheel.
 \end{theorem}
@@ -43,6 +44,7 @@
 
 \begin{corollary}[7.2.10.a]
   \label{cor:7.2.10.a}
+  \uses{thm:7.2.1.a}
   Theorem 7.2.1.a specialized to graphs.
 \end{corollary}
 
@@ -53,6 +55,7 @@
 
 \begin{corollary}[7.2.10.b]
   \label{cor:7.2.10.b}
+  \uses{thm:7.2.1.b}
   Theorem 7.2.1.b specialized to graphs.
 \end{corollary}
 
@@ -69,7 +72,7 @@
 
 \begin{proof}[Proof sketch]
   \uses{cor:7.2.10.a,def:k_conn,def:1_elem_ext}
-  Up to isomorphism, there is just one $3$-connected $1$-edge extension of $K_5$. To obtain it, one partitions one vertex of $K_5$ into two vertices of degree $2$ and connects the two vertices by a new edge. The resulting graph has a $K_{3,3}$ minor. Thus, the theorem follows fromCorollary 7.2.10.a.
+  Up to isomorphism, there is just one $3$-connected $1$-edge extension of $K_{5}$. To obtain it, one partitions one vertex of $K_{5}$ into two vertices of degree $2$ and connects the two vertices by a new edge. The resulting graph has a $K_{3,3}$ minor. Thus, the theorem follows from Corollary 7.2.10.a.
 \end{proof}
 
 \begin{theorem}[7.2.11.b]
@@ -88,7 +91,7 @@
 
 \begin{theorem}[7.3.1.a]
   \label{thm:7.3.1.a}
-  \uses{}
+  \uses{def:k_conn,def:binary_matroid,def:minor,def:wheel,def:isomorphism,def:gap}
   Let $M$ be a $3$-connected binary matroid with a $3$-connected proper minor $N$ on at least $6$ elements. Assume $N$ is not a wheel.
   Then for some $t \geq 1$, there is a sequence $M_{0}, \dots, M_{t} = M$ of nested $3$-connected minors where $M_{0}$ is isomorphic to $N$ and where the gap is $1$.
 \end{theorem}
@@ -111,7 +114,7 @@
 
 \begin{theorem}[7.3.1.b]
   \label{thm:7.3.1.b}
-  \uses{}
+  \uses{def:k_conn,def:binary_matroid,def:minor,def:wheel,def:isomorphism,def:gap}
   Let $M$ be a $3$-connected binary matroid with a $3$-connected proper minor $N$ on at least $6$ elements. Assume $N$ is a wheel.
   Then for some $t \geq 1$, there is a sequence $M_{0}, \dots, M_{t} = M$ of nested $3$-connected minors where:
   \begin{itemize}
@@ -171,7 +174,7 @@
 
 \begin{theorem}[7.3.3, wheel theorem]
   \label{thm:7.3.3}
-  Let $G$ be a $3$-connected graph on at least $6$ edges. If $G$ is not a wheel, then $G$ has some edge $z$ such that at least one of the minors $G / z$ and $G \\ z$ is $3$-connected.
+  Let $G$ be a $3$-connected graph on at least $6$ edges. If $G$ is not a wheel, then $G$ has some edge $z$ such that at least one of the minors $G / z$ and $G \setminus z$ is $3$-connected.
 \end{theorem}
 
 \begin{proof}[Proof sketch]
@@ -181,15 +184,20 @@
     \item Let $H$ be a largest wheel minor of $G$. Since $G$ is not a wheel, $H$ is a proper minor of $G$.
     \item Apply Corollary 7.3.2.b to $G$ and $H$ to get a sequence of nested $3$-connected minors $G_{0}, \dots, G_{t} = G$ where $G_{0}$ is isomorphic to $H$.
     \item Since $H$ is the largest wheel minor and $G$ is not a wheel, Corollary 7.3.2.b shows that $s = 0$ and $t \geq 1$.
-    \item Additionally, from corollary we know that $G = G_{t}$ has exactly one extra edge compared to $G_{t - 1}$. In other words, $G_{t - 1} = G / z$ or $G \\ z$ for some edge $z$.
+    \item Additionally, from corollary we know that $G = G_{t}$ has exactly one extra edge compared to $G_{t - 1}$. In other words, $G_{t - 1} = G / z$ or $G \setminus z$ for some edge $z$.
   \end{itemize}
 \end{proof}
 
 \begin{theorem}[7.3.3 for binary matroids]
   \label{thm:7.3.3.binary}
   \uses{thm:7.3.1.a,thm:7.3.1.b}
-  Theorem 7.3.3 can be rewritten for binary matroids instead of graphs. The proof then relies on Theorem 7.3.1 instead of Corollary 7.3.2.
+  Theorem 7.3.3 can be rewritten for binary matroids instead of graphs.
 \end{theorem}
+
+\begin{proof}[Proof sketch]
+  \uses{thm:7.3.1.a,thm:7.3.1.b}
+  Similar to the proof of Theorem 7.3.3, but use Theorem 7.3.1 instead of Corollary 7.3.2.
+\end{proof}
 
 \begin{proposition}[7.3.4.observation]
   \label{prop:7.3.4.obs}
@@ -199,6 +207,7 @@
 
 \begin{theorem}[7.3.4]
   \label{thm:7.3.4}
+  \uses{def:k_conn,def:binary_matroid,def:minor,def:1_elem_expansion,def:1_elem_addition,def:1_elem_expansion}
   Let $M$ be a $3$-connected binary matroid with a $3$-connected proper minor $N$ on at least $6$ elements. If $M$ does not contain a $3$-connected $1$-element expansion (resp. addition) of any $N$ minor, then $M$ has a sequence of nested $3$-connected minors $M_{0}, \dots, M_{t} = M$ where $M_{0}$ is an $N$ minor of $M$ and where each $M_{i + 1}$ is obtained from $M_{i}$ by expansions (resp. additions) involving some series (resp. parallel) elements, possibly none, followed by a $1$-element addition (resp. expansion).
 \end{theorem}
 
@@ -226,11 +235,14 @@
 \end{theorem}
 
 \begin{proof}[Proof sketch]
-  \uses{lem:3.2.48}
+  \uses{lem:3.2.48,cor:5.2.15,cor:7.3.5}
   \begin{itemize}
     \item "Only if": planarity is preserved by taking minors, and by Lemma 3.2.48 both $K_{3,3}$ and $K_{5}$ are not planar.
     \item Let $G$ be a connected nonplanar graph with all proper minors planar. Goal: show that $G$ is isomorphic to $K_{3,3}$ or $K_{5}$.
-    \item
+    \item Prove that $G$ cannot be $1$- or $2$-separable. Thus $G$ is $3$-connected.
+    \item By Corollary 5.2.15, $G$ has a $W_{3}$ minor, say $H$. Note: no $H$ minor of $G$ can be extended to a minor of $G$ by addition of an edge that connects two nonadjacent nodes.
+    \item Then by Corollary 7.3.5.b, there exists a sequence $G_{0}, \dots, G_{t} = G$ of $3$-connected minors where $G_{0}$ is an $H$ minor and $G_{i + 1}$ is constructed from $G_{i}$ following very specific steps.
+    \item By minimality, $G_{t - 1}$ is planar and $G$ is not. Argue about a planar drawing of $G_{t - 1}$ and how $G$ can be derived from it. Show that this must result in a subdivision of $K_{3,3}$ or $K_{5}$.
   \end{itemize}
 \end{proof}
 

@@ -4,9 +4,7 @@
 
 The goal of this chapter is to prove the ``simple'' direction of the regular matroid decomposition theorem.
 
-\todo[inline]{todo: move ingredients to respective sections, add them as ``uses'' clauses}
-
-Ingredients from Section 9.2:
+Ingredients from Section 9.2: % todo: move ingredients to respective sections, add them as ``uses'' clauses
 \begin{itemize}
   \item A matrix is TU if all its subdeterminants are $0$, $\pm 1$.
   \item A binary matroid is regular if it has a signing that is TU.
@@ -14,7 +12,7 @@ Ingredients from Section 9.2:
   \item The signing can be accomplished by signing one arbitrarily selected row or column at a time.
 \end{itemize}
 
-Ingredients from minimal violation matrices:
+Ingredients from minimal violation matrices: % todo: move ingredients to respective sections, add them as ``uses'' clauses
 \begin{itemize}
   \item Definition: a minimal violation matrix of total unimodularity (minimal violation matrix, MVM) is a $\{0, \pm 1\}$ matrix that is not TU, but all its submatrices are TU.
   \item MVMs are square and have determinant not equal to $0, \pm 1$.
@@ -40,8 +38,12 @@ Ingredients from minimal violation matrices:
 \begin{lemma}[11.2.7]
   \label{lem:11.2.7}
   \uses{prop:8.3.10,prop:8.3.11,prop:8.5.3}
-  \todo[inline]{todo: add lemma}
+  $M_{2}$ of (8.3.10) and (8.3.11) is regular iff $M_{2\Delta}$ of (8.5.3) ($M_{2}$ converted by a $\Delta Y$ exchange) is regular.
 \end{lemma}
+
+\begin{proof}[Proof sketch]
+  Utilize signings, minimal violation matrices, intersections (inside matrices), column dependence, pivot, duality.
+\end{proof}
 
 \begin{corollary}[11.2.8]
   \label{cor:11.2.8}
@@ -92,17 +94,20 @@ Ingredients from minimal violation matrices:
 
 \begin{proposition}[11.3.3]
   \label{prop:11.3.3}
-  \todo[inline]{add prop}
+  \uses{prop:10.2.8}
+  Graph plus $T$ set representing $R_{10}$
 \end{proposition}
 
 \begin{proposition}[11.3.5]
   \label{prop:11.3.5}
-  \todo[inline]{add prop}
+  \uses{prop:10.2.4}
+  Graph plus $T$ set representing $F_{7}$.
 \end{proposition}
 
 \begin{proposition}[11.3.11]
   \label{prop:11.3.11}
-  \todo[inline]{add prop}
+  \uses{prop:9.2.14}
+  The binary representation matrix $B^{12}$ for $R_{12}$.
 \end{proposition}
 
 The goal of the chapter is to prove the ``hard'' direction of the regular matroid decomposition theorem.
@@ -116,7 +121,7 @@ The goal of the chapter is to prove the ``hard'' direction of the regular matroi
 \end{theorem}
 
 \begin{proof}[Proof sketch]
-  \uses{thm:7.2.1.a,prop:11.3.3,def:isomorphism,def:1_elem_ext,prop:11.3.5,def:F7,def:contraction}
+  \uses{thm:7.2.1.a,prop:11.3.3,def:isomorphism,def:1_elem_ext,prop:11.3.5,def:F7,def:contraction} % thm:11.3.1 = thm:7.2.1
   \begin{itemize}
     \item Splitter theorem case (a)
     \item $R_{10}$ is self-dual, so it suffices to consider $1$-element additions.

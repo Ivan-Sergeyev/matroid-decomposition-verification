@@ -2,25 +2,21 @@
 
 \begin{proposition}[10.2.4]
   \label{prop:10.2.4}
-  \todo[inline]{expand}
   Derivation of a graph with $T$ nodes for $F_{7}$.
 \end{proposition}
 
 \begin{proposition}[10.2.6]
   \label{prop:10.2.6}
-  \todo[inline]{expand}
   Derivation of a graph with $T$ nodes for $M(K_{3,3})^{*}$.
 \end{proposition}
 
 \begin{proposition}[10.2.8]
   \label{prop:10.2.8}
-  \todo[inline]{expand}
   Derivation of a graph with $T$ nodes for $R_{10}$.
 \end{proposition}
 
 \begin{proposition}[10.2.9]
   \label{prop:10.2.9}
-  \todo[inline]{expand}
   Derivation of a graph with $T$ nodes for $R_{12}$.
 \end{proposition}
 
@@ -51,8 +47,8 @@
     \item By Theorem 7.4.1, $M$ is not graphic or cographic.
     \item By Lemmas 8.2.2, 8.2.6, and 8.2.7, if $M$ has a $1$- or $2$-separation, then $M$ is a $1$- or $2$-sum. But then the components of the sum are planar, so $M$ is also planar. Therefore, $M$ is $3$-connected.
     \item By the census of Section 3.3, every $3$-connected $\leq 8$-element matroid is planar, so $|M| \geq 9$.
-    \item By the binary matroid version of the wheel Theorem 7.3.3, there exists an element $z$ such that $M \\ z$ or $M / z$ is $3$-connected. Dualizing does not afect the assumptions, so we may assume that $M \\ z$ is $3$-connected.
-    \item Let $G$ be a planar graph representing $M \\ z$. Extend $G$ to a representation of $M$ as follows:
+    \item By the binary matroid version of the wheel Theorem 7.3.3, there exists an element $z$ such that $M \setminus z$ or $M / z$ is $3$-connected. Dualizing does not afect the assumptions, so we may assume that $M \setminus z$ is $3$-connected.
+    \item Let $G$ be a planar graph representing $M \setminus z$. Extend $G$ to a representation of $M$ as follows:
     \begin{itemize}
       \item If $G$ is a wheel, invoke (10.2.6) or (10.2.4). The latter contracdicts regularity of $M$, the former shows what we need.
       \item If $G$ is not a wheel, use Theorem 7.3.3 and Menger's theorem. Use a path argument and edge contraction to reduce to (10.2.6) and conclude the proof.
@@ -109,7 +105,7 @@
   % in \label{lem:R10_nongraphic}: \uses{prop:10.2.8}
   % in \label{lem:R12_nongraphic}: \uses{prop:10.2.9}
   % in \label{lem:R10_noncographic}: \uses{lem:R10_nongraphic,lem:R10_selfdual}
-  % in \label{lem:R12_noncographic}: \uses{lem:R12_nongraphic,lem:R12_ introduces  andselfdual}
+  % in \label{lem:R12_noncographic}: \uses{lem:R12_nongraphic,lem:R12_selfdual}
   Representations (10.2.8) and (10.2.9) for $R_{10}$ and $R_{12}$ show that these are nongraphic and isomorphic to their duals, hence also noncographic, so we are done.
 \end{proof}
 
