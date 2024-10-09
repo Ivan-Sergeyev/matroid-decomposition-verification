@@ -2,6 +2,8 @@
 
 The goal of this project is to formally verify Seymour's decomposition theorem in Lean 4.
 
+[Blueprint](blueprint/src/print.pdf)
+
 ## References
 
 - [K. Truemper - Matroid Decomposition](https://www2.math.ethz.ch/EMIS/monographs/md/)
