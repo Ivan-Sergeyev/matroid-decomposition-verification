@@ -1,6 +1,20 @@
 \section{Chapter 5 from Truemper}
 
-% ERROR: Label 'lem:5.2.4' could not be resolved
+\begin{lemma}[5.2.4]
+  \label{lem:5.2.4}
+  \uses{def:k_conn,def:minor,def:1_elem_ext}
+  Let $N$ be a connected minor of a connected binary matroid $M$. Let $z \in M \setminus N$. Then $M$ has a connected minor $N'$ that is a $1$-element extension of $N$ by $z$.
+\end{lemma}
+
+\begin{proof}[Proof sketch]
+  \uses{lem:3.3.12}
+  \begin{itemize}
+    \item By Lemma 3.3.12, $M$ has a representation matrix that displays $N$ via a submatrix.
+    \item Case distinction between $z$ being represented by a nonzero or a zero vector.
+    \item Nonzero case: immediately get submatrix representing $N'$.
+    \item Zero case: take a shortest path in the matrix, perform pivots, in one subcase use duality.
+  \end{itemize}
+\end{proof}
 
 \begin{proposition}[5.2.8]
   \label{prop:5.2.8}

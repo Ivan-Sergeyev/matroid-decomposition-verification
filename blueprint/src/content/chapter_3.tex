@@ -1,20 +1,108 @@
 \section{Chapter 3 from Truemper}
 
-% ERROR: Label 'lem:3.3.19' could not be resolved
-% ERROR: Label 'lem:3.3.20' could not be resolved
-% ERROR: Label 'thm:3.2.25.a' could not be resolved
-% ERROR: Label 'thm:3.2.25.b' could not be resolved
+\subsection{Chapter 3.2}
 
-% ERROR: Label 'switching op sec 3' could not be resolved
+\begin{theorem}[3.2.25.a]
+  \label{thm:3.2.25.a}
+  \uses{def:graphic_matroid,def:k_sep}
+  Let $M$ be the graphic matroid of a connected graph $G$. Assume $(E_{1}, E_{2})$ is a $k$-separation of $M$ with minimal $k \geq 1$. Define $G_{1}$ (resp. $G_{2}$) from $G$ by removing the edges of $E_{2}$ (resp. $E_{1}$) from $G$. Let $R_{1}, \dots, R_{g}$ be the connected components of $G_{1}$, and $S_{1}, \dots, S_{h}$ be those of $G_{2}$.
 
-\begin{lemma}[3.3.12]
-  \label{lem:3.3.12}
-  % \uses{}
-  \todo[inline]{add name, label, uses, text}
-\end{lemma}
+  If $k$ = 1, then the $R_{i}$ and $S_{j}$ are connected in tree fashion.
+\end{theorem}
+
+\begin{proof}[Proof sketch]
+  Count edges and nodes.
+\end{proof}
+
+\begin{theorem}[3.2.25.b]
+  \label{thm:3.2.25.b}
+  \uses{thm:3.2.25.a}
+  Same setting as Theorem 3.2.25.a. If $k$ = 2, then the $R_{i}$ and $S_{j}$ are connected in cycle fashion.
+\end{theorem}
+
+\begin{proof}[Proof sketch]
+  Count edges and nodes.
+\end{proof}
+
+\begin{definition}[switching operation from section 3]
+  \label{switching op sec 3}
+  A swap of identification of nodes between two subgraphs induced by a $2$-separation of a graph. See description and illustration on page 45.
+\end{definition}
 
 \begin{lemma}[3.2.48]
   \label{lem:3.2.48}
-  % \uses{}
-  \todo[inline]{add name, label, uses, text}
+  \uses{def:M_K_3_3_dual,def:M_K_5_dual}
+  The matroids $M(K_{5})^{∗}$ and $M(K_{3,3})^{∗}$ are not graphic.
 \end{lemma}
+
+\begin{proof}[Proof sketch]
+  A short proof is given on page 51. A longer, but more general proof uses the graphicness testing subroutine described on page 47.
+\end{proof}
+
+
+\subsection{Chapter 3.3}
+
+\begin{lemma}[3.3.12]
+  \label{lem:3.3.12}
+  \uses{def:binary_matroid,def:minor}
+  Let $M$ be a binary matroid with a minor $\overline{M}$, and let $\overline{B}$ be a representation matrix of $\overline{M}$. Then $M$ has a representation matrix $B$ that displays $\overline{M}$ via $\overline{B}$ and thus makes the minor $\overline{M}$ visible.
+\end{lemma}
+
+\begin{proof}[Proof sketch]
+  \uses{def:minor}
+  Follows by the definition of minor via pivots and row/column deletions.
+\end{proof}
+
+\begin{proposition}[3.3.17]
+  \label{prop:3.3.17}
+  \uses{def:binary_matroid}
+  Partitioned version of matrix $B$ representing binary matroid $M$. (same as 3.3.3)
+\end{proposition}
+
+\begin{proposition}[3.3.18] % todo: defines (Tutte) $k$-separation
+  \label{prop:3.3.18}
+  \uses{def:k_sep,prop:3.3.17}
+  If for some $k \geq 1$, $|X_{1} \cup Y_{1}|, |X_{2} \cup Y_{2}| \geq k$, $\mathrm{GF}(2)$-rank $D^{1} + \mathrm{GF}(2)$-rank $D^{2} \leq k - 1$, then $(X_{1} \cup Y_{1}, X_{2} \cup Y_{2})$ is called a (Tutte) $k$-separation of $B$ and $M$. This separation is exact if the rank condition holds with equality. Both $B$ and $M$ are called (Tutte) $k$-separable if they have a $k$-separation. For $k \geq 2$, $B$ and $M$ are (Tutte) $k$-connected if they have no $\ell$-separation for $1 \leq \ell < k$. When $M$ is $2$-connected, we also say that $M$ is connected.
+\end{proposition}
+
+\begin{lemma}[3.3.19]
+  \label{lem:3.3.19}
+  \uses{def:binary_matroid}
+  Let $M$ be a binary matroid with a representation matrix $B$. Then $M$ is connected iff $B$ is connected.
+\end{lemma}
+
+\begin{proof}[Proof sketch]
+  \uses{prop:3.3.17,prop:3.3.18}
+  Check using (3.3.17) and (3.3.18) that $B$ is connecte diff it is $2$-connected. Thus $M$ is $2$-connected, and hence connected, iff $B$ is connected.
+\end{proof}
+
+\begin{lemma}[3.3.20]
+  \label{lem:3.3.20}
+  \uses{def:binary_matroid,def:k_conn,prop:3.3.17}
+  The following statements are equivalent for a binary matroid $M$ with set $E$ and a representation matrix $B$ of $M$.
+  \begin{itemize}
+    \item $M$ is $3$-connected.
+    \item $B$ is connected, has no parallel or unit vector rows and columns, and has no partition as in (3.3.17) with $\mathrm{GF}(2)$-rank $D^{1} = 1$, $D^{2} = 0$, and $|X_{1} \cup Y_{1}|, |X_{2} \cup Y_{2}| \geq 3$.
+    \item Same as (ii), but $|X_{1} \cup Y_{1}|, |X_{2} \cup Y_{2}| \geq 5$.
+  \end{itemize}
+\end{lemma}
+
+\begin{proof}[Proof sketch]
+  \uses{def:k_conn,prop:3.3.17}
+  \begin{itemize}
+    \item (i) is equivalent to (ii) by the definition of $3$-connectivity.
+    \item (iii) trivially implies (ii). (Typo in the book?)
+    \item Assuming (ii), if the length of $B^{1}$ is $3$ or $4$, then $B$ has a zero column or row, or parallel or unit vector rows or columns, which is excluded by the first part of (ii). Thus it suffices to require $|X_{1} \cup Y_{1}| \geq 5$ and by duality $|X_{2} \cup Y_{2}| \geq 5$.
+  \end{itemize}
+\end{proof}
+
+\begin{theorem}[census from Secion 3.3]
+  \label{census sec 3.3}
+  \uses{def:k_conn,def:binary_matroid}
+  A complete census of $3$-connected binary matroids on $\leq 8$ elements.
+\end{theorem}
+
+\begin{proof}[Proof sketch]
+  \uses{def:wheel,def:F7,def:regular_matroid}
+  Verified by case enumeration.
+\end{proof}

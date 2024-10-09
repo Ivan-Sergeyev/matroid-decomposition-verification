@@ -1,11 +1,5 @@
 \section{Basic Definitions}
 
-% ERROR: Label 'def:3_elem_ext' could not be resolved
-% ERROR: Label 'def:loop' could not be resolved
-% ERROR: Label 'def:coloop' could not be resolved
-% ERROR: Label 'def:parallel_elems' could not be resolved
-% ERROR: Label 'def:series_elems' could not be resolved
-
 \subsection{Matroid Structure}
 
 \begin{definition}[matroid]
@@ -15,6 +9,26 @@
 
 \begin{definition}[isomorphism]
   \label{def:isomorphism}
+  Two matroids are isomorphic if they become equal upon a suitable relabeling of the elements.
+\end{definition}
+
+\begin{definition}[loop]
+  \label{def:loop}
+  \todo[inline]{todo: add definition}
+\end{definition}
+
+\begin{definition}[coloop]
+  \label{def:coloop}
+  \todo[inline]{todo: add definition}
+\end{definition}
+
+\begin{definition}[parallel elements]
+  \label{def:parallel_elems}
+  \todo[inline]{todo: add definition}
+\end{definition}
+
+\begin{definition}[series elements]
+  \label{def:series_elems}
   \todo[inline]{todo: add definition}
 \end{definition}
 
@@ -28,8 +42,13 @@
 
 \begin{definition}[regular matroid]
   \label{def:regular_matroid}
-  \todo[inline]{todo: add definition}
+  \uses{def:binary_matroid,def:tu_matrix}
+  A binary matroid $M$ is regular if some binary representation matrix $B$ of $M$ has a totally unimodular signing (i.e., assignment of signs to the $1$s in $B$ that results in a TU matrix).
 \end{definition}
+
+% todo: Two of many important properties of regular matroids:
+% First, a binary matroid M is regular if and only if every representation matrix B can be signed to become a real totally unimodular matrix.
+% Second, every graphic or cographic matroid is regular.
 
 \begin{definition}[graphic matroid]
   \label{def:graphic_matroid}
@@ -59,8 +78,6 @@
 
 \subsection{Specific Matroids (Constructions)}
 
-\subsubsection{Wheels}
-
 \begin{definition}[wheel]
   \label{def:wheel}
   \todo[inline]{todo: add definition}
@@ -76,28 +93,25 @@
   \todo[inline]{todo: add definition}
 \end{definition}
 
-\subsubsection{$R_{10}$}
-
 \begin{definition}[$R_{10}$]
   \label{def:R10}
   \todo[inline]{todo: add definition}
 \end{definition}
-
-\subsubsection{$R_{12}$}
 
 \begin{definition}[$R_{12}$]
   \label{def:R12}
   \todo[inline]{todo: add definition}
 \end{definition}
 
-\subsubsection{Fano matroid}
-
 \begin{definition}[$F_{7}$]
   \label{def:F7}
   \todo[inline]{todo: add definition}
 \end{definition}
 
-\subsubsection{$K_{3,3}$}
+\begin{definition}[$F_{7}^{*}$]
+  \label{def:F7_dual}
+  \todo[inline]{todo: add definition}
+\end{definition}
 
 \begin{definition}[$M(K_{3,3})$]
   \label{def:M_K_3_3}
@@ -108,8 +122,6 @@
   \label{def:M_K_3_3_dual}
   \todo[inline]{todo: add definition}
 \end{definition}
-
-\subsubsection{$K_{5}$}
 
 \begin{definition}[$M(K_{5})$]
   \label{def:M_K_5}
@@ -124,14 +136,16 @@
 
 \subsection{Connectivity and Separation}
 
-\begin{definition}[$k$-connectivity]
-  \label{def:k_conn}
-  \todo[inline]{todo: add definition}
-\end{definition}
-
 \begin{definition}[$k$-separation]
   \label{def:k_sep}
-  \todo[inline]{todo: add definition}
+  % \uses{prop:3.3.18}
+  See text after Proposition 3.3.18.
+\end{definition}
+
+\begin{definition}[$k$-connectivity]
+  \label{def:k_conn}
+  % \uses{prop:3.3.18}
+  See text after Proposition 3.3.18.
 \end{definition}
 
 
@@ -157,7 +171,9 @@
 
 \subsection{Extensions}
 
-% extension = addition or expansion, inverse to resp. deletion and contraction
+% todo: see text on page 62
+
+% todo: extension = addition or expansion, inverse to resp. deletion and contraction
 
 \begin{definition}[$1$-element addition]
   \label{def:1_elem_addition}
@@ -178,6 +194,11 @@
 
 \begin{definition}[$2$-element extension]
   \label{def:2_elem_ext}
+  \todo[inline]{todo: add definition}
+\end{definition}
+
+\begin{definition}[$3$-element extension]
+  \label{def:3_elem_ext}
   \todo[inline]{todo: add definition}
 \end{definition}
 
@@ -214,8 +235,11 @@
 
 \begin{definition}[TU matrix]
   \label{def:tu_matrix}
-  \todo[inline]{todo: add definition}
+  A real matrix $A$ is totally unimodular if every square submatrix $D$ of $A$ has $\det_{\R} D = 0$ or $\pm 1$.
 \end{definition}
+
+% todo: In particular, all entries of a totally unimodular matrix must be $0$ or $\pm 1$.
+
 
 \subsection{Auxiliary Results}
 
@@ -231,11 +255,6 @@
   \label{def:Delta_Y_exchange}
   \todo[inline]{add}
 \end{definition}
-
-\begin{theorem}[census from Secion 3.3]
-  \label{census sec 3.3}
-  \todo[inline]{add}
-\end{theorem}
 
 \begin{definition}[gap]
   \label{def:gap}
