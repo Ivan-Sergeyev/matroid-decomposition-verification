@@ -322,6 +322,17 @@ status open
 
 \begin_layout Plain Layout
 
+%
+\backslash
+setcounter{tocdepth}{1}
+\end_layout
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\begin_layout Plain Layout
+
 
 \backslash
 AtBeginSection[]{%
@@ -345,7 +356,7 @@ frametitle{Outline}
 
     
 \backslash
-tableofcontents[currentsection,currentsubsection]
+tableofcontents[currentsection,subsectionstyle=hide]
 \end_layout
 
 \begin_layout Plain Layout
@@ -576,7 +587,7 @@ Axiomatic definition
 status open
 
 \begin_layout Plain Layout
-Why Regular Matroid Decomposition Theorem?
+Why Seymour's Decomposition Theorem?
 \end_layout
 
 \end_inset
@@ -707,7 +718,7 @@ Polyhedral approach for a special subclass: efficient separation
 \end_deeper
 \end_deeper
 \begin_layout Section
-From Definitions to Seymour's Decomposition Theorem
+Definitions
 \end_layout
 
 \begin_layout Standard
@@ -1140,66 +1151,6 @@ Perform binary row operations to arrive at
 status open
 
 \begin_layout Plain Layout
-Special Binary Matroids
-\end_layout
-
-\end_inset
-
-
-\end_layout
-
-\begin_deeper
-\begin_layout Itemize
-todo!
-\end_layout
-
-\begin_layout Itemize
-R10, R12, F7
-\end_layout
-
-\end_deeper
-\begin_layout Standard
-\begin_inset Separator plain
-\end_inset
-
-
-\end_layout
-
-\begin_layout Frame
-\begin_inset Argument 4
-status open
-
-\begin_layout Plain Layout
-Sums
-\end_layout
-
-\end_inset
-
-
-\end_layout
-
-\begin_deeper
-\begin_layout Itemize
-todo!
-\end_layout
-
-\begin_layout Itemize
-1-, 2-, 3-sums
-\end_layout
-
-\end_deeper
-\begin_layout Standard
-\begin_inset Separator plain
-\end_inset
-
-
-\end_layout
-
-\begin_layout Frame
-\begin_inset Argument 4
-status open
-
-\begin_layout Plain Layout
 Regular Matroids
 \end_layout
 
@@ -1258,8 +1209,418 @@ Every graphic and cographic matroid is regular
 
 \end_deeper
 \end_deeper
+\begin_layout Standard
+\begin_inset Separator plain
+\end_inset
+
+
+\end_layout
+
+\begin_layout Frame
+\begin_inset Argument 4
+status open
+
+\begin_layout Plain Layout
+Special Binary Matroids
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_deeper
+\begin_layout Itemize
+Nonregular 
+\begin_inset Formula $F_{7}$
+\end_inset
+
+ is represented by 
+\begin_inset Formula $\begin{bmatrix}1 & 0 & 1 & 1\\
+1 & 1 & 0 & 1\\
+0 & 1 & 1 & 1
+\end{bmatrix}$
+\end_inset
+
+
+\end_layout
+
+\begin_layout Itemize
+Regular, nongraphic, noncographic 
+\begin_inset Formula $R_{10}$
+\end_inset
+
+ is represented by 
+\begin_inset Formula $\begin{bmatrix}1 & 0 & 0 & 1 & 1\\
+1 & 1 & 0 & 0 & 1\\
+0 & 1 & 1 & 0 & 1\\
+0 & 0 & 1 & 1 & 1\\
+1 & 1 & 1 & 1 & 1
+\end{bmatrix}$
+\end_inset
+
+
+\end_layout
+
+\begin_layout Itemize
+Regular, nongraphic, noncographic 
+\begin_inset Formula $R_{12}$
+\end_inset
+
+ is represented by 
+\begin_inset Formula $\begin{bmatrix}1 & 0 & 1 & 1 & 0 & 0\\
+0 & 1 & 1 & 1 & 0 & 0\\
+1 & 0 & 1 & 0 & 1 & 1\\
+0 & 1 & 0 & 1 & 1 & 1\\
+1 & 0 & 1 & 0 & 1 & 0\\
+0 & 1 & 0 & 1 & 0 & 1
+\end{bmatrix}$
+\end_inset
+
+
+\end_layout
+
+\end_deeper
+\begin_layout Standard
+\begin_inset Separator plain
+\end_inset
+
+
+\end_layout
+
+\begin_layout Frame
+\begin_inset Argument 4
+status open
+
+\begin_layout Plain Layout
+\begin_inset Formula $1$
+\end_inset
+
+-, 
+\begin_inset Formula $2$
+\end_inset
+
+-, and 
+\begin_inset Formula $3$
+\end_inset
+
+-Sums of Graphs
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_deeper
+\begin_layout Itemize
+\begin_inset Formula $1$
+\end_inset
+
+-sums: identification of a node
+\end_layout
+
+\begin_layout Itemize
+\begin_inset Formula $2$
+\end_inset
+
+-sums:
+\end_layout
+
+\begin_layout Standard
+\noindent
+\align center
+\begin_inset Graphics
+	filename 2_sum_graph.png
+	display false
+	scale 50
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Itemize
+\begin_inset Formula $3$
+\end_inset
+
+-sums:
+\end_layout
+
+\begin_layout Standard
+\noindent
+\align center
+\begin_inset Graphics
+	filename 3_sum_graph.png
+	display false
+	scale 50
+
+\end_inset
+
+
+\end_layout
+
+\end_deeper
+\begin_layout Standard
+\begin_inset Separator plain
+\end_inset
+
+
+\end_layout
+
+\begin_layout Frame
+\begin_inset Argument 4
+status open
+
+\begin_layout Plain Layout
+\begin_inset Formula $1$
+\end_inset
+
+-sums of Binary Matroids
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_deeper
+\begin_layout Itemize
+A 
+\begin_inset Formula $1$
+\end_inset
+
+-separable matroid can be represented by
+\end_layout
+
+\begin_layout Standard
+\noindent
+\align center
+\begin_inset Graphics
+	filename 1_sum.png
+	display false
+	scale 50
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Itemize
+This also defines 
+\begin_inset Formula $M_{1}\oplus_{1}M_{2}$
+\end_inset
+
+ for 
+\begin_inset Formula $M_{1}$
+\end_inset
+
+ and 
+\begin_inset Formula $M_{2}$
+\end_inset
+
+ represented by 
+\begin_inset Formula $A^{1}$
+\end_inset
+
+ and 
+\begin_inset Formula $A^{2}$
+\end_inset
+
+
+\end_layout
+
+\end_deeper
+\begin_layout Standard
+\begin_inset Separator plain
+\end_inset
+
+
+\end_layout
+
+\begin_layout Frame
+\begin_inset Argument 4
+status open
+
+\begin_layout Plain Layout
+\begin_inset Formula $2$
+\end_inset
+
+-sums of Binary Matroids
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_deeper
+\begin_layout Itemize
+A 
+\begin_inset Formula $2$
+\end_inset
+
+-separable matroid can be represented by 
+\end_layout
+
+\begin_layout Standard
+\noindent
+\align center
+\begin_inset Graphics
+	filename 2_sum_sep.png
+	display false
+	scale 50
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Itemize
+This also defines 
+\begin_inset Formula $M_{1}\oplus_{2}M_{2}$
+\end_inset
+
+ for 
+\begin_inset Formula $M_{1}$
+\end_inset
+
+ and 
+\begin_inset Formula $M_{2}$
+\end_inset
+
+ represented by
+\end_layout
+
+\begin_layout Standard
+\noindent
+\align center
+\begin_inset Graphics
+	filename 2_sum_1.png
+	display false
+	scale 50
+
+\end_inset
+
+
+\begin_inset space \hspace{}
+\length 2em
+\end_inset
+
+
+\begin_inset Graphics
+	filename 2_sum_2.png
+	display false
+	scale 50
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Itemize
+The bottom-left submatrix is reconstructed via 
+\begin_inset Formula $\left(\text{column }y\text{ of }B^{2}\right)\cdot\left(\text{row }x\text{ of }B^{1}\right)$
+\end_inset
+
+
+\end_layout
+
+\end_deeper
+\begin_layout Standard
+\begin_inset Separator plain
+\end_inset
+
+
+\end_layout
+
+\begin_layout Frame
+\begin_inset Argument 4
+status open
+
+\begin_layout Plain Layout
+\begin_inset Formula $3$
+\end_inset
+
+-sums of Binary Matroids
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_deeper
+\begin_layout Itemize
+A 
+\begin_inset Formula $3$
+\end_inset
+
+-separable matroid can be represented by 
+\end_layout
+
+\begin_layout Standard
+\noindent
+\align center
+\begin_inset Graphics
+	filename 3_sum_sep.png
+	display false
+	scale 50
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Itemize
+This also defines 
+\begin_inset Formula $M_{1}\oplus_{3}M_{2}$
+\end_inset
+
+ for 
+\begin_inset Formula $M_{1}$
+\end_inset
+
+ and 
+\begin_inset Formula $M_{2}$
+\end_inset
+
+ represented by
+\end_layout
+
+\begin_layout Standard
+\noindent
+\align center
+\begin_inset Graphics
+	filename 3_sum_1.png
+	display false
+	scale 50
+
+\end_inset
+
+
+\begin_inset space \hspace{}
+\length 2em
+\end_inset
+
+
+\begin_inset Graphics
+	filename 3_sum_2.png
+	display false
+	scale 50
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Itemize
+The bottom-left submatrix is computed via a formula from these submatrices
+\end_layout
+
+\end_deeper
 \begin_layout Section
-Seymour's Decomposition Theorem
+High-Level Proof of Seymour's Decomposition Theorem
 \end_layout
 
 \begin_layout Frame
@@ -1342,10 +1703,55 @@ Dependency Graph
 \begin_layout Standard
 \noindent
 \align center
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+
+\backslash
+only<1>{
+\end_layout
+
+\end_inset
+
+
 \begin_inset Graphics
 	filename dep_graph_all.png
 	display false
 	width 90page%
+
+\end_inset
+
+
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+}
+\backslash
+only<2>{
+\end_layout
+
+\end_inset
+
+
+\begin_inset Graphics
+	filename dep_graph_clusters.png
+	display false
+	width 90page%
+
+\end_inset
+
+
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+}
+\end_layout
 
 \end_inset
 
@@ -1812,6 +2218,16 @@ Theorem 10.2.11
 
 \begin_deeper
 \begin_layout Itemize
+\begin_inset Argument item:2
+status open
+
+\begin_layout Plain Layout
+
+2-
+\end_layout
+
+\end_inset
+
 Relies on many involved results: Menger's theorem, Kuratowski's theorem,
  the wheel theorem, and the census of small 
 \begin_inset Formula $3$
@@ -1848,6 +2264,16 @@ Lemma 10.3.1
 
 \begin_deeper
 \begin_layout Itemize
+\begin_inset Argument item:2
+status open
+
+\begin_layout Plain Layout
+
+2-
+\end_layout
+
+\end_inset
+
 Proof 
 \begin_inset Formula $=$
 \end_inset
@@ -1900,6 +2326,16 @@ Theorem 10.3.11
 
 \begin_deeper
 \begin_layout Itemize
+\begin_inset Argument item:2
+status open
+
+\begin_layout Plain Layout
+
+2-
+\end_layout
+
+\end_inset
+
 Relies on results about 
 \begin_inset Formula $3$
 \end_inset
@@ -1910,6 +2346,16 @@ splitter theorem
 \end_layout
 
 \begin_layout Itemize
+\begin_inset Argument item:2
+status open
+
+\begin_layout Plain Layout
+
+2-
+\end_layout
+
+\end_inset
+
 Long and technical proof with many cases and graph constructions
 \end_layout
 
@@ -2059,11 +2505,31 @@ Former case + ingredient 1.3
 \end_layout
 
 \begin_layout Itemize
+\begin_inset Argument item:2
+status open
+
+\begin_layout Plain Layout
+
+2-
+\end_layout
+
+\end_inset
+
 There is an alternative proof [Geelen, Gerards, '04]
 \end_layout
 
 \begin_deeper
 \begin_layout Itemize
+\begin_inset Argument item:2
+status open
+
+\begin_layout Plain Layout
+
+2-
+\end_layout
+
+\end_inset
+
 Seems shorter, but appears to heavily rely on graph-theoretic results
 \end_layout
 
@@ -2364,11 +2830,7 @@ Let
 \begin_inset Formula $N$
 \end_inset
 
- be a minor with a 
-\begin_inset Formula $3$
-\end_inset
-
--separation that lies in 
+ be a minor that lies in 
 \begin_inset Formula $\mathcal{M}$
 \end_inset
 
@@ -2385,6 +2847,15 @@ Let
 \end_inset
 
 .
+ Let 
+\begin_inset Formula $N$
+\end_inset
+
+ have a 
+\begin_inset Formula $3$
+\end_inset
+
+-separation.
  If 
 \begin_inset Formula $M\in\mathcal{M}$
 \end_inset
@@ -2428,7 +2899,11 @@ Theorem 11.3.10, aka restatement of Corollary 6.3.24 for R12
 
 \begin_deeper
 \begin_layout Itemize
-Corollary from a characterization theorem for a separation algorithm
+Corollary from a 
+\bar under
+characterization theorem
+\bar default
+ for a separation algorithm
 \end_layout
 
 \end_deeper
@@ -2580,14 +3055,23 @@ Let
 \begin_inset Formula $6$
 \end_inset
 
- elements
+ elements, and not a wheel
 \end_layout
 
+\begin_layout Itemize
+
+\series bold
+Claim:
+\series default
+ The following are equivalent:
+\end_layout
+
+\begin_deeper
 \begin_layout Itemize
 \begin_inset Formula $N$
 \end_inset
 
- is called a 
+ is a 
 \series bold
 splitter 
 \series default
@@ -2595,7 +3079,7 @@ of
 \begin_inset Formula $\mathcal{M}$
 \end_inset
 
- if every 
+, i.e., every 
 \begin_inset Formula $M\in\mathcal{M}$
 \end_inset
 
@@ -2611,19 +3095,6 @@ of
 \end_layout
 
 \begin_layout Itemize
-
-\series bold
-Claim:
-\series default
- A non-wheel 
-\begin_inset Formula $N$
-\end_inset
-
- is a splitter of 
-\begin_inset Formula $\mathcal{M}$
-\end_inset
-
- iff 
 \begin_inset Formula $\mathcal{M}$
 \end_inset
 
@@ -2656,12 +3127,13 @@ Theorem 7.2.1.a
 
 \end_layout
 
+\end_deeper
 \begin_layout Itemize
-There is also a wheel version, it is used in 
+(There is also a wheel version, it is used in 
 \begin_inset Formula $3$
 \end_inset
 
--connected nested extensions
+-connected nested extensions)
 \end_layout
 
 \end_deeper
@@ -2740,7 +3212,11 @@ Then
 \end_layout
 
 \begin_layout Itemize
+
+\bar under
 Technical lemma
+\bar default
+
 \begin_inset Flex Beamer Note
 status open
 
@@ -2777,7 +3253,7 @@ Theorem 6.4.1
 \begin_inset Formula $1$
 \end_inset
 
--extension case: this contradicts assumptions on 
+-extension case: contradicts the assumptions on 
 \begin_inset Formula $\mathcal{M}$
 \end_inset
 
@@ -2832,7 +3308,7 @@ Arrive at:
 \end_layout
 
 \begin_layout Itemize
-This contradicts assumptions on 
+This contradicts the assumptions on 
 \begin_inset Formula $\mathcal{M}$
 \end_inset
 
@@ -3006,7 +3482,11 @@ Reason about a matrix representation of
 \end_layout
 
 \begin_layout Itemize
-Apply a characterization theorem for a separation algorithm, do case analysis
+Apply a 
+\bar under
+characterization theorem
+\bar default
+ for a separation algorithm, do case analysis
 \begin_inset Flex Beamer Note
 status open
 
@@ -3020,8 +3500,118 @@ Theorem 6.3.20
 \end_layout
 
 \end_deeper
+\begin_layout Standard
+\begin_inset Separator plain
+\end_inset
+
+
+\end_layout
+
+\begin_layout Frame
+\begin_inset Argument 4
+status open
+
+\begin_layout Plain Layout
+Corollaries of Splitter Theorem
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_deeper
+\begin_layout Itemize
+\begin_inset Formula $M\left(K_{5}\right)$
+\end_inset
+
+ is a splitter of the regular matroids with no 
+\begin_inset Formula $M\left(K_{3,3}\right)$
+\end_inset
+
+ minors
+\end_layout
+
+\begin_layout Itemize
+\begin_inset Formula $R_{10}$
+\end_inset
+
+ is a splitter of the class of regular matroids
+\end_layout
+
+\begin_layout Itemize
+Theorems about nested connected minors, for example:
+\end_layout
+
+\begin_deeper
+\begin_layout Itemize
+Let 
+\begin_inset Formula $M$
+\end_inset
+
+ be a 
+\begin_inset Formula $3$
+\end_inset
+
+-connected binary matroid
+\end_layout
+
+\begin_layout Itemize
+Let 
+\begin_inset Formula $N$
+\end_inset
+
+ be a 
+\begin_inset Formula $3$
+\end_inset
+
+-connected proper minor of 
+\begin_inset Formula $M$
+\end_inset
+
+ on 
+\begin_inset Formula $\geq6$
+\end_inset
+
+ elements, and not a wheel
+\end_layout
+
+\begin_layout Itemize
+Then there is a sequence 
+\begin_inset Formula $M_{0},\dots,M_{t}=M$
+\end_inset
+
+ of nested 
+\begin_inset Formula $3$
+\end_inset
+
+-connected minors where 
+\begin_inset Formula $M_{0}$
+\end_inset
+
+ is isomorphic to 
+\begin_inset Formula $N$
+\end_inset
+
+ and where the rank 
+\begin_inset Formula $+$
+\end_inset
+
+ corank gap 
+\begin_inset Formula $=$
+\end_inset
+
+ 
+\begin_inset Formula $1$
+\end_inset
+
+
+\end_layout
+
+\end_deeper
+\end_deeper
 \begin_layout Subsection
-Separation Algorithm
+Separation Algorithm and Its Corollaries
 \end_layout
 
 \begin_layout Frame
@@ -3570,11 +4160,11 @@ Analyse the structure of the corresponding representation matrix
 
 \begin_layout Itemize
 Consider a shortest path in the corresponding bipartite graph, apply path
- shortening technique to reduce it via pivots to a path of length 
+ shortening technique to reduce it to a path of length 
 \begin_inset Formula $2$
 \end_inset
 
-
+ via pivots
 \end_layout
 
 \begin_layout Itemize
