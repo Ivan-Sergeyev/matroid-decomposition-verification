@@ -912,7 +912,7 @@ A
 \series bold
 circuit
 \series default
- is a maximal dependent subset of 
+ is a minimal dependent subset of 
 \begin_inset Formula $E$
 \end_inset
 
@@ -2024,7 +2024,7 @@ If
 \begin_inset Formula $1$
 \end_inset
 
--separable or 
+- or 
 \begin_inset Formula $2$
 \end_inset
 

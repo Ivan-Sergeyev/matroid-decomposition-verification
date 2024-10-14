@@ -2024,7 +2024,7 @@ If
 \begin_inset Formula $1$
 \end_inset
 
--separable or 
+- or 
 \begin_inset Formula $2$
 \end_inset
 
@@ -3585,7 +3585,11 @@ Then there is a sequence
 \begin_inset Formula $3$
 \end_inset
 
--connected minors where 
+-connected minors
+\begin_inset Newline newline
+\end_inset
+
+where 
 \begin_inset Formula $M_{0}$
 \end_inset
 
