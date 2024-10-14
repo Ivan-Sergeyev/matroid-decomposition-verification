@@ -17,7 +17,7 @@ theorem Matrix.IndepCols_subset (A : Matrix X Y Z2) (I J : Set (X ⊕ Y)) (hAJ :
   sorry
 
 theorem Matrix.IndepCols_aug (A : Matrix X Y Z2) (I B : Set (X ⊕ Y))
-    (AI : A.IndepCols I) (hAI : ¬Maximal A.IndepCols I) (hAB : Maximal A.IndepCols B) :
+    (hAI : A.IndepCols I) (nonmax : ¬Maximal A.IndepCols I) (hAB : Maximal A.IndepCols B) :
     ∃ x ∈ B \ I, A.IndepCols (insert x I) := by
   sorry
 
@@ -64,11 +64,11 @@ def Matrix.TwoSumComposition {X₁ X₂ Y₁ Y₂ : Type}
     Matrix (X₁ ⊕ X₂) (Y₁ ⊕ Y₂) Z2 :=
   Matrix.fromBlocks A₁ 0 (fun i j => y i * x j) A₂
 
-def Matroid.TwoSum {X₁ X₂ Y₁ Y₂ : Type}
+def IndepMatroid.TwoSum {X₁ X₂ Y₁ Y₂ : Type}
     [DecidableEq X₁] [DecidableEq Y₁]
     [DecidableEq X₂] [DecidableEq Y₂]
-    {M₁ : IndepMatroid ((X₁ ⊕ Unit) ⊕ Y₁)} -- TODO the Unit row ≠ 0
-    {M₂ : IndepMatroid (X₂ ⊕ (Unit ⊕ Y₂))} -- TODO the Unit col ≠ 0
+    {M₁ : IndepMatroid ((X₁ ⊕ Unit) ⊕ Y₁)}
+    {M₂ : IndepMatroid (X₂ ⊕ (Unit ⊕ Y₂))}
     (hM₁ : M₁.IsBinary) (hM₂ : M₂.IsBinary) :
     IndepMatroid ((X₁ ⊕ X₂) ⊕ (Y₁ ⊕ Y₂)) :=
   let ⟨B₁, _⟩ := hM₁
@@ -78,3 +78,32 @@ def Matroid.TwoSum {X₁ X₂ Y₁ Y₂ : Type}
   let x : Y₁ → Z2 := (B₁ ∘ Sum.inr) ()       -- makes sense only if `x ≠ 0`
   let y : X₂ → Z2 := ((B₂ · ∘ Sum.inl) · ()) -- makes sense only if `y ≠ 0`
   (Matrix.TwoSumComposition A₁ x A₂ y).toIndepMatroid
+
+def IndepMatroid.cast (M : IndepMatroid X) (hXY : X = Y) : IndepMatroid Y where
+  E := hXY ▸ M.E
+  Indep := hXY ▸ M.Indep
+  indep_empty := by subst hXY; exact M.indep_empty
+  indep_subset := by subst hXY; exact M.indep_subset
+  indep_aug := by subst hXY; exact M.indep_aug
+  indep_maximal := by subst hXY; exact M.indep_maximal
+  subset_ground := by subst hXY; exact M.subset_ground
+
+def IndepMatroid.IsTwoSum {X₁ X₂ Y₁ Y₂ : Type}
+    [DecidableEq X₁] [DecidableEq Y₁]
+    [DecidableEq X₂] [DecidableEq Y₂]
+    {M₁ : IndepMatroid (X₁ ⊕ Y₁)}
+    {M₂ : IndepMatroid (X₂ ⊕ Y₂)}
+    (hM₁ : M₁.IsBinary) (hM₂ : M₂.IsBinary)
+    (M : IndepMatroid (X ⊕ Y)) (hM : M.IsBinary) :
+    Prop :=
+  let ⟨B₁, hB₁⟩ := hM₁
+  let ⟨B₂, hB₂⟩ := hM₂
+  ∃ X' Y' : Type, ∃ _ : DecidableEq X', ∃ _ : DecidableEq Y',
+    ∃ hX₁ : X₁ = (X' ⊕ Unit), ∃ hY₂ : Y₂ = (Unit ⊕ Y'), ∃ hX : X = (X' ⊕ X₂), ∃ hY : Y = (Y₁ ⊕ Y'),
+      M = IndepMatroid.cast (
+        @IndepMatroid.TwoSum _ _ _ _ _ _ _ _
+          (M₁.cast (congr_arg (· ⊕ Y₁) hX₁))
+          (M₂.cast (congr_arg (X₂ ⊕ ·) hY₂))
+          ⟨hX₁ ▸ B₁, by sorry⟩ ⟨hY₂ ▸ B₂, by sorry⟩
+      ) (congr_arg₂ Sum hX.symm hY.symm) ∧
+      (hX₁ ▸ B₁) (Sum.inr ()) ≠ (0 : Y₁ → Z2) ∧ (fun i : X₂ => (hY₂ ▸ B₂ i) (Sum.inl ())) ≠ (0 : X₂ → Z2)
