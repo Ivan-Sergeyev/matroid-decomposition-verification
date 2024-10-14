@@ -1,0 +1,80 @@
+-- matroids: use definition from MathLib (independence matroids)
+
+
+-- binary matroids: via standard representation matrix B
+-- * let B be a binary matrix
+-- * ground set: row indices + column indices
+-- * independence system: GF(2)-independent columns of [I | B]
+
+
+-- interfaces:
+-- * M.IsBinary: checks if matroid M is binary
+-- * M.ReprMatrix: returns a (standard) representation matrix defining M
+
+
+-- regular matroids:
+-- * binary with representation matrix B having a TU signing
+-- * i.e. there is 0, +-1 matrix B' that is TU and s.t. |B'| = B
+
+
+-- 1-sum:
+-- * matrices (helper):
+--   * matrix A1, matrix A2
+--   * return matrix:
+--   * | A1     | 0  |
+--   * | 0      | A2 |
+-- * matroids (final):
+--   * M1 represented by B1, row index x with nonzero row
+--   * M2 represented by B2, col index y with nonzero col
+--   * return M represented by above matrix
+
+-- * theorem: 1-sum is equivalent to direct sum
+-- * theorem: 1-sum of two regular matroids is regular (11.2.1)
+
+
+-- 2-sum:
+-- * matrices and vectors (helper):
+--   * matrix A1, row vector x, matrix A2, col vector y
+--   * x and y are nonzero, len(x) = #cols(A1), len(y) = #rows(A2)
+--   * return matrix:
+--   * | A1     | 0  |
+--   * | y * x  | A2 |
+-- * "structured" matroids (probably unnecessary):
+--   * M1 represented by B1 = [A1 / x] with x nonzero
+--   * M2 represented by B2 = [y | A2] with y nonzero
+--   * return M represented by same matrix as above
+-- * "unstructured" matroids (final):
+--   * M1 represented by B1, row index x with nonzero row
+--   * M2 represented by B2, col index y with nonzero col
+--   * return M represented by above matrix, dropping x and y
+
+-- * theorem: 2-sum of two regular matroids is regular (11.2.1)
+
+
+-- 3-sum:
+-- * matrices and vectors (helper):
+--   * matrix A1, row vector z1, matrix D1, matrix D-bar
+--   * matrix A2, col vector z2, matrix D2 (same matrix D-bar)
+--   * len(z1) + 3 = #cols(A1), len(z2) + 3 = #rows(A2)
+--   * D-bar is (any) 2x2 GF(2)-nonsingular
+--   * return matrix: (8.3.10)
+--   * | A1          | 0   | 0  |
+--   * | z1  | 1 1   | 0   | 0  |
+--   * | D1  | D-bar | 1/1 | A2 |
+--   * | D12 | D2    | z2  |    |
+-- * "unstructured" matroids (final):
+--   * M1 represented by B1, row indices x1 x2 x3, col indices y1 y2 y3
+--   * 3x3 submatrix x1 x2 x3 y1 y2 y3 has to be: (8.3.9)
+--   * | 1 1   | 0   |
+--   * | D-bar | 1/1 |
+--   * where D-bar GF(2)-nonsingular
+--   * M2 represented by B2, row indices x1' x2' x3', col indices y1' y2' y3'
+--   * 3x3 submatrix x1' x2' x3' y1' y2' y3' has to be the same as above (8.3.9)
+--   * return M represented by above matrix (8.3.10)
+
+-- * theorem: 3-sum of two regular matroids is regular (11.2.9)
+
+-- k-sum: (optional)
+-- similar to 3-sum
+-- see 8.3.2, 8.3.3, 8.3.4, 8.3.7
+-- 3-sum is a special case
