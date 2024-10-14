@@ -1,1 +1,1 @@
-import MatroidDecompositionTheoremVerification.Example
+import MatroidDecompositionTheoremVerification.Binary
