@@ -4,7 +4,7 @@
     // Set the number of spaces per tab
     "editor.tabSize": 2,
     // Display vertical rulers at specified character column for readability
-    "editor.rulers": [100],
+    "editor.rulers": [120],
     // Set the default file encoding to UTF-8
     "files.encoding": "utf8",
     // Use Unix-style line endings ('\n') by default
