@@ -88,22 +88,36 @@ def IndepMatroid.cast (M : IndepMatroid X) (hXY : X = Y) : IndepMatroid Y where
   indep_maximal := by subst hXY; exact M.indep_maximal
   subset_ground := by subst hXY; exact M.subset_ground
 
+def IndepMatroid.mapEquiv (M : IndepMatroid X) (eXY : X ≃ Y) : IndepMatroid Y where
+  E := eXY '' M.E
+  Indep I := ∃ I₀, M.Indep I₀ ∧ I = eXY '' I₀
+  indep_empty := ⟨∅, M.indep_empty, (Set.image_empty eXY).symm⟩
+  indep_subset I J hI hJ := by
+    obtain ⟨I', hIJ⟩ := hI
+    refine ⟨eXY.symm '' I, ?_, (Equiv.eq_image_iff_symm_image_eq eXY _ I).mpr rfl⟩
+    have := M.indep_subset (I := eXY.symm '' I) (J := eXY.symm '' J)
+    simp_all only [Equiv.symm_image_image, Equiv.symm_image_subset, true_implies]
+  indep_aug := by sorry
+  indep_maximal I := by sorry
+  subset_ground I hI := by have := M.subset_ground (eXY.symm '' I); aesop
+
 def IndepMatroid.IsTwoSum {X₁ X₂ Y₁ Y₂ : Type}
     [DecidableEq X₁] [DecidableEq Y₁]
     [DecidableEq X₂] [DecidableEq Y₂]
     {M₁ : IndepMatroid (X₁ ⊕ Y₁)}
     {M₂ : IndepMatroid (X₂ ⊕ Y₂)}
     (hM₁ : M₁.IsBinary) (hM₂ : M₂.IsBinary)
-    (M : IndepMatroid (X ⊕ Y)) (hM : M.IsBinary) :
+    (M : IndepMatroid (X ⊕ Y)) :
     Prop :=
   let ⟨B₁, hB₁⟩ := hM₁
   let ⟨B₂, hB₂⟩ := hM₂
   ∃ X' Y' : Type, ∃ _ : DecidableEq X', ∃ _ : DecidableEq Y',
-    ∃ hX₁ : X₁ = (X' ⊕ Unit), ∃ hY₂ : Y₂ = (Unit ⊕ Y'), ∃ hX : X = (X' ⊕ X₂), ∃ hY : Y = (Y₁ ⊕ Y'),
-      M = IndepMatroid.cast (
+    ∃ hX₁ : X₁ = (X' ⊕ Unit), ∃ hY₂ : Y₂ = (Unit ⊕ Y'), ∃ eX : (X' ⊕ X₂) ≃ X, ∃ eY : (Y₁ ⊕ Y') ≃ Y,
+      M = IndepMatroid.mapEquiv (
         @IndepMatroid.TwoSum _ _ _ _ _ _ _ _
           (M₁.cast (congr_arg (· ⊕ Y₁) hX₁))
           (M₂.cast (congr_arg (X₂ ⊕ ·) hY₂))
-          ⟨hX₁ ▸ B₁, by sorry⟩ ⟨hY₂ ▸ B₂, by sorry⟩
-      ) (congr_arg₂ Sum hX.symm hY.symm) ∧
+          ⟨hX₁ ▸ B₁, by subst hX₁; convert hB₁⟩
+          ⟨hY₂ ▸ B₂, by subst hY₂; convert hB₂⟩
+      ) (Equiv.sumCongr eX eY) ∧
       (hX₁ ▸ B₁) (Sum.inr ()) ≠ (0 : Y₁ → Z2) ∧ (fun i : X₂ => (hY₂ ▸ B₂ i) (Sum.inl ())) ≠ (0 : X₂ → Z2)
