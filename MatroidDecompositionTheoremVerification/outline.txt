@@ -55,7 +55,7 @@
 -- * matrices and vectors (helper):
 --   * matrix A1, row vector z1, matrix D1, matrix D-bar
 --   * matrix A2, col vector z2, matrix D2 (same matrix D-bar)
---   * len(z1) + 3 = #cols(A1), len(z2) + 3 = #rows(A2)
+--   * len(z1) + 2 = #cols(A1), len(z2) + 2 = #rows(A2)
 --   * D-bar is (any) 2x2 GF(2)-nonsingular
 --   * return matrix: (8.3.10)
 --   * | A1          | 0   | 0  |
