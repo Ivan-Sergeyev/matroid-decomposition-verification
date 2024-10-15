@@ -107,7 +107,8 @@ def IndepMatroid.IsTwoSum {X₁ X₂ Y₁ Y₂ : Type}
     {M₁ : IndepMatroid (X₁ ⊕ Y₁)}
     {M₂ : IndepMatroid (X₂ ⊕ Y₂)}
     (hM₁ : M₁.IsBinary) (hM₂ : M₂.IsBinary)
-    (M : IndepMatroid (X ⊕ Y)) :
+    (M : IndepMatroid (X ⊕ Y))
+    (hM : M.IsBinary) :
     Prop :=
   let ⟨B₁, hB₁⟩ := hM₁
   let ⟨B₂, hB₂⟩ := hM₂
