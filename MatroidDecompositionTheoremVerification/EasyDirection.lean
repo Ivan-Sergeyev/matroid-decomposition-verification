@@ -148,7 +148,7 @@ noncomputable def BinaryMatroid.threeSum
   let D₂ : Matrix X₂ (Fin 2) Z2 := fun i j => B₂ (.inr (.inr i)) (.inl j) -- the bottom left submatrix
   ⟨
     ⟨_, Matrix.threeSumComposition A₁ A₂ z₁ z₂ D_₁ D₁ D₂, rfl⟩,
-    ∃ _ : Invertible D_₁, D_₁ = D_₂ -- the matrix `D_₁ = D_₂` (called D-bar in the book) is not singular
+    IsUnit D_₁ ∧ D_₁ = D_₂ -- the matrix `D_₁ = D_₂` (called D-bar in the book) is invertible
   ⟩
 
 /-- Matroid `M` is a result of 1-summing `M₁` and `M₂` (should be equivalent to direct sums). -/
