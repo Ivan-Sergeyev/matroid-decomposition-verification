@@ -16,7 +16,7 @@ inductive IndepMatroid.IsGood : IndepMatroid T → Prop
 -- leaf constructors
 | graphic {M : IndepMatroid T} (hM : M.IsGraphic) : M.IsGood
 | cographic {M : IndepMatroid T} (hM : M.IsCographic) : M.IsGood
-| theR10 {M : IndepMatroid T} {e : T ≃ Fin 10} (hM : M.mapEquiv e = IndepMatroidR10) : M.IsGood
+| theR10 {M : IndepMatroid T} {e : Fin 10 ≃ T} (hM : M.mapEquiv e = IndepMatroidR10) : M.IsGood
 -- fork constructors
 | is1sum
     {X X₁ X₂ : Type} [DecidableEq X] [DecidableEq X₁] [DecidableEq X₂]
