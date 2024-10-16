@@ -111,35 +111,39 @@ def BinaryMatroid.oneSum (M₁ : BinaryMatroid X₁ Y₁) (M₂ : BinaryMatroid 
     IndepMatroid ((X₁ ⊕ X₂) ⊕ (Y₁ ⊕ Y₂)) :=
   (Matrix.oneSumComposition M₁.B M₂.B).toIndepMatroid -- TODO refactor to return `BinaryMatroid`
 
-/-- Matroid-level 2-sum for matroids defined by their standard representation matrices; does not check legitimacy. -/
+/-- Matroid-level 2-sum for matroids defined by their standard representation matrices; now checks legitimacy. -/
 def BinaryMatroid.twoSum (M₁ : BinaryMatroid (X₁ ⊕ Unit) Y₁) (M₂ : BinaryMatroid X₂ (Unit ⊕ Y₂)) :
-    IndepMatroid ((X₁ ⊕ X₂) ⊕ (Y₁ ⊕ Y₂)) :=
+    IndepMatroid ((X₁ ⊕ X₂) ⊕ (Y₁ ⊕ Y₂)) × Prop :=
   let B₁ := M₁.B -- the standard representation matrix of `M₁`
   let B₂ := M₂.B -- the standard representation matrix of `M₂`
-  let A₁ : Matrix X₁ Y₁ Z2 := B₁ ∘ .inl -- the top submatrix
-  let A₂ : Matrix X₂ Y₂ Z2 := (B₂ · ∘ .inr) -- the right submatrix
-  let x : Y₁ → Z2 := (B₁ ∘ .inr) ()       -- makes sense only if `x ≠ 0`
-  let y : X₂ → Z2 := ((B₂ · ∘ .inl) · ()) -- makes sense only if `y ≠ 0`
-  (Matrix.twoSumComposition A₁ x A₂ y).toIndepMatroid -- TODO refactor to return `BinaryMatroid`
+  let A₁ : Matrix X₁ Y₁ Z2 := B₁ ∘ .inl -- the top submatrix of `B₁`
+  let A₂ : Matrix X₂ Y₂ Z2 := (B₂ · ∘ .inr) -- the right submatrix of `B₂`
+  let x : Y₁ → Z2 := (B₁ ∘ .inr) () -- the bottom row of the matrix `B₁`
+  let y : X₂ → Z2 := ((B₂ · ∘ .inl) · ()) -- the leftmost column of the matrix `B₂`
+  ⟨
+    (Matrix.twoSumComposition A₁ x A₂ y).toIndepMatroid, -- TODO refactor to return `BinaryMatroid`
+    x ≠ 0 ∧ y ≠ 0
+  ⟩
 
-/-- Matroid-level 3-sum for matroids defined by their standard representation matrices; does not check legitimacy. -/
+/-- Matroid-level 3-sum for matroids defined by their standard representation matrices; now checks legitimacy. -/
 def BinaryMatroid.threeSum
     (M₁ : BinaryMatroid ((X₁ ⊕ Unit) ⊕ Fin 2) ((Y₁ ⊕ Fin 2) ⊕ Unit))
     (M₂ : BinaryMatroid (Unit ⊕ (Fin 2 ⊕ X₂)) (Fin 2 ⊕ (Unit ⊕ Y₂))) :
-    IndepMatroid (((X₁ ⊕ Unit) ⊕ (Fin 2 ⊕ X₂)) ⊕ ((Y₁ ⊕ Fin 2) ⊕ (Unit ⊕ Y₂))) :=
+    IndepMatroid (((X₁ ⊕ Unit) ⊕ (Fin 2 ⊕ X₂)) ⊕ ((Y₁ ⊕ Fin 2) ⊕ (Unit ⊕ Y₂))) × Prop :=
   let B₁ := M₁.B -- the standard representation matrix of `M₁`
   let B₂ := M₂.B -- the standard representation matrix of `M₂`
   let A₁ : Matrix X₁ (Y₁ ⊕ Fin 2) Z2 := ((B₁ ∘ .inl ∘ .inl) · ∘ .inl) -- the top left submatrix
   let A₂ : Matrix (Fin 2 ⊕ X₂) Y₂ Z2 := ((B₂ ∘ .inr) · ∘ .inr ∘ .inr) -- the bottom right submatrix
   let z₁ : Y₁ → Z2 := fun j => B₁ (.inl (.inr ())) (.inl (.inl j)) -- the middle left "row vector"
   let z₂ : X₂ → Z2 := fun i => B₂ (.inr (.inr i)) (.inr (.inl ())) -- the bottom middle "column vector"
-  let D : Matrix (Fin 2) (Fin 2) Z2 := fun i j => B₁ (.inr i) (.inl (.inr j)) -- the bottom middle 2x2 submatrix
-  let D : Matrix (Fin 2) (Fin 2) Z2 := fun i j => B₂ (.inr (.inl i)) (.inl j) -- the middle left 2x2 submatrix
-  -- TODO require both `D` are identical
-  -- TODO require that `D` is regular
+  let D_₁ : Matrix (Fin 2) (Fin 2) Z2 := fun i j => B₁ (.inr i) (.inl (.inr j)) -- the bottom middle 2x2 submatrix
+  let D_₂ : Matrix (Fin 2) (Fin 2) Z2 := fun i j => B₂ (.inr (.inl i)) (.inl j) -- the middle left 2x2 submatrix
   let D₁ : Matrix (Fin 2) Y₁ Z2 := fun i j => B₁ (.inr i) (.inl (.inl j)) -- the bottom left submatrix
   let D₂ : Matrix X₂ (Fin 2) Z2 := fun i j => B₂ (.inr (.inr i)) (.inl j) -- the bottom left submatrix
-  (Matrix.threeSumComposition A₁ A₂ z₁ z₂ D D₁ D₂).toIndepMatroid -- TODO refactor to return `BinaryMatroid`
+  ⟨
+    (Matrix.threeSumComposition A₁ A₂ z₁ z₂ D_₁ D₁ D₂).toIndepMatroid, -- TODO refactor to return `BinaryMatroid`
+     ∃ _ : Invertible D_₁, D_₁ = D_₂ -- the matrix `D_₁ = D_₂` is not singular
+  ⟩
 
 /-- Matroid `M` is a result of 1-summing `M₁` and `M₂` (should be equivalent to direct sums). -/
 def BinaryMatroid.Is1sum (M : BinaryMatroid X Y) (M₁ : BinaryMatroid X₁ Y₁) (M₂ : BinaryMatroid X₂ Y₂) : Prop :=
@@ -152,13 +156,10 @@ def BinaryMatroid.Is2sum (M : BinaryMatroid X Y) (M₁ : BinaryMatroid X₁ Y₁
   let B₂ := M₂.B -- the standard representation matrix of `M₂`
   ∃ X' Y' : Type, ∃ _ : DecidableEq X', ∃ _ : DecidableEq Y', -- indexing types for the shared parts
     ∃ hX : X₁ = (X' ⊕ Unit), ∃ hY : Y₂ = (Unit ⊕ Y'), ∃ eX : X ≃ (X' ⊕ X₂), ∃ eY : Y ≃ (Y₁ ⊕ Y'),
-      M.toIndepMatroid = IndepMatroid.mapEquiv (
-        BinaryMatroid.twoSum
-          ⟨M₁.cast (congr_arg (· ⊕ Y₁) hX), hX ▸ B₁, by subst hX; convert M₁.hB⟩
-          ⟨M₂.cast (congr_arg (X₂ ⊕ ·) hY), hY ▸ B₂, by subst hY; convert M₂.hB⟩
-      ) (Equiv.sumCongr eX eY).symm ∧
-      (hX ▸ B₁) (Sum.inr ()) ≠ (0 : Y₁ → Z2) ∧ -- the requirement `x ≠ 0`
-      (fun i : X₂ => (hY ▸ B₂ i) (Sum.inl ())) ≠ (0 : X₂ → Z2) -- the requirement `y ≠ 0`
+      let M₀ := BinaryMatroid.twoSum
+        ⟨M₁.cast (congr_arg (· ⊕ Y₁) hX), hX ▸ B₁, by subst hX; convert M₁.hB⟩
+        ⟨M₂.cast (congr_arg (X₂ ⊕ ·) hY), hY ▸ B₂, by subst hY; convert M₂.hB⟩
+      M.toIndepMatroid = IndepMatroid.mapEquiv M₀.fst (Equiv.sumCongr eX eY).symm ∧ M₀.snd
 
 /-- Matroid `M` is a result of 3-summing `M₁` and `M₂` in some way. -/
 def BinaryMatroid.Is3sum (M : BinaryMatroid X Y) (M₁ : BinaryMatroid X₁ Y₁) (M₂ : BinaryMatroid X₂ Y₂) : Prop :=
@@ -169,14 +170,10 @@ def BinaryMatroid.Is3sum (M : BinaryMatroid X Y) (M₁ : BinaryMatroid X₁ Y₁
     ∃ hX₁ : X₁ = ((X₁' ⊕ Unit) ⊕ Fin 2), ∃ hY₁ : Y₁ = ((Y₁' ⊕ Fin 2) ⊕ Unit),
     ∃ hX₂ : X₂ = (Unit ⊕ (Fin 2 ⊕ X₂')), ∃ hY₂ : Y₂ = (Fin 2 ⊕ (Unit ⊕ Y₂')),
       ∃ eX : X ≃ ((X₁' ⊕ Unit) ⊕ (Fin 2 ⊕ X₂')), ∃ eY : Y ≃ ((Y₁' ⊕ Fin 2) ⊕ (Unit ⊕ Y₂')),
-        M.toIndepMatroid = IndepMatroid.mapEquiv (
-          BinaryMatroid.threeSum
+        let M₀ := BinaryMatroid.threeSum
             ⟨M₁.cast (by subst hX₁ hY₁; rfl), hX₁ ▸ hY₁ ▸ B₁, (by subst hX₁ hY₁; convert M₁.hB)⟩
             ⟨M₂.cast (by subst hX₂ hY₂; rfl), hX₂ ▸ hY₂ ▸ B₂, (by subst hX₂ hY₂; convert M₂.hB)⟩
-        ) (Equiv.sumCongr eX eY).symm ∧
-        True ∧ -- TODO require `Invertible D`
-        True -- TODO require consistency between
-             -- the bottom middle 2x2 submatrix of `B₁` and the middle left 2x2 submatrix of `B₂`
+        M.toIndepMatroid = IndepMatroid.mapEquiv M₀.fst (Equiv.sumCongr eX eY).symm ∧ M₀.snd
 
 /-- Any 1-sum of regular matroids is a regular matroid. -/
 noncomputable
