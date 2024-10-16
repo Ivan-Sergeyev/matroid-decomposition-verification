@@ -84,6 +84,12 @@ def IndepMatroid.mapEquiv (M : IndepMatroid X) (eXY : X ≃ Y) : IndepMatroid Y 
   indep_maximal I := by sorry
   subset_ground I hI := by have := M.subset_ground (eXY.symm '' I); aesop
 
+def BinaryMatroid.mapEquiv {X' Y' : Type} [DecidableEq X'] [DecidableEq Y']
+    (M : BinaryMatroid X Y) (eX : X ≃ X') (eY : Y ≃ Y') : BinaryMatroid X' Y' where
+  toIndepMatroid := M.toIndepMatroid.mapEquiv (Equiv.sumCongr eX eY)
+  B := fun i j => M.B (eX.symm i) (eY.symm j)
+  hB := by sorry
+
 variable {X₁ X₂ Y₁ Y₂ : Type} [DecidableEq X₁] [DecidableEq Y₁] [DecidableEq X₂] [DecidableEq Y₂]
 
 /-- Matrix-level 1-sum for matroids defined by their standard representation matrices. -/
@@ -108,12 +114,12 @@ noncomputable abbrev Matrix.threeSumComposition (A₁ : Matrix X₁ (Y₁ ⊕ Fi
 
 /-- Matroid-level (independent sets) 1-sum for matroids defined by their standard representation matrices. -/
 def BinaryMatroid.oneSum (M₁ : BinaryMatroid X₁ Y₁) (M₂ : BinaryMatroid X₂ Y₂) :
-    IndepMatroid ((X₁ ⊕ X₂) ⊕ (Y₁ ⊕ Y₂)) :=
-  (Matrix.oneSumComposition M₁.B M₂.B).toIndepMatroid -- TODO refactor to return `BinaryMatroid`
+    BinaryMatroid (X₁ ⊕ X₂) (Y₁ ⊕ Y₂) :=
+  ⟨_, Matrix.oneSumComposition M₁.B M₂.B, rfl⟩
 
 /-- Matroid-level 2-sum for matroids defined by their standard representation matrices; now checks legitimacy. -/
 def BinaryMatroid.twoSum (M₁ : BinaryMatroid (X₁ ⊕ Unit) Y₁) (M₂ : BinaryMatroid X₂ (Unit ⊕ Y₂)) :
-    IndepMatroid ((X₁ ⊕ X₂) ⊕ (Y₁ ⊕ Y₂)) × Prop :=
+    BinaryMatroid (X₁ ⊕ X₂) (Y₁ ⊕ Y₂) × Prop :=
   let B₁ := M₁.B -- the standard representation matrix of `M₁`
   let B₂ := M₂.B -- the standard representation matrix of `M₂`
   let A₁ : Matrix X₁ Y₁ Z2 := B₁ ∘ .inl -- the top submatrix of `B₁`
@@ -121,15 +127,15 @@ def BinaryMatroid.twoSum (M₁ : BinaryMatroid (X₁ ⊕ Unit) Y₁) (M₂ : Bin
   let x : Y₁ → Z2 := (B₁ ∘ .inr) () -- the bottom row of the matrix `B₁`
   let y : X₂ → Z2 := ((B₂ · ∘ .inl) · ()) -- the leftmost column of the matrix `B₂`
   ⟨
-    (Matrix.twoSumComposition A₁ x A₂ y).toIndepMatroid, -- TODO refactor to return `BinaryMatroid`
+    ⟨_, Matrix.twoSumComposition A₁ x A₂ y, rfl⟩,
     x ≠ 0 ∧ y ≠ 0
   ⟩
 
 /-- Matroid-level 3-sum for matroids defined by their standard representation matrices; now checks legitimacy. -/
-def BinaryMatroid.threeSum
+noncomputable def BinaryMatroid.threeSum
     (M₁ : BinaryMatroid ((X₁ ⊕ Unit) ⊕ Fin 2) ((Y₁ ⊕ Fin 2) ⊕ Unit))
     (M₂ : BinaryMatroid (Unit ⊕ (Fin 2 ⊕ X₂)) (Fin 2 ⊕ (Unit ⊕ Y₂))) :
-    IndepMatroid (((X₁ ⊕ Unit) ⊕ (Fin 2 ⊕ X₂)) ⊕ ((Y₁ ⊕ Fin 2) ⊕ (Unit ⊕ Y₂))) × Prop :=
+    BinaryMatroid ((X₁ ⊕ Unit) ⊕ (Fin 2 ⊕ X₂)) ((Y₁ ⊕ Fin 2) ⊕ (Unit ⊕ Y₂)) × Prop :=
   let B₁ := M₁.B -- the standard representation matrix of `M₁`
   let B₂ := M₂.B -- the standard representation matrix of `M₂`
   let A₁ : Matrix X₁ (Y₁ ⊕ Fin 2) Z2 := ((B₁ ∘ .inl ∘ .inl) · ∘ .inl) -- the top left submatrix
@@ -141,14 +147,14 @@ def BinaryMatroid.threeSum
   let D₁ : Matrix (Fin 2) Y₁ Z2 := fun i j => B₁ (.inr i) (.inl (.inl j)) -- the bottom left submatrix
   let D₂ : Matrix X₂ (Fin 2) Z2 := fun i j => B₂ (.inr (.inr i)) (.inl j) -- the bottom left submatrix
   ⟨
-    (Matrix.threeSumComposition A₁ A₂ z₁ z₂ D_₁ D₁ D₂).toIndepMatroid, -- TODO refactor to return `BinaryMatroid`
-     ∃ _ : Invertible D_₁, D_₁ = D_₂ -- the matrix `D_₁ = D_₂` is not singular
+    ⟨_, Matrix.threeSumComposition A₁ A₂ z₁ z₂ D_₁ D₁ D₂, rfl⟩,
+    ∃ _ : Invertible D_₁, D_₁ = D_₂ -- the matrix `D_₁ = D_₂` (called D-bar in the book) is not singular
   ⟩
 
 /-- Matroid `M` is a result of 1-summing `M₁` and `M₂` (should be equivalent to direct sums). -/
 def BinaryMatroid.Is1sum (M : BinaryMatroid X Y) (M₁ : BinaryMatroid X₁ Y₁) (M₂ : BinaryMatroid X₂ Y₂) : Prop :=
   ∃ eX : X ≃ (X₁ ⊕ X₂), ∃ eY : Y ≃ (Y₁ ⊕ Y₂),
-    M.toIndepMatroid = (BinaryMatroid.oneSum M₁ M₂).mapEquiv (Equiv.sumCongr eX eY).symm
+    M = (BinaryMatroid.oneSum M₁ M₂).mapEquiv eX.symm eY.symm
 
 /-- Matroid `M` is a result of 2-summing `M₁` and `M₂` in some way. -/
 def BinaryMatroid.Is2sum (M : BinaryMatroid X Y) (M₁ : BinaryMatroid X₁ Y₁) (M₂ : BinaryMatroid X₂ Y₂) : Prop :=
@@ -159,7 +165,7 @@ def BinaryMatroid.Is2sum (M : BinaryMatroid X Y) (M₁ : BinaryMatroid X₁ Y₁
       let M₀ := BinaryMatroid.twoSum
         ⟨M₁.cast (congr_arg (· ⊕ Y₁) hX), hX ▸ B₁, by subst hX; convert M₁.hB⟩
         ⟨M₂.cast (congr_arg (X₂ ⊕ ·) hY), hY ▸ B₂, by subst hY; convert M₂.hB⟩
-      M.toIndepMatroid = IndepMatroid.mapEquiv M₀.fst (Equiv.sumCongr eX eY).symm ∧ M₀.snd
+      M = M₀.fst.mapEquiv eX.symm eY.symm ∧ M₀.snd
 
 /-- Matroid `M` is a result of 3-summing `M₁` and `M₂` in some way. -/
 def BinaryMatroid.Is3sum (M : BinaryMatroid X Y) (M₁ : BinaryMatroid X₁ Y₁) (M₂ : BinaryMatroid X₂ Y₂) : Prop :=
@@ -173,7 +179,7 @@ def BinaryMatroid.Is3sum (M : BinaryMatroid X Y) (M₁ : BinaryMatroid X₁ Y₁
         let M₀ := BinaryMatroid.threeSum
             ⟨M₁.cast (by subst hX₁ hY₁; rfl), hX₁ ▸ hY₁ ▸ B₁, (by subst hX₁ hY₁; convert M₁.hB)⟩
             ⟨M₂.cast (by subst hX₂ hY₂; rfl), hX₂ ▸ hY₂ ▸ B₂, (by subst hX₂ hY₂; convert M₂.hB)⟩
-        M.toIndepMatroid = IndepMatroid.mapEquiv M₀.fst (Equiv.sumCongr eX eY).symm ∧ M₀.snd
+        M = M₀.fst.mapEquiv eX.symm eY.symm ∧ M₀.snd
 
 /-- Any 1-sum of regular matroids is a regular matroid. -/
 noncomputable
