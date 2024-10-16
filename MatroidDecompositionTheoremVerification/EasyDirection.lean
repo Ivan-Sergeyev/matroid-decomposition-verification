@@ -71,23 +71,23 @@ def IndepMatroid.cast (M : IndepMatroid X) (hXY : X = Y) : IndepMatroid Y where
   subset_ground := by subst hXY; exact M.subset_ground
 
 /-- Matroid isomorphism, i.e., renaming the elements (the type changes as well); implemented for independent sets. -/
-def IndepMatroid.mapEquiv (M : IndepMatroid X) (eXY : X ≃ Y) : IndepMatroid Y where
-  E := eXY '' M.E
-  Indep I := ∃ I₀, M.Indep I₀ ∧ I = eXY '' I₀
-  indep_empty := ⟨∅, M.indep_empty, (Set.image_empty eXY).symm⟩
+def IndepMatroid.mapEquiv (M : IndepMatroid X) (eYX : Y ≃ X) : IndepMatroid Y where
+  E := eYX.symm '' M.E
+  Indep I := ∃ I₀, M.Indep I₀ ∧ I = eYX.symm '' I₀
+  indep_empty := ⟨∅, M.indep_empty, by simp⟩
   indep_subset I J hI hJ := by
-    refine ⟨eXY.symm '' I, ?_, by rw [Equiv.eq_image_iff_symm_image_eq eXY]⟩
+    refine ⟨eYX '' I, ?_, by simp [Equiv.eq_image_iff_symm_image_eq eYX]⟩
     obtain ⟨I', hIJ⟩ := hI
-    have := M.indep_subset (I := eXY.symm '' I) (J := eXY.symm '' J)
+    have := M.indep_subset (I := eYX '' I) (J := eYX '' J)
     simp_all
   indep_aug := by sorry
   indep_maximal I := by sorry
-  subset_ground I hI := by have := M.subset_ground (eXY.symm '' I); aesop
+  subset_ground I hI := by have := M.subset_ground (eYX '' I); aesop
 
 def BinaryMatroid.mapEquiv {X' Y' : Type} [DecidableEq X'] [DecidableEq Y']
-    (M : BinaryMatroid X Y) (eX : X ≃ X') (eY : Y ≃ Y') : BinaryMatroid X' Y' where
+    (M : BinaryMatroid X Y) (eX : X' ≃ X) (eY : Y' ≃ Y) : BinaryMatroid X' Y' where
   toIndepMatroid := M.toIndepMatroid.mapEquiv (Equiv.sumCongr eX eY)
-  B := fun i j => M.B (eX.symm i) (eY.symm j)
+  B := fun i j => M.B (eX i) (eY j)
   hB := by sorry
 
 variable {X₁ X₂ Y₁ Y₂ : Type} [DecidableEq X₁] [DecidableEq Y₁] [DecidableEq X₂] [DecidableEq Y₂]
@@ -154,7 +154,7 @@ noncomputable def BinaryMatroid.threeSum
 /-- Matroid `M` is a result of 1-summing `M₁` and `M₂` (should be equivalent to direct sums). -/
 def BinaryMatroid.Is1sum (M : BinaryMatroid X Y) (M₁ : BinaryMatroid X₁ Y₁) (M₂ : BinaryMatroid X₂ Y₂) : Prop :=
   ∃ eX : X ≃ (X₁ ⊕ X₂), ∃ eY : Y ≃ (Y₁ ⊕ Y₂),
-    M = (BinaryMatroid.oneSum M₁ M₂).mapEquiv eX.symm eY.symm
+    M = (BinaryMatroid.oneSum M₁ M₂).mapEquiv eX eY
 
 /-- Matroid `M` is a result of 2-summing `M₁` and `M₂` in some way. -/
 def BinaryMatroid.Is2sum (M : BinaryMatroid X Y) (M₁ : BinaryMatroid X₁ Y₁) (M₂ : BinaryMatroid X₂ Y₂) : Prop :=
@@ -165,7 +165,7 @@ def BinaryMatroid.Is2sum (M : BinaryMatroid X Y) (M₁ : BinaryMatroid X₁ Y₁
       let M₀ := BinaryMatroid.twoSum
         ⟨M₁.cast (congr_arg (· ⊕ Y₁) hX), hX ▸ B₁, by subst hX; convert M₁.hB⟩
         ⟨M₂.cast (congr_arg (X₂ ⊕ ·) hY), hY ▸ B₂, by subst hY; convert M₂.hB⟩
-      M = M₀.fst.mapEquiv eX.symm eY.symm ∧ M₀.snd
+      M = M₀.fst.mapEquiv eX eY ∧ M₀.snd
 
 /-- Matroid `M` is a result of 3-summing `M₁` and `M₂` in some way. -/
 def BinaryMatroid.Is3sum (M : BinaryMatroid X Y) (M₁ : BinaryMatroid X₁ Y₁) (M₂ : BinaryMatroid X₂ Y₂) : Prop :=
@@ -179,7 +179,7 @@ def BinaryMatroid.Is3sum (M : BinaryMatroid X Y) (M₁ : BinaryMatroid X₁ Y₁
         let M₀ := BinaryMatroid.threeSum
             ⟨M₁.cast (by subst hX₁ hY₁; rfl), hX₁ ▸ hY₁ ▸ B₁, (by subst hX₁ hY₁; convert M₁.hB)⟩
             ⟨M₂.cast (by subst hX₂ hY₂; rfl), hX₂ ▸ hY₂ ▸ B₂, (by subst hX₂ hY₂; convert M₂.hB)⟩
-        M = M₀.fst.mapEquiv eX.symm eY.symm ∧ M₀.snd
+        M = M₀.fst.mapEquiv eX eY ∧ M₀.snd
 
 /-- Any 1-sum of regular matroids is a regular matroid. -/
 noncomputable
