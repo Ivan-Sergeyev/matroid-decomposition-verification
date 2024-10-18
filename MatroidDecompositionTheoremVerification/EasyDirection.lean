@@ -6,7 +6,7 @@ abbrev Z2 : Type := Fin 2
 
 variable {X Y : Type} [DecidableEq X] [DecidableEq Y]
 
-/-- Is given set of columns in the (standard) representation [I | B] Z2-independent? -/
+/-- Is given set of columns in the (standard) representation [I | B] `Z2`-independent? -/
 def Matrix.IndepCols (B : Matrix X Y Z2) (S : Set (X ⊕ Y)) : Prop :=
   LinearIndependent Z2 ((Matrix.fromColumns 1 B).submatrix id ((↑) : S → X ⊕ Y)).transpose
 
@@ -57,8 +57,8 @@ def Matrix.TU (A : Matrix X Y ℚ) : Prop :=
 structure RegularMatroid (X Y : Type) [DecidableEq X] [DecidableEq Y]
   extends BinaryMatroid X Y where
     B' : Matrix X Y ℚ -- signed version of `B`
-    hB' : (Matrix.fromColumns (1 : Matrix X X ℚ) B').TU -- signed version of `B` is TU
-    hBB' : ∀ i : X, ∀ j : Y, if B i j = 0 then B' i j = 0 else B' i j = 1 ∨ B' i j = -1 -- signed version of `B` matches `B`
+    hB' : (Matrix.fromColumns (1 : Matrix X X ℚ) B').TU -- the matrix is totally unimodular
+    hBB' : ∀ i : X, ∀ j : Y, if B i j = 0 then B' i j = 0 else B' i j = 1 ∨ B' i j = -1 -- `B'` matches `B`
 
 /-- Matroid casting, i.e., renaming the type without changing the elements; implemented for independent sets. -/
 def IndepMatroid.cast (M : IndepMatroid X) (hXY : X = Y) : IndepMatroid Y where
@@ -187,9 +187,9 @@ def BinaryMatroid.Is1sum.toRegular {M : BinaryMatroid X Y} {M₁ : RegularMatroi
     (hM : M.Is1sum M₁.toBinaryMatroid M₂.toBinaryMatroid) :
     RegularMatroid X Y where
   toBinaryMatroid := M
-  A := sorry
-  hA := sorry
-  hBA := sorry
+  B' := sorry
+  hB' := sorry
+  hBB' := sorry
 
 /-- Any 2-sum of regular matroids is a regular matroid. -/
 noncomputable
@@ -197,9 +197,9 @@ def BinaryMatroid.Is2sum.toRegular {M : BinaryMatroid X Y} {M₁ : RegularMatroi
     (hM : M.Is2sum M₁.toBinaryMatroid M₂.toBinaryMatroid) :
     RegularMatroid X Y where
   toBinaryMatroid := M
-  A := sorry
-  hA := sorry
-  hBA := sorry
+  B' := sorry
+  hB' := sorry
+  hBB' := sorry
 
 /-- Any 3-sum of regular matroids is a regular matroid. -/
 noncomputable
@@ -207,6 +207,6 @@ def BinaryMatroid.Is3sum.toRegular {M : BinaryMatroid X Y} {M₁ : RegularMatroi
     (hM : M.Is3sum M₁.toBinaryMatroid M₂.toBinaryMatroid) :
     RegularMatroid X Y where
   toBinaryMatroid := M
-  A := sorry
-  hA := sorry
-  hBA := sorry
+  B' := sorry
+  hB' := sorry
+  hBB' := sorry
