@@ -47,11 +47,10 @@ structure BinaryMatroid (X Y : Type) [DecidableEq X] [DecidableEq Y]
     hB : B.toIndepMatroid = toIndepMatroid
 
 def Matrix.TU (A : Matrix X Y ℚ) : Prop :=
-  ∀ k : ℕ, ∀ f : Fin k → X, ∀ g : Fin k → Y,
-    Function.Injective f → Function.Injective g →
-      (A.submatrix f g).det = 0 ∨
-      (A.submatrix f g).det = 1 ∨
-      (A.submatrix f g).det = -1
+  ∀ k : ℕ, ∀ f : Fin k → X, ∀ g : Fin k → Y, f.Injective → g.Injective →
+    (A.submatrix f g).det = 0 ∨
+    (A.submatrix f g).det = 1 ∨
+    (A.submatrix f g).det = -1
 
 /-- Regular matroid on the ground set `(X ⊕ Y)`. -/
 structure RegularMatroid (X Y : Type) [DecidableEq X] [DecidableEq Y]
