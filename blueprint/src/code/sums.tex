@@ -1,0 +1,112 @@
+\section{Sums}
+
+\subsection{$1$-Sums}
+
+\begin{definition}[$1$-sum of matrices]
+  \label{def:code_1_sum_of_matrices}
+  % \uses{}
+  Let $B$ be a matrix that can be represented as
+  \begin{tabular}{cccc}
+                                 & $Y_{1}$                      & $Y_{2}$                      &  \\ \cline{2-3}
+    \multicolumn{1}{c|}{$X_{1}$} & \multicolumn{1}{c|}{$B_{1}$} & \multicolumn{1}{c|}{    $0$} &  \\ \cline{2-3}
+    \multicolumn{1}{c|}{$X_{2}$} & \multicolumn{1}{c|}{    $0$} & \multicolumn{1}{c|}{$B_{2}$} &  \\ \cline{2-3}
+  \end{tabular}
+  Then we say that $B_{1}$ and $B_{2}$ are the two \emph{components} of a \emph{$1$-sum decomposition} of $B$.
+
+  Conversely, a \emph{$1$-sum composition} with \emph{components} $B_{1}$ and $B_{2}$ is the matrix $B$ above.
+
+  The expression $B = B_{1} \oplus_{1} B_{2}$ means either process.
+\end{definition}
+
+\begin{definition}[matroid $1$-sum]
+  \label{def:code_1_sum_of_binary}
+  \uses{def:code_binary_matroid,def:code_1_sum_of_matrices}
+  Let $M$ be a binary matroid with a representation matrix $B$.
+  Suppose that $B$ can be partitioned as in Definition \ref{def:code_1_sum_of_matrices} with non-zero blocks $B_{1}$ and $B_{2}$.
+  Then the binary matroids $M_{1}$ and $M_{2}$ represented by $B_{1}$ and $B_{2}$, respectively, are the two \emph{components} of a \emph{$1$-sum decomposition} of $M$.
+
+  Conversely, a \emph{$1$-sum composition} with \emph{components} $M_{1}$ and $M_{2}$ is the matroid $M$ defined by the corresponding representation matrix $B$.
+
+  The expression $M = M_{1} \oplus_{1} M_{2}$ means either process.
+  % Note: $1$-sum of matroids is the same as direct sum
+\end{definition}
+
+\begin{lemma}[$1$-separation leads to $1$-sum decomposition]
+  \label{lem:code_1_sep_yields_1_sum}
+  \uses{def:code_1_sum_of_binary,def:code_k_sep}
+  Let $M$ be a binary matroid that is $1$-separable.
+  Then $M$ can be decomposed as a $1$-sum with components given by the $1$-separation.
+\end{lemma}
+
+\begin{proof}[Proof sketch]
+  \uses{def:code_1_sum_of_binary,def:code_k_sep}
+  Check by definition.
+\end{proof}
+
+\begin{lemma}[$1$-sum of regular matroids is regular]
+  \label{lem:code_1_sum_of_regular}
+  \uses{def:code_1_sum_of_binary}
+  Let $M_{1}$ and $M_{2}$ be regular matroids. Then $M = M_{1} \oplus_{1} M_{2}$ is a regular matroid.
+
+  Conversely, if a regular matroid $M$ can be decomposed as a $1$-sum $M = M_{1} \oplus_{1} M_{2}$, then $M_{1}$ and $M_{2}$ are both regular.
+\end{lemma}
+
+\begin{proof}[Proof sketch]
+  \uses{def:code_1_sum_of_binary}
+  Let $B$, $B_{1}$, and $B_{2}$ be representation matrices of $M$, $M_{1}$, and $M_{2}$, respectively.
+  \begin{itemize}
+    \item Converse direction: any square submatrix of $B_{1}$ or $B_{2}$ is a submatrix of $B$, hence TU.
+    \item Forward direction: any square submatrix $Z$ of $M$ has the form
+    \begin{tabular}{cc}
+      \cline{1-2}
+      \multicolumn{1}{|c|}{$Z_{1}$} & \multicolumn{1}{c|}{    $0$} \\ \cline{1-2}
+      \multicolumn{1}{|c|}{    $0$} & \multicolumn{1}{c|}{$Z_{2}$} \\ \cline{1-2}
+    \end{tabular}
+    where $Z_{1}$ and $Z_{2}$ are submatrices of $B_{1}$ and $B_{2}$, respectively.
+    \item If $Z_{1}$ is square, then $Z_{2}$ is also square and $\det Z = \det Z_{1} \cdot \det Z_{2} \in \{0, \pm 1\}$.
+    \item If $Z_{1}$ has more rows than columns, then the rows of $Z$ containing $Z_{1}$ are \GFtwo-dependent, so $\det Z = 0$.
+    \item Similar if $Z_{1}$ has more columns than rows.
+  \end{itemize}
+\end{proof}
+
+
+\subsection{$2$-Sums}
+
+\begin{definition}[$2$-sum of matrices]
+  \label{def:code_2_sum_of_matrices}
+  % \uses{}
+  \todo[inline]{add}
+\end{definition}
+
+\begin{definition}[matroid $2$-sum]
+  \label{def:code_2_sum_of_binary}
+  \uses{def:code_binary_matroid}
+  \todo[inline]{add}
+\end{definition}
+
+\begin{lemma}[$2$-sum of regular matroids is regular]
+  \label{lem:code_2_sum_of_reg}
+  \uses{def:code_2_sum_of_binary}
+  \todo[inline]{add name, label, uses, text}
+\end{lemma}
+
+
+\subsection{$3$-Sums}
+
+\begin{definition}[$3$-sum of matrices]
+  \label{def:code_3_sum_of_matrices}
+  % \uses{}
+  \todo[inline]{add}
+\end{definition}
+
+\begin{definition}[matroid $3$-sum]
+  \label{def:code_3_sum_of_binary}
+  \uses{def:code_binary_matroid}
+  \todo[inline]{add}
+\end{definition}
+
+\begin{lemma}[$3$-sum of regular matroids is regular]
+  \label{lem:code_3_sum_of_reg}
+  \uses{def:code_3_sum_of_binary}
+  \todo[inline]{add name, label, uses, text}
+\end{lemma}
