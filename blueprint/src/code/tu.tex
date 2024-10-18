@@ -1,4 +1,64 @@
 \section{Properties of TU Matrices}
 
-\todo[inline]{add required properties}
-% \uses{def:code_tu_matrix}
+\begin{lemma}[any submatrix of a TU matrix is TU]
+  \label{lem:code_submatrix_of_tu}
+  \uses{def:code_tu_matrix}
+  Let $A$ be a real matrix that is TU and let $B$ be a submatrix of $A$. Then $B$ is TU.
+\end{lemma}
+
+\begin{proof}[Proof sketch]
+  \uses{def:code_tu_matrix}
+  Any square submatrix of $B$ is a submatrix of $A$, so its determinant is $0$ or $\pm 1$. Thus, $B$ is TU.
+\end{proof}
+
+\begin{lemma}[block-diagonal matrix with TU blocks is TU]
+  \label{lem:code_diagonal_with_tu_blocks}
+  \uses{def:code_tu_matrix}
+  Let $A$ be a matrix of the form
+  \begin{tabular}{cc}
+    \cline{1-2}
+    \multicolumn{1}{|c|}{$A_{1}$} & \multicolumn{1}{c|}{    $0$} \\ \cline{1-2}
+    \multicolumn{1}{|c|}{    $0$} & \multicolumn{1}{c|}{$A_{2}$} \\ \cline{1-2}
+  \end{tabular}
+  where $A_{1}$ and $A_{2}$ are both TU. Then $A$ is also TU.
+\end{lemma}
+
+\begin{proof}[Proof sketch]
+  \uses{def:code_tu_matrix}
+  Any square submatrix $T$ of $A$ has the form
+  \begin{tabular}{cc}
+    \cline{1-2}
+    \multicolumn{1}{|c|}{$T_{1}$} & \multicolumn{1}{c|}{    $0$} \\ \cline{1-2}
+    \multicolumn{1}{|c|}{    $0$} & \multicolumn{1}{c|}{$T_{2}$} \\ \cline{1-2}
+  \end{tabular}
+  where $T_{1}$ and $T_{2}$ are submatrices of $A_{1}$ and $A_{2}$, respectively.
+  \begin{itemize}
+    \item If $T_{1}$ is square, then $T_{2}$ is also square, and $\det T = \det T_{1} \cdot \det T_{2} \in \{0, \pm 1\}$.
+    \item If $T_{1}$ has more rows than columns, then the rows of $T$ containing $T_{1}$ are \GFtwo-dependent, so $\det T = 0$.
+    \item Similar if $T_{1}$ has more columns than rows.
+  \end{itemize}
+\end{proof}
+
+\begin{definition}[$\mathcal{F}$-pivot]
+  \label{def:code_pivot}
+  Let $A$ be a matrix over a field $\mathcal{F}$ with row index set $X$ and column index set $Y$.
+  Let $A_{xy}$ be a nonzero element.
+  The result of a \emph{$\mathcal{F}$-pivot} of $A$ on the \emph{pivot element} $A_{xy}$
+  is the matrix $A'$ over $\mathcal{F}$ with row index set $X'$ and column index set $Y'$ defined as follows.
+  \begin{itemize}
+    \item For every $u \in X - x$ and $w \in Y - y$, let $A_{uw}' = A_{uw} + (A_{uy} \cdot A_{xw}) / (-A_{xy})$.
+    \item Let $A_{xy}' = -A_{xy}$, $X' = X - x + y$, and $Y' = Y - y + x$.
+  \end{itemize}
+\end{definition}
+
+\begin{lemma}[pivoting preserves TUness]
+  \label{lem:code_pivot_tu}
+  \uses{def:code_tu_matrix,def:code_pivot}
+  Let $A$ be a TU matrix and let $A_{xy}$ be a nonzero element.
+  Let $A'$ be the matrix obtained by performing a real pivot in $A$ on $A_{xy}$.
+  Then $A'$ is TU.
+\end{lemma}
+
+\begin{proof}[Proof sketch]
+  \todo[inline]{todo: add proof, see lemma 9.2.2 in Truemper}
+\end{proof}

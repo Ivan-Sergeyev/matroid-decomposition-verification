@@ -7,9 +7,9 @@
   % \uses{}
   Let $B$ be a matrix that can be represented as
   \begin{tabular}{cccc}
-                                 & $Y_{1}$                      & $Y_{2}$                      &  \\ \cline{2-3}
-    \multicolumn{1}{c|}{$X_{1}$} & \multicolumn{1}{c|}{$B_{1}$} & \multicolumn{1}{c|}{    $0$} &  \\ \cline{2-3}
-    \multicolumn{1}{c|}{$X_{2}$} & \multicolumn{1}{c|}{    $0$} & \multicolumn{1}{c|}{$B_{2}$} &  \\ \cline{2-3}
+                                 & $Y_{1}$                      & $Y_{2}$                      \\ \cline{2-3}
+    \multicolumn{1}{c|}{$X_{1}$} & \multicolumn{1}{c|}{$B_{1}$} & \multicolumn{1}{c|}{    $0$} \\ \cline{2-3}
+    \multicolumn{1}{c|}{$X_{2}$} & \multicolumn{1}{c|}{    $0$} & \multicolumn{1}{c|}{$B_{2}$} \\ \cline{2-3}
   \end{tabular}
   Then we say that $B_{1}$ and $B_{2}$ are the two \emph{components} of a \emph{$1$-sum decomposition} of $B$.
 
@@ -22,7 +22,7 @@
   \label{def:code_1_sum_of_binary}
   \uses{def:code_binary_matroid,def:code_1_sum_of_matrices}
   Let $M$ be a binary matroid with a representation matrix $B$.
-  Suppose that $B$ can be partitioned as in Definition \ref{def:code_1_sum_of_matrices} with non-zero blocks $B_{1}$ and $B_{2}$.
+  Suppose that $B$ can be partitioned as in Definition~\ref{def:code_1_sum_of_matrices} with non-zero blocks $B_{1}$ and $B_{2}$.
   Then the binary matroids $M_{1}$ and $M_{2}$ represented by $B_{1}$ and $B_{2}$, respectively, are the two \emph{components} of a \emph{$1$-sum decomposition} of $M$.
 
   Conversely, a \emph{$1$-sum composition} with \emph{components} $M_{1}$ and $M_{2}$ is the matroid $M$ defined by the corresponding representation matrix $B$.
@@ -31,7 +31,7 @@
   % Note: $1$-sum of matroids is the same as direct sum
 \end{definition}
 
-\begin{lemma}[$1$-separation leads to $1$-sum decomposition]
+\begin{lemma}[$1$-separations and $1$-sums]
   \label{lem:code_1_sep_yields_1_sum}
   \uses{def:code_1_sum_of_binary,def:code_k_sep}
   Let $M$ be a binary matroid that is $1$-separable.
@@ -43,29 +43,24 @@
   Check by definition.
 \end{proof}
 
+% todo: lemma 8.2.2.a: graphic with 1-sum decomposition -> graph representations connected via node identification
+% todo: lemma 8.2.2.b: 1-sum composition of graphic (planar) is graphic (planar)
+
 \begin{lemma}[$1$-sum of regular matroids is regular]
   \label{lem:code_1_sum_of_regular}
-  \uses{def:code_1_sum_of_binary}
+  \uses{def:code_1_sum_of_binary,def:code_regular_matroid}
   Let $M_{1}$ and $M_{2}$ be regular matroids. Then $M = M_{1} \oplus_{1} M_{2}$ is a regular matroid.
 
   Conversely, if a regular matroid $M$ can be decomposed as a $1$-sum $M = M_{1} \oplus_{1} M_{2}$, then $M_{1}$ and $M_{2}$ are both regular.
 \end{lemma}
 
 \begin{proof}[Proof sketch]
-  \uses{def:code_1_sum_of_binary}
-  Let $B$, $B_{1}$, and $B_{2}$ be representation matrices of $M$, $M_{1}$, and $M_{2}$, respectively.
+  \uses{def:code_1_sum_of_binary,def:code_regular_matroid} % todo: \uses{def:code_1_sum_of_binary,def:code_regular_matroid,lem:code_tu_blocks_of_tu,lem:code_tu_of_tu_blocks}
+  \todo[inline]{extract into lemmas about TU matrices}
+  Let $B$, $B_{1}$, and $B_{2}$ be the representation matrices of $M$, $M_{1}$, and $M_{2}$, respectively.
   \begin{itemize}
-    \item Converse direction: any square submatrix of $B_{1}$ or $B_{2}$ is a submatrix of $B$, hence TU.
-    \item Forward direction: any square submatrix $Z$ of $M$ has the form
-    \begin{tabular}{cc}
-      \cline{1-2}
-      \multicolumn{1}{|c|}{$Z_{1}$} & \multicolumn{1}{c|}{    $0$} \\ \cline{1-2}
-      \multicolumn{1}{|c|}{    $0$} & \multicolumn{1}{c|}{$Z_{2}$} \\ \cline{1-2}
-    \end{tabular}
-    where $Z_{1}$ and $Z_{2}$ are submatrices of $B_{1}$ and $B_{2}$, respectively.
-    \item If $Z_{1}$ is square, then $Z_{2}$ is also square and $\det Z = \det Z_{1} \cdot \det Z_{2} \in \{0, \pm 1\}$.
-    \item If $Z_{1}$ has more rows than columns, then the rows of $Z$ containing $Z_{1}$ are \GFtwo-dependent, so $\det Z = 0$.
-    \item Similar if $Z_{1}$ has more columns than rows.
+    \item Converse direction. Let $B'$ be a TU signing of $B$. Let $B_{1}'$ and $B_{2}'$ be signings of $B_{1}$ and $B_{2}$, respectively, obtained from $B$. By Lemma~\ref{lem:submatrix_of_tu}, $B_{1}'$ and $B_{2}'$ are both TU, so $M_{1}$ and $M_{2}$ are both regular.
+    \item Forward direction. Let $B_{1}'$ and $B_{2}'$ be TU signings of $B_{1}$ and $B_{2}$, respectively. Let $B'$ be the corresponding signing of $B$. By Lemma~\ref{lem:code_diagonal_with_tu_blocks}, $B'$ is TU, so $M$ is regular.
   \end{itemize}
 \end{proof}
 
@@ -75,20 +70,105 @@
 \begin{definition}[$2$-sum of matrices]
   \label{def:code_2_sum_of_matrices}
   % \uses{}
-  \todo[inline]{add}
+  Let $B$ be a matrix of the form
+  \begin{tabular}{cccc}
+                                 & $Y_{1}$                      & $Y_{2}$                      \\ \cline{2-3}
+    \multicolumn{1}{c|}{$X_{1}$} & \multicolumn{1}{c|}{$A_{1}$} & \multicolumn{1}{c|}{    $0$} \\ \cline{2-3}
+    \multicolumn{1}{c|}{$X_{2}$} & \multicolumn{1}{c|}{    $D$} & \multicolumn{1}{c|}{$A_{2}$} \\ \cline{2-3}
+  \end{tabular}
+  Let $B_{1}$ be a matrix of the form
+  \begin{tabular}{cccc}
+                                 & $Y_{1}$ \\ \cline{2-3}
+    \multicolumn{1}{c|}{$X_{1}$} & \multicolumn{1}{c|}{$A_{1}$} \\ \cline{2-3}
+    \multicolumn{1}{c|}{   Unit} & \multicolumn{1}{c|}{    $x$} \\ \cline{2-3}
+  \end{tabular}
+  Let $B_{2}$ be a matrix of the form
+  \begin{tabular}{cccc}
+                                 &                     Unit & $Y_{2}$ \\ \cline{2-3}
+    \multicolumn{1}{c|}{$X_{2}$} & \multicolumn{1}{c|}{$y$} & \multicolumn{1}{c|}{$A_{2}$} \\ \cline{2-3}
+  \end{tabular}
+  Suppose that $\GFtwo \text{-rank } D = 1$, $x \neq 0$, $y \neq 0$, $D = y \cdot x$ (outer product).
+
+  Then we say that $B_{1}$ and $B_{2}$ are the two \emph{components} of a \emph{$2$-sum decomposition} of $B$.
+
+  Conversely, a \emph{$2$-sum composition} with \emph{components} $B_{1}$ and $B_{2}$ is the matrix $B$ above.
+
+  The expression $B = B_{1} \oplus_{2} B_{2}$ means either process.
 \end{definition}
 
 \begin{definition}[matroid $2$-sum]
   \label{def:code_2_sum_of_binary}
-  \uses{def:code_binary_matroid}
-  \todo[inline]{add}
+  \uses{def:code_binary_matroid,def:code_2_sum_of_matrices}
+  Let $M$ be a binary matroid with a representation matrix $B$.
+  Suppose $B$, $B_{1}$, and $B_{2}$ satisfy the assumptions of Definition~\ref{def:code_2_sum_of_matrices}.
+  Then the binary matroids $M_{1}$ and $M_{2}$ represented by $B_{1}$ and $B_{2}$, respectively, are the two \emph{components} of a \emph{$2$-sum decomposition} of $M$.
+
+  Conversely, a \emph{$2$-sum composition} with \emph{components} $M_{1}$ and $M_{2}$ is the matroid $M$ defined by the corresponding representation matrix $B$.
+
+  The expression $M = M_{1} \oplus_{2} M_{2}$ means either process.
 \end{definition}
 
-\begin{lemma}[$2$-sum of regular matroids is regular]
-  \label{lem:code_2_sum_of_reg}
-  \uses{def:code_2_sum_of_binary}
-  \todo[inline]{add name, label, uses, text}
+\begin{lemma}[$2$-separations and $2$-sums of connected binary matroids]
+  \label{lem:code_2_sep_2_sum}
+  \uses{def:code_2_sum_of_binary,def:code_k_sep,def:code_k_conn}
+  Let $M$ be a binary matroid that is $2$-separable.
+  Then $M$ can be decomposed as a $2$-sum with connected components given by the $2$-separation.
+
+  Conversely, any $2$-sum of two connected binary matroids is a connected binary matroid.
 \end{lemma}
+
+\begin{proof}[Proof sketch]
+  \uses{def:code_2_sum_of_binary,def:code_k_sep,def:code_k_conn}
+  Check by definition. Connectedness of representation matrices is equivalent to connectedness of corresponding matroids.
+\end{proof}
+
+\begin{lemma}[$2$-sum of regular matroids is regular]
+  \label{lem:code_2_sum_of_regular}
+  \uses{def:code_2_sum_of_binary,def:code_regular_matroid}
+  Let $M_{1}$ and $M_{2}$ be regular matroids. Then $M = M_{1} \oplus_{2} M_{2}$ is a regular matroid.
+\end{lemma}
+
+\begin{proof}[Proof sketch]
+  \uses{def:code_2_sum_of_binary,def:code_regular_matroid}
+  \todo[inline]{extract lemmas into statements about TU matrices}
+
+  Let $B$, $B_{1}$, and $B_{2}$ be the representation matrices of $M$, $M_{1}$, and $M_{2}$, respectively.
+  Let $B_{1}'$ and $B_{2}'$ be TU signings of $B_{1}$ and $B_{2}$, respectively.
+  In particular, let $A_{1}'$, $x'$, $A_{2}'$, and $y'$ be the signed versions of $A_{1}$, $x$, $A_{2}$, and $y$, respectively.
+  Let $B'$ be the signing of $B$ where the blocks of $A_{1}$ and $A_{2}$ are signed as $A_{1}'$ and $A_{2}'$ and the block of $D$ is signed as $D' = y' \cdot x'$ (outer product).
+
+  \emph{Lemma:} $\left[ A_{1}' / D' \right]$ is TU.
+
+  \emph{Proof sketch:} Consider a square submatrix $T$. Its rows are a subset of: rows of $A_{1}'$, copies of row $x'$, $0$ rows.
+  If there are any $0$ rows or $\geq 2$ copies of row $x'$, then $\det T = 0$.
+  If there are no $0$ rows and $\leq 1$ copy of row $x'$, then $T$ is a submatrix of $B_{1}'$, so $\det T \in \{0, \pm 1\}$.
+
+  \emph{Lemma:} $\left[D' \mid A_{2}' \right]$ is TU.
+
+  Proof sketch: Similar, up to transposition.
+
+  \emph{Lemma:} Let $T$ be a square submatrix of $B'$.
+
+  \emph{Proof:} Induction on the size of $T$.
+  \emph{Base:} If $T$ consists of only $1$ element, then this element is $0$ or $\pm 1$, so $\det T \in \{0, \pm 1\}$.
+  \emph{Step:} Let $T$ have size $t$ and suppose all square submatrices of $B'$ of size $\leq t - 1$ are TU.
+  \begin{itemize}
+    \item Suppose $T$ contains no rows of $X_{1}$. Then $T$ is a submatrix of $\left[D' \mid A_{2}' \right]$, so $\det T \in \{0, \pm 1\}$.
+    \item Suppose $T$ contains no columns of $Y_{2}$. Then $T$ is a submatrix of $\left[ A_{1}' / D' \right]$, so $\det T \in \{0, \pm 1\}$.
+    \item Suppose $T$ contains no rows of $X_{2}$.
+    \begin{itemize}
+      \item If $T$ contains a column of $Y_{2}$, then $T$ contains a $0$ column, so $\det T = 0$.
+      \item If $T$ contains no columns of $Y_{2}$, then $T$ is a submatrix of $A_{1}$, so $\det T \in \{0, \pm 1\}$.
+    \end{itemize}
+    \item Suppose $T$ contains no columns of $Y_{1}$.
+    \begin{itemize}
+      \item If $T$ contains a row of $X_{1}$, then $T$ contains a $0$ row, so $\det T = 0$.
+      \item If $T$ contains no rows of $X_{1}$, then $T$ is a submatrix of $A_{2}$, so $\det T \in \{0, \pm 1\}$.
+    \end{itemize}
+    \item Remaining case: $T$ contains rows of $X_{1}$ and $X_{2}$ and columns of $Y_{1}$ and $Y_{2}$.
+    \todo[inline]{complete proof, see last paragraph of Lemma 11.2.1 in Truemper} % lem:code_pivot_tu
+  \end{itemize}
+\end{proof}
 
 
 \subsection{$3$-Sums}
@@ -105,8 +185,14 @@
   \todo[inline]{add}
 \end{definition}
 
+\begin{lemma}[$3$-separations and $3$-sums]
+  \label{lem:code_3_sep_3_sum}
+  \uses{def:code_3_sum_of_binary,def:code_k_conn,def:code_k_sep}
+  \todo[inline]{add}
+\end{lemma}
+
 \begin{lemma}[$3$-sum of regular matroids is regular]
-  \label{lem:code_3_sum_of_reg}
+  \label{lem:code_3_sum_of_regular}
   \uses{def:code_3_sum_of_binary}
-  \todo[inline]{add name, label, uses, text}
+  \todo[inline]{add}
 \end{lemma}
