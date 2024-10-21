@@ -59,7 +59,7 @@
   \todo[inline]{extract into lemmas about TU matrices}
   Let $B$, $B_{1}$, and $B_{2}$ be the representation matrices of $M$, $M_{1}$, and $M_{2}$, respectively.
   \begin{itemize}
-    \item Converse direction. Let $B'$ be a TU signing of $B$. Let $B_{1}'$ and $B_{2}'$ be signings of $B_{1}$ and $B_{2}$, respectively, obtained from $B$. By Lemma~\ref{lem:submatrix_of_tu}, $B_{1}'$ and $B_{2}'$ are both TU, so $M_{1}$ and $M_{2}$ are both regular.
+    \item Converse direction. Let $B'$ be a TU signing of $B$. Let $B_{1}'$ and $B_{2}'$ be signings of $B_{1}$ and $B_{2}$, respectively, obtained from $B$. By Lemma~\ref{lem:code_submatrix_of_tu}, $B_{1}'$ and $B_{2}'$ are both TU, so $M_{1}$ and $M_{2}$ are both regular.
     \item Forward direction. Let $B_{1}'$ and $B_{2}'$ be TU signings of $B_{1}$ and $B_{2}$, respectively. Let $B'$ be the corresponding signing of $B$. By Lemma~\ref{lem:code_diagonal_with_tu_blocks}, $B'$ is TU, so $M$ is regular.
   \end{itemize}
 \end{proof}
@@ -129,43 +129,32 @@
 \end{lemma}
 
 \begin{proof}[Proof sketch]
-  \uses{def:code_2_sum_of_binary,def:code_regular_matroid}
-  \todo[inline]{extract lemmas into statements about TU matrices}
+  \uses{def:code_2_sum_of_binary,def:code_regular_matroid,lem:code_tu_row_props,cor:code_tu_col_props}
 
   Let $B$, $B_{1}$, and $B_{2}$ be the representation matrices of $M$, $M_{1}$, and $M_{2}$, respectively.
   Let $B_{1}'$ and $B_{2}'$ be TU signings of $B_{1}$ and $B_{2}$, respectively.
   In particular, let $A_{1}'$, $x'$, $A_{2}'$, and $y'$ be the signed versions of $A_{1}$, $x$, $A_{2}$, and $y$, respectively.
-  Let $B'$ be the signing of $B$ where the blocks of $A_{1}$ and $A_{2}$ are signed as $A_{1}'$ and $A_{2}'$ and the block of $D$ is signed as $D' = y' \cdot x'$ (outer product).
+  Let $B'$ be the signing of $B$ where the blocks of $A_{1}$ and $A_{2}$ are signed as $A_{1}'$ and $A_{2}'$, respectively, and the block of $D$ is signed as $D' = y' \cdot x'$ (outer product).
 
-  \emph{Lemma:} $\left[ A_{1}' / D' \right]$ is TU.
+  Note that $\left[ A_{1}' / D' \right]$ is TU by Lemma~\ref{lem:code_tu_row_props}, as every row of $D'$ is either zero or a copy of $x'$.
+  Similarly, $\left[D' \mid A_{2}' \right]$ is TU by Corollary~\ref{cor:code_tu_col_props}, as every column of $D'$ is either zero or a copy of $y'$.
+  Additionally, $\left[ A_{1}' \mid 0 \right]$ is TU by Lemma~\ref{lem:code_tu_col_props}, and $\left[ 0 / A_{2}' \right]$ is TU by Lemma~\ref{lem:code_tu_row_props}.
 
-  \emph{Proof sketch:} Consider a square submatrix $T$. Its rows are a subset of: rows of $A_{1}'$, copies of row $x'$, $0$ rows.
-  If there are any $0$ rows or $\geq 2$ copies of row $x'$, then $\det T = 0$.
-  If there are no $0$ rows and $\leq 1$ copy of row $x'$, then $T$ is a submatrix of $B_{1}'$, so $\det T \in \{0, \pm 1\}$.
+  \todo[inline]{prove lemma below, separate into statement about TU matrices}
 
-  \emph{Lemma:} $\left[D' \mid A_{2}' \right]$ is TU.
-
-  Proof sketch: Similar, up to transposition.
-
-  \emph{Lemma:} Let $T$ be a square submatrix of $B'$.
+  \emph{Lemma:} Let $T$ be a square submatrix of $B'$. Then $\det T \in \{0, \pm 1\}$.
 
   \emph{Proof:} Induction on the size of $T$.
   \emph{Base:} If $T$ consists of only $1$ element, then this element is $0$ or $\pm 1$, so $\det T \in \{0, \pm 1\}$.
   \emph{Step:} Let $T$ have size $t$ and suppose all square submatrices of $B'$ of size $\leq t - 1$ are TU.
   \begin{itemize}
     \item Suppose $T$ contains no rows of $X_{1}$. Then $T$ is a submatrix of $\left[D' \mid A_{2}' \right]$, so $\det T \in \{0, \pm 1\}$.
+    \item Suppose $T$ contains no rows of $X_{2}$. Then $T$ is a submatrix of $\left[A_{1}' \mid 0 \right]$, so $\det T \in \{0, \pm 1\}$.
+    \item Suppose $T$ contains no columns of $Y_{1}$. Then $T$ is a submatrix of $\left[0 / A_{2}' \right]$, so $\det T \in \{0, \pm 1\}$.
     \item Suppose $T$ contains no columns of $Y_{2}$. Then $T$ is a submatrix of $\left[ A_{1}' / D' \right]$, so $\det T \in \{0, \pm 1\}$.
-    \item Suppose $T$ contains no rows of $X_{2}$.
-    \begin{itemize}
-      \item If $T$ contains a column of $Y_{2}$, then $T$ contains a $0$ column, so $\det T = 0$.
-      \item If $T$ contains no columns of $Y_{2}$, then $T$ is a submatrix of $A_{1}$, so $\det T \in \{0, \pm 1\}$.
-    \end{itemize}
-    \item Suppose $T$ contains no columns of $Y_{1}$.
-    \begin{itemize}
-      \item If $T$ contains a row of $X_{1}$, then $T$ contains a $0$ row, so $\det T = 0$.
-      \item If $T$ contains no rows of $X_{1}$, then $T$ is a submatrix of $A_{2}$, so $\det T \in \{0, \pm 1\}$.
-    \end{itemize}
     \item Remaining case: $T$ contains rows of $X_{1}$ and $X_{2}$ and columns of $Y_{1}$ and $Y_{2}$.
+    \item If $T$ is $2 \times 2$, then $T$ is TU. Indeed, all proper submatrices of $T$ are of size $\leq 1$, which are $\{0, \pm 1\}$ entries of $A'$, and $T$ contains a zero entry (in the row of $X_{2}$ and column of $Y_{2}$), so it cannot be a minimal violation matrix by Lemma~\ref{lem:code_mvm_props}. Thus, assume $T$ has size $\geq 3$.
+    \item .
     \todo[inline]{complete proof, see last paragraph of Lemma 11.2.1 in Truemper} % lem:code_pivot_tu
   \end{itemize}
 \end{proof}
