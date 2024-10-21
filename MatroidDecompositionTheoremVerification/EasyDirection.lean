@@ -1,12 +1,13 @@
 import Mathlib
 
+open scoped Matrix
 
 /-- The finite field on two elements. -/
 abbrev Z2 : Type := Fin 2
 
 variable {X Y : Type} [DecidableEq X] [DecidableEq Y]
 
-/-- Is given set of columns in the (standard) representation [I | B] `Z2`-independent? -/
+/-- Given matrix `B` is the set of columns `S` in the (standard) representation [I | B] `Z2`-independent? -/
 def Matrix.IndepCols (B : Matrix X Y Z2) (S : Set (X ⊕ Y)) : Prop :=
   LinearIndependent Z2 ((Matrix.fromColumns 1 B).submatrix id ((↑) : S → X ⊕ Y)).transpose
 
@@ -46,11 +47,57 @@ structure BinaryMatroid (X Y : Type) [DecidableEq X] [DecidableEq Y]
     B : Matrix X Y Z2
     hB : B.toIndepMatroid = toIndepMatroid
 
+/-- Is the matrix `A` totally unimodular? -/
 def Matrix.TU (A : Matrix X Y ℚ) : Prop :=
   ∀ k : ℕ, ∀ f : Fin k → X, ∀ g : Fin k → Y, f.Injective → g.Injective →
     (A.submatrix f g).det = 0 ∨
     (A.submatrix f g).det = 1 ∨
     (A.submatrix f g).det = -1
+
+lemma Matrix.TU_rephrased (A : Matrix X Y ℚ) : A.TU ↔
+    ∀ k : ℕ, ∀ f : Fin k → X, ∀ g : Fin k → Y,
+      (A.submatrix f g).det = 0 ∨
+      (A.submatrix f g).det = 1 ∨
+      (A.submatrix f g).det = -1
+    := by
+  constructor <;> intro hA
+  · intro k f g
+    if hf : f.Injective then
+      if hg : g.Injective then
+        exact hA k f g hf hg
+      else
+        left
+        unfold Function.Injective at hg
+        push_neg at hg
+        obtain ⟨i, j, hqij, hij⟩ := hg
+        apply Matrix.det_zero_of_column_eq
+        · exact hij
+        intro
+        simp [hqij]
+    else
+      left
+      unfold Function.Injective at hf
+      push_neg at hf
+      obtain ⟨i, j, hpij, hij⟩ := hf
+      apply Matrix.det_zero_of_row_eq
+      · exact hij
+      show (A (f i)) ∘ (g ·) = (A (f j)) ∘ (g ·)
+      rw [hpij]
+  · intros _ _ _ _ _
+    apply hA
+
+lemma Matrix.submatrix_TU {A : Matrix X Y ℚ} (hA : A.TU) (k : ℕ) (f : Fin k → X) (g : Fin k → Y) :
+    (A.submatrix f g).TU := by
+  intro _ _ _ _ _
+  rw [Matrix.submatrix_submatrix]
+  rw [Matrix.TU_rephrased] at hA
+  apply hA
+
+omit [DecidableEq X] [DecidableEq Y] in
+lemma Matrix.transpose_TU {A : Matrix X Y ℚ} (hA : A.TU) : Aᵀ.TU := by
+  intro _ _ _ _ _
+  simp only [←Matrix.transpose_submatrix, Matrix.det_transpose]
+  apply hA <;> assumption
 
 /-- Regular matroid on the ground set `(X ⊕ Y)`. -/
 structure RegularMatroid (X Y : Type) [DecidableEq X] [DecidableEq Y]
