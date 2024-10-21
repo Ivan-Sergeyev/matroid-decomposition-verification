@@ -54,7 +54,7 @@ def Matrix.TU (A : Matrix X Y ℚ) : Prop :=
     (A.submatrix f g).det = 1 ∨
     (A.submatrix f g).det = -1
 
-lemma Matrix.TU_rephrased (A : Matrix X Y ℚ) : A.TU ↔
+lemma Matrix.TU_iff (A : Matrix X Y ℚ) : A.TU ↔
     ∀ k : ℕ, ∀ f : Fin k → X, ∀ g : Fin k → Y,
       (A.submatrix f g).det = 0 ∨
       (A.submatrix f g).det = 1 ∨
@@ -86,11 +86,19 @@ lemma Matrix.TU_rephrased (A : Matrix X Y ℚ) : A.TU ↔
   · intros _ _ _ _ _
     apply hA
 
+lemma Matrix.mapEquiv_TU {X' Y' : Type} [DecidableEq X'] [DecidableEq Y']
+    (A : Matrix X Y ℚ) (eX : X' ≃ X) (eY : Y' ≃ Y) :
+    Matrix.TU ((A · ∘ eY) ∘ eX) ↔ A.TU := by
+  rw [Matrix.TU_iff, Matrix.TU_iff]
+  constructor <;> intro hA k f g
+  · simpa [Matrix.submatrix] using hA k (eX.symm ∘ f) (eY.symm ∘ g)
+  · simpa [Matrix.submatrix] using hA k (eX ∘ f) (eY ∘ g)
+
 lemma Matrix.submatrix_TU {A : Matrix X Y ℚ} (hA : A.TU) (k : ℕ) (f : Fin k → X) (g : Fin k → Y) :
     (A.submatrix f g).TU := by
   intro _ _ _ _ _
   rw [Matrix.submatrix_submatrix]
-  rw [Matrix.TU_rephrased] at hA
+  rw [Matrix.TU_iff] at hA
   apply hA
 
 omit [DecidableEq X] [DecidableEq Y] in
@@ -99,12 +107,17 @@ lemma Matrix.transpose_TU {A : Matrix X Y ℚ} (hA : A.TU) : Aᵀ.TU := by
   simp only [←Matrix.transpose_submatrix, Matrix.det_transpose]
   apply hA <;> assumption
 
+lemma Matrix.TU_glue_iff (A : Matrix X Y ℚ) : (Matrix.fromColumns (1 : Matrix X X ℚ) A).TU ↔ A.TU := by
+  rw [Matrix.TU_iff, Matrix.TU_iff]
+  constructor <;> intro hA k f g
+  · exact hA k f (Sum.inr ∘ g)
+  · sorry
+
 /-- Regular matroid on the ground set `(X ⊕ Y)`. -/
-structure RegularMatroid (X Y : Type) [DecidableEq X] [DecidableEq Y]
-  extends BinaryMatroid X Y where
-    B' : Matrix X Y ℚ -- signed version of `B`
-    hB' : (Matrix.fromColumns (1 : Matrix X X ℚ) B').TU -- the matrix is totally unimodular
-    hBB' : ∀ i : X, ∀ j : Y, if B i j = 0 then B' i j = 0 else B' i j = 1 ∨ B' i j = -1 -- `B'` matches `B`
+def BinaryMatroid.IsRegular (M : BinaryMatroid X Y) : Prop :=
+  ∃ B' : Matrix X Y ℚ, -- signed version of `B`
+    (Matrix.fromColumns (1 : Matrix X X ℚ) B').TU ∧ -- the matrix is totally unimodular
+    ∀ i : X, ∀ j : Y, if M.B i j = 0 then B' i j = 0 else B' i j = 1 ∨ B' i j = -1 -- `B'` matches `B`
 
 /-- Matroid casting, i.e., renaming the type without changing the elements; implemented for independent sets. -/
 def IndepMatroid.cast (M : IndepMatroid X) (hXY : X = Y) : IndepMatroid Y where
@@ -136,7 +149,53 @@ def BinaryMatroid.mapEquiv {X' Y' : Type} [DecidableEq X'] [DecidableEq Y']
   B := fun i j => M.B (eX i) (eY j)
   hB := by sorry
 
-variable {X₁ X₂ Y₁ Y₂ : Type} [DecidableEq X₁] [DecidableEq Y₁] [DecidableEq X₂] [DecidableEq Y₂]
+variable {X₁ X₂ Y₁ Y₂ : Type}
+
+lemma Matrix.submatrix_fromBlocks {α : Type*} {ι ρ : Type} (f : ι → X₁ ⊕ X₂) (g : ρ → Y₁ ⊕ Y₂)
+    (A₁₁ : Matrix X₁ Y₁ α) (A₁₂ : Matrix X₁ Y₂ α) (A₂₁ : Matrix X₂ Y₁ α) (A₂₂ : Matrix X₂ Y₂ α) :
+    (Matrix.fromBlocks A₁₁ A₁₂ A₂₁ A₂₂).submatrix f g =
+    (fun (i : ι) (j : ρ) =>
+      match f i with
+      | .inl i₁ =>
+        match g j with
+        | .inl j₁ => A₁₁ i₁ j₁
+        | .inr j₂ => A₁₂ i₁ j₂
+      | .inr i₂ =>
+        match g j with
+        | .inl j₁ => A₂₁ i₂ j₁
+        | .inr j₂ => A₂₂ i₂ j₂
+    ) := by
+  aesop
+
+lemma todo {α β₁ β₂ : Type} (f : α → β₁ ⊕ β₂) :
+    ∃ α₁ α₂ : Type, ∃ e : α ≃ α₁ ⊕ α₂, ∃ f₁ : α₁ → β₁, ∃ f₂ : α₂ → β₂,
+      ∀ i : α, f i = (Sum.elim (Sum.inl ∘ f₁) (Sum.inr ∘ f₂)) (e i) := by
+  classical
+  use { a : α // ∃ b₁ : β₁, f a = Sum.inl b₁ }
+  use { a : α // ∃ b₂ : β₂, f a = Sum.inr b₂ }
+  let e' : α → { a : α // ∃ b₁ : β₁, f a = Sum.inl b₁ } ⊕ { a : α // ∃ b₂ : β₂, f a = Sum.inr b₂ } :=
+    fun a : α =>
+      if hb₁ : ∃ b₁ : β₁, f a = Sum.inl b₁ then sorry else sorry
+  sorry
+
+lemma Matrix.fromBlocks_TU {A₁ : Matrix X₁ Y₁ ℚ} {A₂ : Matrix X₂ Y₂ ℚ} (hA₁ : A₁.TU) (hA₂ : A₂.TU) :
+    (Matrix.fromBlocks A₁ 0 0 A₂).TU := by
+  intro k f g hf hg
+  obtain ⟨ι₁, ι₂, eι, f₁, f₂, hf⟩ := todo f
+  obtain ⟨ρ₁, ρ₂, eρ, g₁, g₂, hg⟩ := todo g
+  have todo_extract :
+    (Matrix.fromBlocks A₁ 0 0 A₂).submatrix f g =
+    ((Matrix.fromBlocks
+      (A₁.submatrix f₁ g₁) 0
+      0 (A₂.submatrix f₂ g₂)
+    ) · ∘ eρ) ∘ eι
+  · ext i j
+    cases hi : eι i <;> cases hj : eρ j <;> simp [hi, hj] <;> aesop
+  rw [todo_extract]
+  --rw [Matrix.det_fromBlocks_zero₂₁]
+  sorry
+
+variable [DecidableEq X₁] [DecidableEq Y₁] [DecidableEq X₂] [DecidableEq Y₂]
 
 /-- Matrix-level 1-sum for matroids defined by their standard representation matrices. -/
 abbrev Matrix.oneSumComposition (A₁ : Matrix X₁ Y₁ Z2) (A₂ : Matrix X₂ Y₂ Z2) :
@@ -228,31 +287,38 @@ def BinaryMatroid.Is3sum (M : BinaryMatroid X Y) (M₁ : BinaryMatroid X₁ Y₁
         M = M₀.fst.mapEquiv eX eY ∧ M₀.snd
 
 /-- Any 1-sum of regular matroids is a regular matroid. -/
-noncomputable
-def BinaryMatroid.Is1sum.toRegular {M : BinaryMatroid X Y} {M₁ : RegularMatroid X₁ Y₁} {M₂ : RegularMatroid X₂ Y₂}
-    (hM : M.Is1sum M₁.toBinaryMatroid M₂.toBinaryMatroid) :
-    RegularMatroid X Y where
-  toBinaryMatroid := M
-  B' := sorry
-  hB' := sorry
-  hBB' := sorry
+theorem BinaryMatroid.Is1sum.isRegular {M : BinaryMatroid X Y} {M₁ : BinaryMatroid X₁ Y₁} {M₂ : BinaryMatroid X₂ Y₂}
+    (hM : M.Is1sum M₁ M₂) (hM₁ : M₁.IsRegular) (hM₂ : M₂.IsRegular) :
+    M.IsRegular := by
+  obtain ⟨eX, eY, hMXY⟩ := hM
+  dsimp only [BinaryMatroid.oneSum, BinaryMatroid.mapEquiv, Matrix.oneSumComposition] at hMXY
+  obtain ⟨B₁', hB₁, hBB₁⟩ := hM₁
+  obtain ⟨B₂', hB₂, hBB₂⟩ := hM₂
+  let B' := Matrix.fromBlocks B₁' 0 0 B₂'
+  have hB' : B'.TU
+  · apply Matrix.fromBlocks_TU
+    · rwa [Matrix.TU_glue_iff] at hB₁
+    · rwa [Matrix.TU_glue_iff] at hB₂
+  use (B' · ∘ eY) ∘ eX
+  constructor
+  · rwa [Matrix.TU_glue_iff, Matrix.mapEquiv_TU]
+  · intro i j
+    cases hi : eX i <;> cases hj : eY j <;> simp [hi, hj] <;> aesop
 
 /-- Any 2-sum of regular matroids is a regular matroid. -/
-noncomputable
-def BinaryMatroid.Is2sum.toRegular {M : BinaryMatroid X Y} {M₁ : RegularMatroid X₁ Y₁} {M₂ : RegularMatroid X₂ Y₂}
-    (hM : M.Is2sum M₁.toBinaryMatroid M₂.toBinaryMatroid) :
-    RegularMatroid X Y where
-  toBinaryMatroid := M
-  B' := sorry
-  hB' := sorry
-  hBB' := sorry
+theorem BinaryMatroid.Is2sum.isRegular {M : BinaryMatroid X Y} {M₁ : BinaryMatroid X₁ Y₁} {M₂ : BinaryMatroid X₂ Y₂}
+    (hM : M.Is2sum M₁ M₂) (hM₁ : M₁.IsRegular) (hM₂ : M₂.IsRegular) :
+    M.IsRegular := by
+  obtain ⟨eX, eY, hMXY⟩ := hM
+  obtain ⟨B₁', hB₁, hBB₁⟩ := hM₁
+  obtain ⟨B₂', hB₂, hBB₂⟩ := hM₂
+  sorry
 
 /-- Any 3-sum of regular matroids is a regular matroid. -/
-noncomputable
-def BinaryMatroid.Is3sum.toRegular {M : BinaryMatroid X Y} {M₁ : RegularMatroid X₁ Y₁} {M₂ : RegularMatroid X₂ Y₂}
-    (hM : M.Is3sum M₁.toBinaryMatroid M₂.toBinaryMatroid) :
-    RegularMatroid X Y where
-  toBinaryMatroid := M
-  B' := sorry
-  hB' := sorry
-  hBB' := sorry
+theorem BinaryMatroid.Is3sum.isRegular {M : BinaryMatroid X Y} {M₁ : BinaryMatroid X₁ Y₁} {M₂ : BinaryMatroid X₂ Y₂}
+    (hM : M.Is3sum M₁ M₂) (hM₁ : M₁.IsRegular) (hM₂ : M₂.IsRegular) :
+    M.IsRegular := by
+  obtain ⟨eX, eY, hMXY⟩ := hM
+  obtain ⟨B₁', hB₁, hBB₁⟩ := hM₁
+  obtain ⟨B₂', hB₂, hBB₂⟩ := hM₂
+  sorry

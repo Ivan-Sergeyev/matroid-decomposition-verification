@@ -34,6 +34,6 @@ inductive IndepMatroid.IsGood : IndepMatroid T → Prop
     {M₁ : BinaryMatroid X₁ Y₁} {M₂ : BinaryMatroid X₂ Y₂} {M : BinaryMatroid X Y} (hM : M.Is3sum M₁ M₂)
     (hT : (X ⊕ Y) = T) : (M.toIndepMatroid.cast hT).IsGood
 
-theorem hardSeymour {X Y : Type} [DecidableEq X] [DecidableEq Y] (M : RegularMatroid X Y) :
-    M.toBinaryMatroid.IsGood := by
+theorem hardSeymour {X Y : Type} [DecidableEq X] [DecidableEq Y] {M : BinaryMatroid X Y} (hM : M.IsRegular) :
+    M.IsGood := by
   sorry
