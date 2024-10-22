@@ -3,20 +3,21 @@ import MatroidDecompositionTheoremVerification.EasyDirection
 
 variable {T : Type} [DecidableEq T]
 
-def IndepMatroid.IsGraphic (M : IndepMatroid T) : Prop :=
+def Matroid.IsGraphic (M : Matroid T) : Prop :=
   sorry
 
-def IndepMatroid.IsCographic (M : IndepMatroid T) : Prop :=
+def Matroid.IsCographic (M : Matroid T) : Prop :=
   sorry
 
-def IndepMatroidR10 : IndepMatroid (Fin 10) :=
+def MatroidR10 : Matroid (Fin 10) :=
   sorry
 
-inductive IndepMatroid.IsGood : IndepMatroid T → Prop
+inductive Matroid.IsGood : Matroid T → Prop
 -- leaf constructors
-| graphic {M : IndepMatroid T} (hM : M.IsGraphic) : M.IsGood
-| cographic {M : IndepMatroid T} (hM : M.IsCographic) : M.IsGood
-| theR10 {M : IndepMatroid T} {e : Fin 10 ≃ T} (hM : M.mapEquiv e = IndepMatroidR10) : M.IsGood
+| graphic {M : Matroid T} (hM : M.IsGraphic) : M.IsGood
+| cographic {M : Matroid T} (hM : M.IsCographic) : M.IsGood
+/-
+| theR10 {M : Matroid T} {e : Fin 10 ≃ T} (hM : M.mapEquiv e = IndepMatroidR10) : M.IsGood
 -- fork constructors
 | is1sum
     {X X₁ X₂ : Type} [DecidableEq X] [DecidableEq X₁] [DecidableEq X₂]
@@ -33,7 +34,8 @@ inductive IndepMatroid.IsGood : IndepMatroid T → Prop
     {Y Y₁ Y₂ : Type} [DecidableEq Y] [DecidableEq Y₁] [DecidableEq Y₂]
     {M₁ : BinaryMatroid X₁ Y₁} {M₂ : BinaryMatroid X₂ Y₂} {M : BinaryMatroid X Y} (hM : M.Is3sum M₁ M₂)
     (hT : (X ⊕ Y) = T) : (M.toIndepMatroid.cast hT).IsGood
-
-theorem hardSeymour {X Y : Type} [DecidableEq X] [DecidableEq Y] {M : BinaryMatroid X Y} (hM : M.IsRegular) :
+-/
+theorem hardSeymour {X Y : Set T} [∀ x, Decidable (x ∈ X)] [∀ y, Decidable (y ∈ Y)] {M : BinaryMatroid X Y}
+    (hM : M.IsRegular) :
     M.IsGood := by
   sorry
