@@ -78,37 +78,60 @@
   A submatrix $T$ of $A^{T}$ is a transpose of a submatrix of $A$, so $\det T \in \{0, \pm 1\}$.
 \end{proof}
 
-\begin{lemma}[adjoining to TU matrices]
-  \label{lem:code_tu_row_props}
+\begin{lemma}[appending zero vector to TU]
+  \label{lem:code_tu_add_zero_row}
   \uses{def:code_tu_matrix}
-  Let $A$ be a TU matrix.
-  \begin{itemize}
-    \item Let $a$ be a zero row. Then $C = \left[ A / a \right]$ is TU.
-    \item Let $a$ be a unit row. Then $C = \left[ A / a \right]$ is TU.
-    \item Let $a$ be some row of $A$. Then $C = \left[ A / a \right]$ is TU.
-    \item Let $B$ be a matrix whose every row is a row of $A$, a zero row, or a unit row. Then $C = \left[ A / B \right]$ is TU.
-  \end{itemize}
+  Let $A$ be a TU matrix. Let $a$ be a zero row. Then $C = \left[ A / a \right]$ is TU.
 \end{lemma}
 
 \begin{proof}[Proof sketch]
   \uses{def:code_tu_matrix}
-  \begin{itemize}
-    \item Let $T$ be a square submatrix of $C$. If $T$ contains a zero row, then $\det T = 0$. Otherwise $T$ is a submatrix of $A$, so $\det T \in \{0, \pm 1\}$.
-    \item Let $T$ be a square submatrix of $C$. If $T$ contains the same row twice, then the rows are \GFtwo-dependent, so $\det T = 0$. Otherwise $T$ is a submatrix of $A$, so $\det T \in \{0, \pm 1\}$.
-    \item Let $T$ be a square submatrix of $C$. If $T$ contains the $\pm 1$ entry of the unit row, then $\det T$ equals the determinant of some submatrix of $A$ times $\pm 1$, so $\det T \in \{0, \pm 1\}$. If $T$ contains some entries of the unit row except the $\pm 1$, then $\det T = 0$. Otherwise $T$ is a submatrix of $A$, so $\det T \in \{0, \pm 1\}$.
-    \item Either repeatedly apply the previous three items or direcly perform a similar case analysis.
-  \end{itemize}
+  Let $T$ be a square submatrix of $C$. If $T$ contains a zero row, then $\det T = 0$. Otherwise $T$ is a submatrix of $A$, so $\det T \in \{0, \pm 1\}$.
 \end{proof}
 
-\begin{corollary}[column properties of TU matrices]
-  \label{cor:code_tu_col_props}
-  \uses{def:code_tu_matrix,lem:code_tu_row_props}
-  Properties listed in Lemma~\ref{lem:code_tu_row_props} also hold with respect to columns.
+\begin{lemma}[appending unit vector to TU]
+  \label{lem:code_tu_add_unit_row}
+  \uses{def:code_tu_matrix}
+  Let $A$ be a TU matrix. Let $a$ be a unit row. Then $C = \left[ A / a \right]$ is TU.
+\end{lemma}
+
+\begin{proof}[Proof sketch]
+  \uses{def:code_tu_matrix}
+  Let $T$ be a square submatrix of $C$. If $T$ contains the $\pm 1$ entry of the unit row, then $\det T$ equals the determinant of some submatrix of $A$ times $\pm 1$, so $\det T \in \{0, \pm 1\}$. If $T$ contains some entries of the unit row except the $\pm 1$, then $\det T = 0$. Otherwise $T$ is a submatrix of $A$, so $\det T \in \{0, \pm 1\}$.
+\end{proof}
+
+\begin{lemma}[appending parallel element to TU]
+  \label{lem:code_tu_add_copy_row}
+  \uses{def:code_tu_matrix}
+  Let $A$ be a TU matrix. Let $a$ be some row of $A$. Then $C = \left[ A / a \right]$ is TU.
+\end{lemma}
+
+\begin{proof}[Proof sketch]
+  \uses{def:code_tu_matrix}
+  Let $T$ be a square submatrix of $C$. If $T$ contains the same row twice, then the rows are \GFtwo-dependent, so $\det T = 0$. Otherwise $T$ is a submatrix of $A$, so $\det T \in \{0, \pm 1\}$.
+\end{proof}
+
+\begin{lemma}[appending rows to TU]
+  \label{lem:code_tu_add_ok_rows}
+  \uses{def:code_tu_matrix}
+  Let $A$ be a TU matrix. Let $B$ be a matrix whose every row is a row of $A$, a zero row, or a unit row. Then $C = \left[ A / B \right]$ is TU.
+\end{lemma}
+
+\begin{proof}[Proof sketch]
+  \uses{def:code_tu_matrix,lem:code_tu_add_zero_row,lem:code_tu_add_unit_row,lem:code_tu_add_copy_row}
+  Either repeatedly apply Lemmas~\ref{lem:code_tu_add_zero_row}, \ref{lem:code_tu_add_unit_row}, and \ref{lem:code_tu_add_copy_row}
+  or perform a similar case analysis direcly.
+\end{proof}
+
+\begin{corollary}[appending columns to TU]
+  \label{cor:code_tu_add_ok_cols}
+  \uses{def:code_tu_matrix,lem:code_tu_add_zero_row,lem:code_tu_add_unit_row,lem:code_tu_add_copy_row}
+  Let $A$ be a TU matrix. Let $B$ be a matrix whose every column is a column of $A$, a zero column, or a unit column. Then $C = \left[ A \mid B \right]$ is TU.
 \end{corollary}
 
 \begin{proof}[Proof sketch]
-  \uses{def:code_tu_matrix,lem:code_tu_row_props,lem:code_tu_transpose}
-  Combine results of Lemma~\ref{lem:code_tu_row_props} and Lemma~\ref{lem:code_tu_transpose}.
+  \uses{def:code_tu_matrix,lem:code_tu_add_zero_row,lem:code_tu_add_unit_row,lem:code_tu_add_copy_row,lem:code_tu_transpose}
+  $C^{T}$ is TU by Lemma~\ref{lem:code_tu_add_ok_rows} and construction, so $C$ is TU by Lemma~\ref{lem:code_tu_transpose}.
 \end{proof}
 
 \begin{definition}[$\mathcal{F}$-pivot]
