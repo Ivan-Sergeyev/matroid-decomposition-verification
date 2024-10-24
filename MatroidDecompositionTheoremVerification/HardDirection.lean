@@ -21,7 +21,7 @@ inductive BinaryMatroid.IsGood : BinaryMatroid α → Prop
 -- fork constructors
 | is1sum {M₁ : BinaryMatroid α} {M₂ : BinaryMatroid α} {M : BinaryMatroid α} (hM : M.Is1sum M₁ M₂) : M.IsGood
 | is2sum {M₁ : BinaryMatroid α} {M₂ : BinaryMatroid α} {M : BinaryMatroid α} (hM : M.Is2sum M₁ M₂) : M.IsGood
---| is3sum {M₁ : BinaryMatroid α} {M₂ : BinaryMatroid α} {M : BinaryMatroid α} (hM : M.Is3sum M₁ M₂) : M.IsGood
+| is3sum {M₁ : BinaryMatroid α} {M₂ : BinaryMatroid α} {M : BinaryMatroid α} (hM : M.Is3sum M₁ M₂) : M.IsGood
 
 theorem hardSeymour {M : BinaryMatroid α} (hM : M.IsRegular) : M.IsGood := by
   sorry
