@@ -2,13 +2,14 @@
 
 \begin{definition}[TU matrix]
   \label{def:code_tu_matrix}
-  % \uses{}
+  \lean{Matrix.TU}
   A real matrix is \emph{totally unimodular (TU)} if its every subdeterminant (i.e., determinant of every square submatrix) is $0$ or $\pm 1$.
 \end{definition}
 
 \begin{lemma}[entries of a TU matrix]
   \label{lem:code_tu_entries}
   \uses{def:code_tu_matrix}
+  \lean{Matrix.entries_TU}
   If $A$ is TU, then every entry of $A$ is $0$ or $\pm 1$.
 \end{lemma}
 
@@ -20,6 +21,7 @@
 \begin{lemma}[TUness with adjoint identity matrix]
   \label{lem:code_tu_adjoin_id}
   \uses{def:code_tu_matrix}
+  % \lean{} % todo: add reference to corresponding lemma in lean
   $A$ is TU iff every basis matrix of $\left[ I \mid A \right]$ has determinant $\pm 1$.
 \end{lemma}
 
@@ -31,6 +33,7 @@
 \begin{lemma}[any submatrix of a TU matrix is TU]
   \label{lem:code_submatrix_of_tu}
   \uses{def:code_tu_matrix}
+  \lean{Matrix.submatrix_TU}
   Let $A$ be a real matrix that is TU and let $B$ be a submatrix of $A$. Then $B$ is TU.
 \end{lemma}
 
@@ -42,6 +45,7 @@
 \begin{lemma}[block-diagonal matrix with TU blocks is TU]
   \label{lem:code_diagonal_with_tu_blocks}
   \uses{def:code_tu_matrix}
+  \lean{Matrix.fromBlocks_TU}
   Let $A$ be a matrix of the form
   \begin{tabular}{cc}
     \cline{1-2}
@@ -70,6 +74,7 @@
 \begin{lemma}[transpose of TU is TU]
   \label{lem:code_tu_transpose}
   \uses{def:code_tu_matrix}
+  \lean{Matrix.transpose_TU}
   Let $A$ be a TU matrix. Then $A^{T}$ is TU.
 \end{lemma}
 
@@ -81,6 +86,7 @@
 \begin{lemma}[appending zero vector to TU]
   \label{lem:code_tu_add_zero_row}
   \uses{def:code_tu_matrix}
+  % \lean{} % todo: add reference to corresponding lemma in lean
   Let $A$ be a TU matrix. Let $a$ be a zero row. Then $C = \left[ A / a \right]$ is TU.
 \end{lemma}
 
@@ -92,6 +98,7 @@
 \begin{lemma}[appending unit vector to TU]
   \label{lem:code_tu_add_unit_row}
   \uses{def:code_tu_matrix}
+  % \lean{} % todo: add reference to corresponding lemma in lean
   Let $A$ be a TU matrix. Let $a$ be a unit row. Then $C = \left[ A / a \right]$ is TU.
 \end{lemma}
 
@@ -103,6 +110,7 @@
 \begin{lemma}[appending parallel element to TU]
   \label{lem:code_tu_add_copy_row}
   \uses{def:code_tu_matrix}
+  % \lean{} % todo: add reference to corresponding lemma in lean
   Let $A$ be a TU matrix. Let $a$ be some row of $A$. Then $C = \left[ A / a \right]$ is TU.
 \end{lemma}
 
@@ -114,6 +122,7 @@
 \begin{lemma}[appending rows to TU]
   \label{lem:code_tu_add_ok_rows}
   \uses{def:code_tu_matrix}
+  % \lean{} % todo: add reference to corresponding lemma in lean
   Let $A$ be a TU matrix. Let $B$ be a matrix whose every row is a row of $A$, a zero row, or a unit row. Then $C = \left[ A / B \right]$ is TU.
 \end{lemma}
 
@@ -126,6 +135,7 @@
 \begin{corollary}[appending columns to TU]
   \label{cor:code_tu_add_ok_cols}
   \uses{def:code_tu_matrix,lem:code_tu_add_zero_row,lem:code_tu_add_unit_row,lem:code_tu_add_copy_row}
+  % \lean{} % todo: add reference to corresponding lemma in lean
   Let $A$ be a TU matrix. Let $B$ be a matrix whose every column is a column of $A$, a zero column, or a unit column. Then $C = \left[ A \mid B \right]$ is TU.
 \end{corollary}
 
@@ -136,6 +146,7 @@
 
 \begin{definition}[$\mathcal{F}$-pivot]
   \label{def:code_pivot}
+  % \lean{} % todo: add reference to corresponding lemma in lean
   Let $A$ be a matrix over a field $\mathcal{F}$ with row index set $X$ and column index set $Y$.
   Let $A_{xy}$ be a nonzero element.
   The result of a \emph{$\mathcal{F}$-pivot} of $A$ on the \emph{pivot element} $A_{xy}$
@@ -149,6 +160,7 @@
 \begin{lemma}[pivoting preserves TUness]
   \label{lem:code_pivot_tu}
   \uses{def:code_tu_matrix,def:code_pivot}
+  % \lean{} % todo: add reference to corresponding lemma in lean
   Let $A$ be a TU matrix and let $A_{xy}$ be a nonzero element.
   Let $A'$ be the matrix obtained by performing a real pivot in $A$ on $A_{xy}$.
   Then $A'$ is TU.
@@ -165,6 +177,7 @@
 \begin{lemma}[pivoting preserves TUness]
   \label{lem:code_reverse_pivot_tu}
   \uses{def:code_tu_matrix,def:code_pivot}
+  % \lean{} % todo: add reference to corresponding lemma in lean
   Let $A$ be a matrix and let $A_{xy}$ be a nonzero element.
   Let $A'$ be the matrix obtained by performing a real pivot in $A$ on $A_{xy}$.
   If $A'$ is TU, then $A$ is TU.
@@ -181,6 +194,7 @@
 \begin{definition}[minimal violation matrix]
   \label{def:code_mvm}
   \uses{def:code_tu_matrix}
+  % \lean{} % todo: add reference to corresponding lemma in lean
   Let $A$ be a real $\{0, \pm 1\}$ matrix that is not TU but all of whose proper submatrices are TU.
   Then $A$ is called a \emph{minimal violation matrix of total unimodularity (minimal violation matrix)}.
 \end{definition}
@@ -188,6 +202,7 @@
 \begin{lemma}[simple properties of MVMs]
   \label{lem:code_mvm_props}
   \uses{def:code_mvm}
+  % \lean{} % todo: add reference to corresponding lemma in lean
   Let $A$ be a minimal violation matrix.
   \begin{itemize}
     \item $A$ is square.
@@ -208,6 +223,7 @@
 \begin{lemma}[pivoting in MVMs]
   \label{lem:code_mvm_pivot}
   \uses{def:code_mvm,def:code_pivot}
+  % \lean{} % todo: add reference to corresponding lemma in lean
   Let $A$ be a minimal violation matrix. Suppose $A$ has $\geq 3$ rows.
   Suppose we perform a real pivot in $A$, then delete the pivot row and column.
   Then the resulting matrix $A'$ is also a minimal violation matrix.

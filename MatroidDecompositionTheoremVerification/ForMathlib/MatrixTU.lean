@@ -43,6 +43,8 @@ lemma Matrix.TU_iff (A : Matrix X Y ℚ) : A.TU ↔
   · intros _ _ _ _ _
     apply hA
 
+lemma Matrix.entries_TU {A : Matrix X Y ℚ} (hA : A.TU) : ∀ i : X, ∀ j : Y, A i j = 0 ∨ A i j = 1 ∨ A i j = -1 := by sorry
+
 lemma Matrix.mapEquiv_TU {X' Y' : Type} [DecidableEq X'] [DecidableEq Y']
     (A : Matrix X Y ℚ) (eX : X' ≃ X) (eY : Y' ≃ Y) :
     Matrix.TU ((A · ∘ eY) ∘ eX) ↔ A.TU := by
