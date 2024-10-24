@@ -2,7 +2,9 @@
 
 The goal of this project is to formally verify Seymour's decomposition theorem in Lean 4.
 
-[Blueprint](blueprint/src/print.pdf)
+## Blueprint
+
+You can find the blueprint on the [GitHub Pages site](https://ivan-sergeyev.github.io/matroid-decomposition-verification/)
 
 ## References
 

@@ -129,16 +129,16 @@
 \end{lemma}
 
 \begin{proof}[Proof sketch]
-  \uses{def:code_2_sum_of_binary,def:code_regular_matroid,lem:code_tu_row_props,cor:code_tu_col_props}
+  \uses{def:code_2_sum_of_binary,def:code_regular_matroid,lem:code_tu_add_ok_rows,cor:code_tu_add_ok_cols}
 
   Let $B$, $B_{1}$, and $B_{2}$ be the representation matrices of $M$, $M_{1}$, and $M_{2}$, respectively.
   Let $B_{1}'$ and $B_{2}'$ be TU signings of $B_{1}$ and $B_{2}$, respectively.
   In particular, let $A_{1}'$, $x'$, $A_{2}'$, and $y'$ be the signed versions of $A_{1}$, $x$, $A_{2}$, and $y$, respectively.
   Let $B'$ be the signing of $B$ where the blocks of $A_{1}$ and $A_{2}$ are signed as $A_{1}'$ and $A_{2}'$, respectively, and the block of $D$ is signed as $D' = y' \cdot x'$ (outer product).
 
-  Note that $\left[ A_{1}' / D' \right]$ is TU by Lemma~\ref{lem:code_tu_row_props}, as every row of $D'$ is either zero or a copy of $x'$.
-  Similarly, $\left[D' \mid A_{2}' \right]$ is TU by Corollary~\ref{cor:code_tu_col_props}, as every column of $D'$ is either zero or a copy of $y'$.
-  Additionally, $\left[ A_{1}' \mid 0 \right]$ is TU by Lemma~\ref{lem:code_tu_col_props}, and $\left[ 0 / A_{2}' \right]$ is TU by Lemma~\ref{lem:code_tu_row_props}.
+  Note that $\left[ A_{1}' / D' \right]$ is TU by Lemma~\ref{lem:code_tu_add_ok_rows}, as every row of $D'$ is either zero or a copy of $x'$.
+  Similarly, $\left[D' \mid A_{2}' \right]$ is TU by Corollary~\ref{cor:code_tu_add_ok_cols}, as every column of $D'$ is either zero or a copy of $y'$.
+  Additionally, $\left[ A_{1}' \mid 0 \right]$ is TU by Corollary~\ref{cor:code_tu_add_ok_cols}, and $\left[ 0 / A_{2}' \right]$ is TU by Lemma~\ref{lem:code_tu_add_ok_rows}.
 
   \todo[inline]{prove lemma below, separate into statement about TU matrices}
 

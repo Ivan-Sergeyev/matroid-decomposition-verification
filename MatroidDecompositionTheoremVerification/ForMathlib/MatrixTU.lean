@@ -58,6 +58,14 @@ lemma Matrix.submatrix_TU {A : Matrix X Y ℚ} (hA : A.TU) (k : ℕ) (f : Fin k 
   rw [Matrix.TU_iff] at hA
   apply hA
 
+lemma Matrix.entries_TU {A : Matrix X Y ℚ} (hA : A.TU) :
+    ∀ i : X, ∀ j : Y, A i j = 0 ∨ A i j = 1 ∨ A i j = -1 := by
+  intro i j
+  let f : Fin 1 → X := (fun _ => i)
+  let g : Fin 1 → Y := (fun _ => j)
+  convert hA 1 f g (Function.injective_of_subsingleton f) (Function.injective_of_subsingleton g) <;>
+  exact Eq.symm (det_fin_one (A.submatrix f g))
+
 lemma Matrix.transpose_TU {A : Matrix X Y ℚ} (hA : A.TU) : Aᵀ.TU := by
   intro _ _ _ _ _
   simp only [←Matrix.transpose_submatrix, Matrix.det_transpose]
