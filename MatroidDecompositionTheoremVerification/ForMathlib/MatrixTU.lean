@@ -43,8 +43,6 @@ lemma Matrix.TU_iff (A : Matrix X Y ℚ) : A.TU ↔
   · intros _ _ _ _ _
     apply hA
 
-lemma Matrix.entries_TU {A : Matrix X Y ℚ} (hA : A.TU) : ∀ i : X, ∀ j : Y, A i j = 0 ∨ A i j = 1 ∨ A i j = -1 := by sorry
-
 lemma Matrix.mapEquiv_TU {X' Y' : Type} [DecidableEq X'] [DecidableEq Y']
     (A : Matrix X Y ℚ) (eX : X' ≃ X) (eY : Y' ≃ Y) :
     Matrix.TU ((A · ∘ eY) ∘ eX) ↔ A.TU := by
@@ -59,6 +57,14 @@ lemma Matrix.submatrix_TU {A : Matrix X Y ℚ} (hA : A.TU) (k : ℕ) (f : Fin k 
   rw [Matrix.submatrix_submatrix]
   rw [Matrix.TU_iff] at hA
   apply hA
+
+lemma Matrix.entries_TU {A : Matrix X Y ℚ} (hA : A.TU) :
+    ∀ i : X, ∀ j : Y, A i j = 0 ∨ A i j = 1 ∨ A i j = -1 := by
+  intro i j
+  let f : Fin 1 → X := (fun _ => i)
+  let g : Fin 1 → Y := (fun _ => j)
+  convert hA 1 f g (Function.injective_of_subsingleton f) (Function.injective_of_subsingleton g) <;>
+  exact Eq.symm (det_fin_one (A.submatrix f g))
 
 lemma Matrix.transpose_TU {A : Matrix X Y ℚ} (hA : A.TU) : Aᵀ.TU := by
   intro _ _ _ _ _
