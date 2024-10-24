@@ -6,6 +6,10 @@ open scoped Matrix
 /-- The finite field on two elements. -/
 abbrev Z2 : Type := ZMod 2
 
+infixr:91 " ᕃ " => Insert.insert
+
+infix:61 " ⫗ " => Disjoint
+
 section construction_from_matrices
 
 variable {α : Type} [DecidableEq α] {X Y : Set α} [∀ x, Decidable (x ∈ X)] [∀ y, Decidable (y ∈ Y)]
@@ -34,7 +38,7 @@ theorem Matrix.IndepCols_subset (B : Matrix X Y Z2) (I J : Set α) (hBJ : B.Inde
 /-- A nonmaximal linearly independent set of columns can be augmented with another linearly independent column. -/
 theorem Matrix.IndepCols_aug (B : Matrix X Y Z2) (I J : Set α)
     (hBI : B.IndepCols I) (nonmax : ¬Maximal B.IndepCols I) (hBJ : Maximal B.IndepCols J) :
-    ∃ x ∈ J \ I, B.IndepCols (insert x I) := by
+    ∃ x ∈ J \ I, B.IndepCols (x ᕃ I) := by
   sorry
 
 /-- Any set of columns has the maximal subset property. -/
@@ -60,7 +64,7 @@ structure BinaryMatroid (α : Type) [DecidableEq α] extends Matroid α where
   Y : Set α
   decmemX : ∀ x, Decidable (x ∈ X)
   decmemY : ∀ y, Decidable (y ∈ Y)
-  hXY : Disjoint X Y
+  hXY : X ⫗ Y
   B : Matrix X Y Z2
   hE : E = X ∪ Y
   hB : toMatroid = B.toIndepMatroid.matroid
@@ -104,7 +108,7 @@ end matrix_level
 
 /-- Matroid-level (independent sets) 1-sum for matroids defined by their standard representation matrices. -/
 def BinaryMatroid.oneSum {M₁ M₂ : BinaryMatroid α}
-    (hXX : Disjoint M₁.X M₂.X) (hYY : Disjoint M₁.Y M₂.Y) (hXY : Disjoint M₁.X M₂.Y) (hYX : Disjoint M₁.Y M₂.X) :
+    (hXX : M₁.X ⫗ M₂.X) (hYY : M₁.Y ⫗ M₂.Y) (hXY : M₁.X ⫗ M₂.Y) (hYX : M₁.Y ⫗ M₂.X) :
     BinaryMatroid α :=
   have dmX₁ := M₁.decmemX
   have dmY₁ := M₁.decmemY
@@ -134,8 +138,8 @@ def BinaryMatroid.oneSum {M₁ M₂ : BinaryMatroid α}
 
 /-- Matroid-level 2-sum for matroids defined by their standard representation matrices; now checks legitimacy. -/
 def BinaryMatroid.twoSum {M₁ M₂ : BinaryMatroid α} {a : α}
-    -- TODO should `(hXX : Disjoint M₁.X M₂.X)` and `(hYY : Disjoint M₁.Y M₂.Y)` be required too?
-    (hY₁ : a ∉ M₁.Y) (hX₂ : a ∉ M₂.X) (ha : M₁.X ∩ M₂.Y = {a}) (hXY : Disjoint M₂.X M₁.Y) :
+    -- TODO should `(hXX : M₁.X ⫗ M₂.X)` and `(hYY : M₁.Y ⫗ M₂.Y)` be required too?
+    (hY₁ : a ∉ M₁.Y) (hX₂ : a ∉ M₂.X) (ha : M₁.X ∩ M₂.Y = {a}) (hXY : M₂.X ⫗ M₁.Y) :
     BinaryMatroid α × Prop :=
   have := M₁.decmemX
   have := M₁.decmemY
@@ -198,13 +202,13 @@ noncomputable def BinaryMatroid.threeSum
 -/
 /-- Matroid `M` is a result of 1-summing `M₁` and `M₂` (should be equivalent to direct sums). -/
 def BinaryMatroid.Is1sum (M : BinaryMatroid α) (M₁ : BinaryMatroid α) (M₂ : BinaryMatroid α) : Prop :=
-  ∃ hXX : Disjoint M₁.X M₂.X, ∃ hYY : Disjoint M₁.Y M₂.Y, ∃ hXY : Disjoint M₁.X M₂.Y, ∃ hYX : Disjoint M₁.Y M₂.X,
+  ∃ hXX : M₁.X ⫗ M₂.X, ∃ hYY : M₁.Y ⫗ M₂.Y, ∃ hXY : M₁.X ⫗ M₂.Y, ∃ hYX : M₁.Y ⫗ M₂.X,
     M = BinaryMatroid.oneSum hXX hYY hXY hYX
 
 /-- Matroid `M` is a result of 2-summing `M₁` and `M₂` in some way. -/
 def BinaryMatroid.Is2sum (M : BinaryMatroid α) (M₁ : BinaryMatroid α) (M₂ : BinaryMatroid α) : Prop :=
-  (Disjoint M₁.X M₂.X ∧ Disjoint M₁.Y M₂.Y) ∧ -- TODO some more disjointness?
-    ∃ a : α, ∃ hY₁ : a ∉ M₁.Y, ∃ hX₂ : a ∉ M₂.X, ∃ ha : M₁.X ∩ M₂.Y = {a}, ∃ hXY : Disjoint M₂.X M₁.Y,
+  (M₁.X ⫗ M₂.X ∧ M₁.Y ⫗ M₂.Y) ∧ -- TODO some more disjointness?
+    ∃ a : α, ∃ hY₁ : a ∉ M₁.Y, ∃ hX₂ : a ∉ M₂.X, ∃ ha : M₁.X ∩ M₂.Y = {a}, ∃ hXY : M₂.X ⫗ M₁.Y,
       let M₀ := BinaryMatroid.twoSum hY₁ hX₂ ha hXY
       M = M₀.fst ∧ M₀.snd
 /-
