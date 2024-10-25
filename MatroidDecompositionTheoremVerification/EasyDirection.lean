@@ -172,8 +172,8 @@ def BinaryMatroid.twoSum {M₁ M₂ : BinaryMatroid α} {a : α}
       (Set.decidableUnion _ _ ·),
       by
         rw [Set.disjoint_union_right, Set.disjoint_union_left, Set.disjoint_union_left]
-        exact ⟨⟨disjoint_left_wo M₁.hXY a, hXY⟩, ⟨disjoint_of_singleton_intersection_both_wo ha,
-          disjoint_right_wo M₂.hXY a⟩⟩,
+        exact ⟨⟨disjoint_left_setminus M₁.hXY {a}, hXY⟩, ⟨disjoint_of_singleton_intersection_both_wo ha,
+          disjoint_right_setminus M₂.hXY {a}⟩⟩,
       B, rfl, rfl
     ⟩,
     x ≠ 0 ∧ y ≠ 0
@@ -250,13 +250,22 @@ noncomputable def BinaryMatroid.threeSum {M₁ M₂ : BinaryMatroid α} {x₁ x�
       (Set.decidableUnion _ _ ·),
       by
         rw [Set.disjoint_union_right, Set.disjoint_union_left, Set.disjoint_union_left]
-        exact ⟨⟨disjoint_left_wo3 M₁.hXY x₁ x₂ x₃, hYX.symm⟩, ⟨
-          disjoint_left_wo3 (disjoint_right_wo3 hXY y₁ y₂ y₃) x₁ x₂ x₃,
-          disjoint_right_wo3 M₂.hXY y₁ y₂ y₃⟩⟩,
+        exact ⟨⟨disjoint_left_setminus M₁.hXY {x₁, x₂, x₃}, hYX.symm⟩, ⟨
+          disjoint_left_setminus (disjoint_right_setminus hXY {y₁, y₂, y₃}) {x₁, x₂, x₃},
+          disjoint_right_setminus M₂.hXY {y₁, y₂, y₃}⟩⟩,
       B, rfl, rfl
     ⟩,
     IsUnit D_₁ ∧ D_₁ = D_₂ -- the matrix `D_₁ = D_₂` (called D-bar in the book) is invertible
-    -- TODO more conditions to check? Something about the 000000000011 column and the 110000000000 row?
+    ∧ M₁.B ⟨x₁, x₁inX₁⟩ ⟨y₁, y₁inY₁⟩ = 1
+    ∧ M₁.B ⟨x₁, x₁inX₁⟩ ⟨y₂, y₂inY₁⟩ = 1
+    ∧ M₁.B ⟨x₂, x₂inX₁⟩ ⟨y₃, y₃inY₁⟩ = 1
+    ∧ M₁.B ⟨x₃, x₃inX₁⟩ ⟨y₃, y₃inY₁⟩ = 1
+    ∧ M₂.B ⟨x₁, x₁inX₂⟩ ⟨y₁, y₁inY₂⟩ = 1
+    ∧ M₂.B ⟨x₁, x₁inX₂⟩ ⟨y₂, y₂inY₂⟩ = 1
+    ∧ M₂.B ⟨x₂, x₂inX₂⟩ ⟨y₃, y₃inY₂⟩ = 1
+    ∧ M₂.B ⟨x₃, x₃inX₂⟩ ⟨y₃, y₃inY₂⟩ = 1
+    ∧ (∀ x : α, ∀ hx : x ∈ M₁.X, x ≠ x₂ ∧ x ≠ x₃ → M₁.B ⟨x, hx⟩ ⟨y₃, y₃inY₁⟩ = 0) -- the rest of the rightmost column is 0s
+    ∧ (∀ y : α, ∀ hy : y ∈ M₂.Y, y ≠ y₂ ∧ y ≠ y₁ → M₂.B ⟨x₁, x₁inX₂⟩ ⟨y, hy⟩ = 0) -- the rest of the topmost row is 0s
   ⟩
 
 /-- Matroid `M` is a result of 1-summing `M₁` and `M₂` (should be equivalent to direct sums). -/
@@ -282,7 +291,7 @@ def BinaryMatroid.Is3sum (M : BinaryMatroid α) (M₁ : BinaryMatroid α) (M₂ 
 theorem BinaryMatroid.Is1sum.isRegular {M : BinaryMatroid α} {M₁ : BinaryMatroid α} {M₂ : BinaryMatroid α}
     (hM : M.Is1sum M₁ M₂) (hM₁ : M₁.IsRegular) (hM₂ : M₂.IsRegular) :
     M.IsRegular := by
-  obtain ⟨eX, eY, hMXY⟩ := hM
+  obtain ⟨hXX, hYY, hXY, hYX, hMsum⟩ := hM
   obtain ⟨B₁, hB₁, hBB₁⟩ := hM₁
   obtain ⟨B₂, hB₂, hBB₂⟩ := hM₂
   let B' := Matrix.oneSumComposition B₁ B₂
@@ -290,6 +299,9 @@ theorem BinaryMatroid.Is1sum.isRegular {M : BinaryMatroid α} {M₁ : BinaryMatr
   · apply Matrix.fromBlocks_TU
     · rwa [Matrix.TU_glue_iff] at hB₁
     · rwa [Matrix.TU_glue_iff] at hB₂
+  have hMX : M.X = (M₁.X ∪ M₂.X) := by simp only [BinaryMatroid.oneSum, hMsum]
+  have hMY : M.Y = (M₁.Y ∪ M₂.Y) := by simp only [BinaryMatroid.oneSum, hMsum]
+  --use B'
   sorry
 
 /-- Any 2-sum of regular matroids is a regular matroid. -/

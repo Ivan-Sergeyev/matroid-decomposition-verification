@@ -2,7 +2,7 @@ import Mathlib
 
 open scoped Matrix
 
-variable {X Y : Type}
+variable {X Y : Type*}
 
 /-- Is the matrix `A` totally unimodular? -/
 def Matrix.TU (A : Matrix X Y ℚ) : Prop :=
@@ -27,8 +27,7 @@ lemma Matrix.TU_iff (A : Matrix X Y ℚ) : A.TU ↔
         unfold Function.Injective at hg
         push_neg at hg
         obtain ⟨i, j, hqij, hij⟩ := hg
-        apply Matrix.det_zero_of_column_eq
-        · exact hij
+        apply Matrix.det_zero_of_column_eq hij
         intro
         simp [hqij]
     else
@@ -40,10 +39,17 @@ lemma Matrix.TU_iff (A : Matrix X Y ℚ) : A.TU ↔
       · exact hij
       show (A (f i)) ∘ (g ·) = (A (f j)) ∘ (g ·)
       rw [hpij]
-  · intros _ _ _ _ _
+  · intro _ _ _ _ _
     apply hA
 
-lemma Matrix.mapEquiv_TU {X' Y' : Type} [DecidableEq X'] [DecidableEq Y']
+lemma Matrix.entries_TU {A : Matrix X Y ℚ} (hA : A.TU) (i : X) (j : Y) :
+    A i j = 0 ∨ A i j = 1 ∨ A i j = -1 := by
+  let f : Fin 1 → X := (fun _ => i)
+  let g : Fin 1 → Y := (fun _ => j)
+  convert hA 1 f g (Function.injective_of_subsingleton f) (Function.injective_of_subsingleton g) <;>
+  exact (det_fin_one (A.submatrix f g)).symm
+
+lemma Matrix.mapEquiv_TU {X' Y' : Type*} [DecidableEq X'] [DecidableEq Y']
     (A : Matrix X Y ℚ) (eX : X' ≃ X) (eY : Y' ≃ Y) :
     Matrix.TU ((A · ∘ eY) ∘ eX) ↔ A.TU := by
   rw [Matrix.TU_iff, Matrix.TU_iff]
@@ -58,14 +64,6 @@ lemma Matrix.submatrix_TU {A : Matrix X Y ℚ} (hA : A.TU) (k : ℕ) (f : Fin k 
   rw [Matrix.TU_iff] at hA
   apply hA
 
-lemma Matrix.entries_TU {A : Matrix X Y ℚ} (hA : A.TU) :
-    ∀ i : X, ∀ j : Y, A i j = 0 ∨ A i j = 1 ∨ A i j = -1 := by
-  intro i j
-  let f : Fin 1 → X := (fun _ => i)
-  let g : Fin 1 → Y := (fun _ => j)
-  convert hA 1 f g (Function.injective_of_subsingleton f) (Function.injective_of_subsingleton g) <;>
-  exact Eq.symm (det_fin_one (A.submatrix f g))
-
 lemma Matrix.transpose_TU {A : Matrix X Y ℚ} (hA : A.TU) : Aᵀ.TU := by
   intro _ _ _ _ _
   simp only [←Matrix.transpose_submatrix, Matrix.det_transpose]
@@ -79,10 +77,10 @@ lemma Matrix.TU_glue_iff [DecidableEq X] (A : Matrix X Y ℚ) : (Matrix.fromColu
 
 variable {X₁ X₂ Y₁ Y₂ : Type}
 
-lemma Matrix.submatrix_fromBlocks {α : Type*} {ι ρ : Type} (f : ι → X₁ ⊕ X₂) (g : ρ → Y₁ ⊕ Y₂)
+lemma Matrix.submatrix_fromBlocks {α ι γ : Type*} (f : ι → X₁ ⊕ X₂) (g : γ → Y₁ ⊕ Y₂)
     (A₁₁ : Matrix X₁ Y₁ α) (A₁₂ : Matrix X₁ Y₂ α) (A₂₁ : Matrix X₂ Y₁ α) (A₂₂ : Matrix X₂ Y₂ α) :
     (Matrix.fromBlocks A₁₁ A₁₂ A₂₁ A₂₂).submatrix f g =
-    (fun (i : ι) (j : ρ) =>
+    (fun (i : ι) (j : γ) =>
       match f i with
       | .inl i₁ =>
         match g j with
