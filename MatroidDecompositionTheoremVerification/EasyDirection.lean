@@ -297,14 +297,14 @@ def convertUnionSum {S₁ S₂ : Set α} [∀ a, Decidable (a ∈ S₁)] [∀ a,
 
 def Matrix.toMatrixUnionUnion {T T₁ T₂ S S₁ S₂ : Set α} -- TODO why does it not work with `β` in place of `ℚ` ?!
     [∀ a, Decidable (a ∈ T₁)] [∀ a, Decidable (a ∈ T₂)] [∀ a, Decidable (a ∈ S₁)] [∀ a, Decidable (a ∈ S₂)]
-    (C : Matrix (↑T₁ ⊕ ↑T₂) (↑S₁ ⊕ ↑S₂) ℚ) (hTTT : T = T₁ ∪ T₂) (hSSS : S = S₁ ∪ S₂) :
+    (C : Matrix (↑T₁ ⊕ ↑T₂) (↑S₁ ⊕ ↑S₂) ℚ) (hT : T = T₁ ∪ T₂) (hS : S = S₁ ∪ S₂) :
     Matrix T S ℚ :=
-  Matrix.of (fun i j => C (convertUnionSum (hTTT ▸ i)) (convertUnionSum (hSSS ▸ j)))
+  Matrix.of (fun i j => C (convertUnionSum (hT ▸ i)) (convertUnionSum (hS ▸ j)))
 
 def Matrix.TU.toMatrixUnionUnion {T T₁ T₂ S S₁ S₂ : Set α}
     [∀ a, Decidable (a ∈ T₁)] [∀ a, Decidable (a ∈ T₂)] [∀ a, Decidable (a ∈ S₁)] [∀ a, Decidable (a ∈ S₂)]
-    {C : Matrix (↑T₁ ⊕ ↑T₂) (↑S₁ ⊕ ↑S₂) ℚ} (hC : C.TU) (hTTT : T = T₁ ∪ T₂) (hSSS : S = S₁ ∪ S₂) :
-    (C.toMatrixUnionUnion hTTT hSSS).TU := by
+    {C : Matrix (↑T₁ ⊕ ↑T₂) (↑S₁ ⊕ ↑S₂) ℚ} (hC : C.TU) (hT : T = T₁ ∪ T₂) (hS : S = S₁ ∪ S₂) :
+    (C.toMatrixUnionUnion hT hS).TU := by
   sorry
 
 /-- Any 1-sum of regular matroids is a regular matroid. -/
