@@ -295,10 +295,10 @@ def convertUnionSum {S₁ S₂ : Set α} [∀ a, Decidable (a ∈ S₁)] [∀ a,
   if hi₂ : i.val ∈ S₂ then Sum.inr ⟨i, hi₂⟩ else
   ((i.property).elim hi₁ hi₂).elim
 
-def Matrix.toMatrixUnionUnion {T T₁ T₂ S S₁ S₂ : Set α} -- TODO why does it not work with `β` in place of `ℚ` ?!
+def Matrix.toMatrixUnionUnion {T T₁ T₂ S S₁ S₂ : Set α}
     [∀ a, Decidable (a ∈ T₁)] [∀ a, Decidable (a ∈ T₂)] [∀ a, Decidable (a ∈ S₁)] [∀ a, Decidable (a ∈ S₂)]
-    (C : Matrix (↑T₁ ⊕ ↑T₂) (↑S₁ ⊕ ↑S₂) ℚ) (hT : T = T₁ ∪ T₂) (hS : S = S₁ ∪ S₂) :
-    Matrix T S ℚ :=
+    {β : Type} (C : Matrix (↑T₁ ⊕ ↑T₂) (↑S₁ ⊕ ↑S₂) β) (hT : T = T₁ ∪ T₂) (hS : S = S₁ ∪ S₂) :
+    Matrix T S β :=
   Matrix.of (fun i j => C (convertUnionSum (hT ▸ i)) (convertUnionSum (hS ▸ j)))
 
 def Matrix.TU.toMatrixUnionUnion {T T₁ T₂ S S₁ S₂ : Set α}
