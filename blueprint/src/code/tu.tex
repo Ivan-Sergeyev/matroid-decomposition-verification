@@ -9,7 +9,7 @@
 \begin{lemma}[entries of a TU matrix]
   \label{lem:code_tu_entries}
   \uses{def:code_tu_matrix}
-  \lean{Matrix.entries_TU}
+  \lean{Matrix.TU.apply}
   If $A$ is TU, then every entry of $A$ is $0$ or $\pm 1$.
 \end{lemma}
 
@@ -33,7 +33,7 @@
 \begin{lemma}[any submatrix of a TU matrix is TU]
   \label{lem:code_submatrix_of_tu}
   \uses{def:code_tu_matrix}
-  \lean{Matrix.submatrix_TU}
+  \lean{Matrix.TU.submatrix}
   Let $A$ be a real matrix that is TU and let $B$ be a submatrix of $A$. Then $B$ is TU.
 \end{lemma}
 
@@ -74,7 +74,7 @@
 \begin{lemma}[transpose of TU is TU]
   \label{lem:code_tu_transpose}
   \uses{def:code_tu_matrix}
-  \lean{Matrix.transpose_TU}
+  \lean{Matrix.TU.transpose}
   Let $A$ be a TU matrix. Then $A^{T}$ is TU.
 \end{lemma}
 
