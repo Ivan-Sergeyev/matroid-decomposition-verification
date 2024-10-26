@@ -6,7 +6,7 @@ open scoped Matrix
 /-- The finite field on two elements. -/
 abbrev Z2 : Type := ZMod 2
 
-infixr:91 " ᕃ " => Insert.insert
+infixr:66 " ᕃ " => Insert.insert -- TODO (low priority) use `syntax` and write a custom delaborator
 
 infix:61 " ⫗ " => Disjoint
 
@@ -14,17 +14,16 @@ section construction_from_matrices
 
 variable {α : Type} [DecidableEq α] {X Y : Set α} [∀ x, Decidable (x ∈ X)] [∀ y, Decidable (y ∈ Y)]
 
+def convertUnionSum (i : Set.Elem (X ∪ Y)) : Set.Elem X ⊕ Set.Elem Y :=
+  if hiX : i.val ∈ X then Sum.inl ⟨i, hiX⟩ else
+  if hiY : i.val ∈ Y then Sum.inr ⟨i, hiY⟩ else
+  ((i.property).elim hiX hiY).elim
+
 /-- Given matrix `B`, is the set of columns `S` in the (standard) representation [`1` | `B`] `Z2`-independent? -/
 def Matrix.IndepCols (B : Matrix X Y Z2) (S : Set α) : Prop :=
   ∃ hs : S ⊆ X ∪ Y,
     LinearIndependent Z2
-      ((Matrix.fromColumns 1 B).submatrix id
-        (fun s : S =>
-          if hsX : s.val ∈ X then Sum.inl ⟨s, hsX⟩ else
-          if hsY : s.val ∈ Y then Sum.inr ⟨s, hsY⟩ else
-          ((hs s.property).elim hsX hsY).elim :
-        S → X ⊕ Y)
-      ).transpose
+      ((Matrix.fromColumns 1 B).submatrix id (fun s : S => (convertUnionSum ⟨s.val, hs s.property⟩))).transpose
 
 /-- The empty set of columns in linearly independent. -/
 theorem Matrix.IndepCols_empty (B : Matrix X Y Z2) : B.IndepCols ∅ := by
@@ -108,12 +107,6 @@ noncomputable abbrev Matrix.threeSumComposition (A₁ : Matrix X₁ (Y₁ ⊕ Fi
 
 end matrix_level
 
-def convertUnionSum {S₁ S₂ : Set α} [∀ a, Decidable (a ∈ S₁)] [∀ a, Decidable (a ∈ S₂)] (i : Set.Elem (S₁ ∪ S₂)) :
-    Set.Elem S₁ ⊕ Set.Elem S₂ :=
-  if hi₁ : i.val ∈ S₁ then Sum.inl ⟨i, hi₁⟩ else
-  if hi₂ : i.val ∈ S₂ then Sum.inr ⟨i, hi₂⟩ else
-  ((i.property).elim hi₁ hi₂).elim
-
 def Matrix.toMatrixUnionUnion {T T₁ T₂ S S₁ S₂ : Set α}
     [∀ a, Decidable (a ∈ T₁)] [∀ a, Decidable (a ∈ T₂)] [∀ a, Decidable (a ∈ S₁)] [∀ a, Decidable (a ∈ S₂)]
     {β : Type} (C : Matrix (↑T₁ ⊕ ↑T₂) (↑S₁ ⊕ ↑S₂) β) (hT : T = T₁ ∪ T₂) (hS : S = S₁ ∪ S₂) :
@@ -148,23 +141,15 @@ def BinaryMatroid.twoSum {M₁ M₂ : BinaryMatroid α} {a : α}
   have dmY₁ := M₁.decmemY
   have dmX₂ := M₂.decmemX
   have dmY₂ := M₂.decmemY
-  let A₁ : Matrix (M₁.X \ {a} : Set α) M₁.Y Z2 := (fun i => M₁.B ⟨i.val, Set.mem_of_mem_diff i.property⟩) -- the top submatrix of `B₁`
-  let A₂ : Matrix M₂.X (M₂.Y \ {a} : Set α) Z2 := (fun j => M₂.B · ⟨j.val, Set.mem_of_mem_diff j.property⟩) -- the right submatrix of `B₂`
+  let A₁ : Matrix (M₁.X \ {a} : Set α) M₁.Y Z2 := -- the top submatrix of `B₁`
+    (fun i => M₁.B ⟨i.val, Set.mem_of_mem_diff i.property⟩)
+  let A₂ : Matrix M₂.X (M₂.Y \ {a} : Set α) Z2 := -- the right submatrix of `B₂`
+    (fun j => M₂.B · ⟨j.val, Set.mem_of_mem_diff j.property⟩)
   let x : M₁.Y → Z2 := M₁.B ⟨a, Set.mem_of_mem_inter_left (by rw [ha]; rfl)⟩ -- the bottom row of `B₁`
   let y : M₂.X → Z2 := (M₂.B · ⟨a, Set.mem_of_mem_inter_right (by rw [ha]; rfl)⟩) -- the left column of `B₂`
-  -- TODO try to refactor using `Matrix.toMatrixUnionUnion`
-  let B : Matrix ↑((M₁.X \ {a} : Set α) ∪ M₂.X) ↑(M₁.Y ∪ (M₂.Y \ {a} : Set α)) Z2 := Matrix.of
-    (fun i j =>
-      Matrix.twoSumComposition A₁ x A₂ y (
-        if hi₁ : i.val ∈ M₁.X \ {a} then Sum.inl ⟨i, hi₁⟩ else
-        if hi₂ : i.val ∈ M₂.X then Sum.inr ⟨i, hi₂⟩ else
-        (i.property.elim hi₁ hi₂).elim
-      ) (
-        if hj₁ : j.val ∈ M₁.Y then Sum.inl ⟨j, hj₁⟩ else
-        if hj₂ : j.val ∈ M₂.Y \ {a} then Sum.inr ⟨j, hj₂⟩ else
-        (j.property.elim hj₁ hj₂).elim
-      )
-    )
+  --
+  let B : Matrix ↑((M₁.X \ {a} : Set α) ∪ M₂.X) ↑(M₁.Y ∪ (M₂.Y \ {a} : Set α)) Z2 :=
+    (Matrix.twoSumComposition A₁ x A₂ y).toMatrixUnionUnion rfl rfl
   ⟨
     ⟨
       B.toMatroid,
@@ -234,6 +219,7 @@ noncomputable def BinaryMatroid.threeSum {M₁ M₂ : BinaryMatroid α} {x₁ x�
         if hx₂ : i.val = x₂ then Sum.inr (Sum.inl 0) else
         if hx₃ : i.val = x₃ then Sum.inr (Sum.inl 1) else
         (i.property.elim hi₁ (by simp_all)).elim
+        -- TODO can `Matrix.toMatrixUnionUnion` be combined with something else to simplify this definition?
       ) (
         if hj₁ : j.val ∈ M₁.Y \ {y₁, y₂, y₃} then Sum.inl (Sum.inl ⟨j, hj₁⟩) else
         if hj₂ : j.val ∈ M₂.Y \ {y₁, y₂, y₃} then Sum.inr (Sum.inr ⟨j, hj₂⟩) else
@@ -266,8 +252,8 @@ noncomputable def BinaryMatroid.threeSum {M₁ M₂ : BinaryMatroid α} {x₁ x�
     ∧ M₂.B ⟨x₁, x₁inX₂⟩ ⟨y₂, y₂inY₂⟩ = 1
     ∧ M₂.B ⟨x₂, x₂inX₂⟩ ⟨y₃, y₃inY₂⟩ = 1
     ∧ M₂.B ⟨x₃, x₃inX₂⟩ ⟨y₃, y₃inY₂⟩ = 1
-    ∧ (∀ x : α, ∀ hx : x ∈ M₁.X, x ≠ x₂ ∧ x ≠ x₃ → M₁.B ⟨x, hx⟩ ⟨y₃, y₃inY₁⟩ = 0) -- the rest of the rightmost column is 0s
-    ∧ (∀ y : α, ∀ hy : y ∈ M₂.Y, y ≠ y₂ ∧ y ≠ y₁ → M₂.B ⟨x₁, x₁inX₂⟩ ⟨y, hy⟩ = 0) -- the rest of the topmost row is 0s
+    ∧ (∀ x : α, ∀ hx : x ∈ M₁.X, x ≠ x₂ ∧ x ≠ x₃ → M₁.B ⟨x, hx⟩ ⟨y₃, y₃inY₁⟩ = 0) -- the rest of the rightmost column is `0`s
+    ∧ (∀ y : α, ∀ hy : y ∈ M₂.Y, y ≠ y₂ ∧ y ≠ y₁ → M₂.B ⟨x₁, x₁inX₂⟩ ⟨y, hy⟩ = 0) -- the rest of the topmost row is `0`s
   ⟩
 
 /-- Matroid `M` is a result of 1-summing `M₁` and `M₂` (should be equivalent to direct sums). -/
@@ -311,13 +297,13 @@ theorem BinaryMatroid.Is1sum.isRegular {M : BinaryMatroid α} {M₁ : BinaryMatr
   let B' := Matrix.oneSumComposition B₁ B₂
   have hB' : B'.TU
   · apply Matrix.fromBlocks_TU
-    · rwa [Matrix.TU_glue_iff] at hB₁
-    · rwa [Matrix.TU_glue_iff] at hB₂
+    · rwa [Matrix.TU_adjoin_id_left_iff] at hB₁
+    · rwa [Matrix.TU_adjoin_id_left_iff] at hB₂
   have hMX : M.X = (M₁.X ∪ M₂.X) := by simp only [BinaryMatroid.oneSum, hMsum]
   have hMY : M.Y = (M₁.Y ∪ M₂.Y) := by simp only [BinaryMatroid.oneSum, hMsum]
   use B'.toMatrixUnionUnion hMX hMY
   constructor
-  · rw [Matrix.TU_glue_iff]
+  · rw [Matrix.TU_adjoin_id_left_iff]
     exact hB'.toMatrixUnionUnion hMX hMY
   · intro i j
     have hMB : M.B = (Matrix.oneSumComposition M₁.B M₂.B).toMatrixUnionUnion hMX hMY
@@ -330,26 +316,28 @@ theorem BinaryMatroid.Is1sum.isRegular {M : BinaryMatroid α} {M₁ : BinaryMatr
     split <;>
     · cases hi : convertUnionSum (hMX ▸ i) with
       | inl i₁ =>
-        specialize hBB₁ i₁
         cases hj : convertUnionSum (hMY ▸ j) with
         | inl j₁ =>
-          specialize hBB₁ j₁
+          specialize hBB₁ i₁ j₁
           aesop
         | inr j₂ =>
           aesop
       | inr i₂ =>
-        specialize hBB₂ i₂
         cases hj : convertUnionSum (hMY ▸ j) with
         | inl j₁ =>
           aesop
         | inr j₂ =>
-          specialize hBB₂ j₂
+          specialize hBB₂ i₂ j₂
           aesop
 
 /-- Any 2-sum of regular matroids is a regular matroid. -/
 theorem BinaryMatroid.Is2sum.isRegular {a : α} {M : BinaryMatroid α} {M₁ : BinaryMatroid α} {M₂ : BinaryMatroid α}
     (hM : M.Is2sum M₁ M₂) (hM₁ : M₁.IsRegular) (hM₂ : M₂.IsRegular) :
     M.IsRegular := by
+  have dmX₁ := M₁.decmemX
+  have dmY₁ := M₁.decmemY
+  have dmX₂ := M₂.decmemX
+  have dmY₂ := M₂.decmemY
   obtain ⟨eX, eY, hMXY⟩ := hM
   obtain ⟨B₁', hB₁, hBB₁⟩ := hM₁
   obtain ⟨B₂', hB₂, hBB₂⟩ := hM₂
@@ -359,6 +347,10 @@ theorem BinaryMatroid.Is2sum.isRegular {a : α} {M : BinaryMatroid α} {M₁ : B
 theorem BinaryMatroid.Is3sum.isRegular {M : BinaryMatroid α} {M₁ : BinaryMatroid α} {M₂ : BinaryMatroid α}
     (hM : M.Is3sum M₁ M₂) (hM₁ : M₁.IsRegular) (hM₂ : M₂.IsRegular) :
     M.IsRegular := by
+  have dmX₁ := M₁.decmemX
+  have dmY₁ := M₁.decmemY
+  have dmX₂ := M₂.decmemX
+  have dmY₂ := M₂.decmemY
   obtain ⟨eX, eY, hMXY⟩ := hM
   obtain ⟨B₁', hB₁, hBB₁⟩ := hM₁
   obtain ⟨B₂', hB₂, hBB₂⟩ := hM₂

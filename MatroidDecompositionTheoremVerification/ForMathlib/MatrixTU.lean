@@ -69,7 +69,8 @@ lemma Matrix.mapEquiv_TU {X' Y' : Type*} [DecidableEq X'] [DecidableEq Y']
   · simpa [Matrix.submatrix] using hA k (eX.symm ∘ f) (eY.symm ∘ g)
   · simpa [Matrix.submatrix] using hA k (eX ∘ f) (eY ∘ g)
 
-lemma Matrix.TU_glue_iff [DecidableEq X] (A : Matrix X Y ℚ) : (Matrix.fromColumns (1 : Matrix X X ℚ) A).TU ↔ A.TU := by
+lemma Matrix.TU_adjoin_id_left_iff [DecidableEq X] (A : Matrix X Y ℚ) :
+    (Matrix.fromColumns (1 : Matrix X X ℚ) A).TU ↔ A.TU := by
   rw [Matrix.TU_iff, Matrix.TU_iff]
   constructor <;> intro hA k f g
   · exact hA k f (Sum.inr ∘ g)
@@ -108,15 +109,14 @@ lemma Matrix.fromBlocks_TU {A₁ : Matrix X₁ Y₁ ℚ} {A₂ : Matrix X₂ Y�
     (Matrix.fromBlocks A₁ 0 0 A₂).TU := by
   intro k f g hf hg
   obtain ⟨ι₁, ι₂, eι, f₁, f₂, hf⟩ := todo f
-  obtain ⟨ρ₁, ρ₂, eρ, g₁, g₂, hg⟩ := todo g
+  obtain ⟨γ₁, γ₂, eγ, g₁, g₂, hg⟩ := todo g
   have todo_extract :
     (Matrix.fromBlocks A₁ 0 0 A₂).submatrix f g =
     ((Matrix.fromBlocks
       (A₁.submatrix f₁ g₁) 0
       0 (A₂.submatrix f₂ g₂)
-    ) · ∘ eρ) ∘ eι
+    ) · ∘ eγ) ∘ eι
   · ext i j
-    cases hi : eι i <;> cases hj : eρ j <;> simp [hi, hj] <;> aesop
+    cases hi : eι i <;> cases hj : eγ j <;> simp [hi, hj] <;> aesop
   rw [todo_extract]
-  --rw [Matrix.det_fromBlocks_zero₂₁]
   sorry
