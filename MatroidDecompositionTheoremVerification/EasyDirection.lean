@@ -305,7 +305,9 @@ def Matrix.TU.toMatrixUnionUnion {T T₁ T₂ S S₁ S₂ : Set α}
     [∀ a, Decidable (a ∈ T₁)] [∀ a, Decidable (a ∈ T₂)] [∀ a, Decidable (a ∈ S₁)] [∀ a, Decidable (a ∈ S₂)]
     {C : Matrix (↑T₁ ⊕ ↑T₂) (↑S₁ ⊕ ↑S₂) ℚ} (hC : C.TU) (hT : T = T₁ ∪ T₂) (hS : S = S₁ ∪ S₂) :
     (C.toMatrixUnionUnion hT hS).TU := by
-  sorry
+  rw [Matrix.TU_iff] at hC ⊢
+  intros
+  apply hC
 
 /-- Any 1-sum of regular matroids is a regular matroid. -/
 theorem BinaryMatroid.Is1sum.isRegular {M : BinaryMatroid α} {M₁ : BinaryMatroid α} {M₂ : BinaryMatroid α}
