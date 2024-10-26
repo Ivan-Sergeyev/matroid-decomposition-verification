@@ -108,6 +108,18 @@ noncomputable abbrev Matrix.threeSumComposition (A₁ : Matrix X₁ (Y₁ ⊕ Fi
 
 end matrix_level
 
+def convertUnionSum {S₁ S₂ : Set α} [∀ a, Decidable (a ∈ S₁)] [∀ a, Decidable (a ∈ S₂)] (i : Set.Elem (S₁ ∪ S₂)) :
+    Set.Elem S₁ ⊕ Set.Elem S₂ :=
+  if hi₁ : i.val ∈ S₁ then Sum.inl ⟨i, hi₁⟩ else
+  if hi₂ : i.val ∈ S₂ then Sum.inr ⟨i, hi₂⟩ else
+  ((i.property).elim hi₁ hi₂).elim
+
+def Matrix.toMatrixUnionUnion {T T₁ T₂ S S₁ S₂ : Set α}
+    [∀ a, Decidable (a ∈ T₁)] [∀ a, Decidable (a ∈ T₂)] [∀ a, Decidable (a ∈ S₁)] [∀ a, Decidable (a ∈ S₂)]
+    {β : Type} (C : Matrix (↑T₁ ⊕ ↑T₂) (↑S₁ ⊕ ↑S₂) β) (hT : T = T₁ ∪ T₂) (hS : S = S₁ ∪ S₂) :
+    Matrix T S β :=
+  Matrix.of (fun i j => C (convertUnionSum (hT ▸ i)) (convertUnionSum (hS ▸ j)))
+
 /-- Matroid-level (independent sets) 1-sum for matroids defined by their standard representation matrices. -/
 def BinaryMatroid.oneSum {M₁ M₂ : BinaryMatroid α}
     (hXX : M₁.X ⫗ M₂.X) (hYY : M₁.Y ⫗ M₂.Y) (hXY : M₁.X ⫗ M₂.Y) (hYX : M₁.Y ⫗ M₂.X) :
@@ -116,19 +128,7 @@ def BinaryMatroid.oneSum {M₁ M₂ : BinaryMatroid α}
   have dmY₁ := M₁.decmemY
   have dmX₂ := M₂.decmemX
   have dmY₂ := M₂.decmemY
-  -- TODO refactor using `Matrix.toMatrixUnionUnion`
-  let B : Matrix ↑(M₁.X ∪ M₂.X) ↑(M₁.Y ∪ M₂.Y) Z2 := Matrix.of
-    (fun i j =>
-      Matrix.oneSumComposition M₁.B M₂.B (
-        if hi₁ : i.val ∈ M₁.X then Sum.inl ⟨i, hi₁⟩ else
-        if hi₂ : i.val ∈ M₂.X then Sum.inr ⟨i, hi₂⟩ else
-        (i.property.elim hi₁ hi₂).elim
-      ) (
-        if hj₁ : j.val ∈ M₁.Y then Sum.inl ⟨j, hj₁⟩ else
-        if hj₂ : j.val ∈ M₂.Y then Sum.inr ⟨j, hj₂⟩ else
-        (j.property.elim hj₁ hj₂).elim
-      )
-    )
+  let B : Matrix ↑(M₁.X ∪ M₂.X) ↑(M₁.Y ∪ M₂.Y) Z2 := (Matrix.oneSumComposition M₁.B M₂.B).toMatrixUnionUnion rfl rfl
   ⟨
     B.toMatroid,
     M₁.X ∪ M₂.X,
@@ -289,18 +289,6 @@ def BinaryMatroid.Is3sum (M : BinaryMatroid α) (M₁ : BinaryMatroid α) (M₂ 
       let M₀ := BinaryMatroid.threeSum hXX hYY hXY hYX
       M = M₀.fst ∧ M₀.snd
 
-def convertUnionSum {S₁ S₂ : Set α} [∀ a, Decidable (a ∈ S₁)] [∀ a, Decidable (a ∈ S₂)] (i : Set.Elem (S₁ ∪ S₂)) :
-    Set.Elem S₁ ⊕ Set.Elem S₂ :=
-  if hi₁ : i.val ∈ S₁ then Sum.inl ⟨i, hi₁⟩ else
-  if hi₂ : i.val ∈ S₂ then Sum.inr ⟨i, hi₂⟩ else
-  ((i.property).elim hi₁ hi₂).elim
-
-def Matrix.toMatrixUnionUnion {T T₁ T₂ S S₁ S₂ : Set α}
-    [∀ a, Decidable (a ∈ T₁)] [∀ a, Decidable (a ∈ T₂)] [∀ a, Decidable (a ∈ S₁)] [∀ a, Decidable (a ∈ S₂)]
-    {β : Type} (C : Matrix (↑T₁ ⊕ ↑T₂) (↑S₁ ⊕ ↑S₂) β) (hT : T = T₁ ∪ T₂) (hS : S = S₁ ∪ S₂) :
-    Matrix T S β :=
-  Matrix.of (fun i j => C (convertUnionSum (hT ▸ i)) (convertUnionSum (hS ▸ j)))
-
 def Matrix.TU.toMatrixUnionUnion {T T₁ T₂ S S₁ S₂ : Set α}
     [∀ a, Decidable (a ∈ T₁)] [∀ a, Decidable (a ∈ T₂)] [∀ a, Decidable (a ∈ S₁)] [∀ a, Decidable (a ∈ S₂)]
     {C : Matrix (↑T₁ ⊕ ↑T₂) (↑S₁ ⊕ ↑S₂) ℚ} (hC : C.TU) (hT : T = T₁ ∪ T₂) (hS : S = S₁ ∪ S₂) :
@@ -331,7 +319,32 @@ theorem BinaryMatroid.Is1sum.isRegular {M : BinaryMatroid α} {M₁ : BinaryMatr
   constructor
   · rw [Matrix.TU_glue_iff]
     exact hB'.toMatrixUnionUnion hMX hMY
-  · sorry
+  · intro i j
+    have hMB : M.B = (Matrix.oneSumComposition M₁.B M₂.B).toMatrixUnionUnion hMX hMY
+    · subst hMsum
+      unfold BinaryMatroid.oneSum
+      ext
+      simp only [Matrix.oneSumComposition, Matrix.toMatrixUnionUnion, convertUnionSum]
+    rw [hMB]
+    simp only [Matrix.oneSumComposition, Matrix.toMatrixUnionUnion] at *
+    split <;>
+    · cases hi : convertUnionSum (hMX ▸ i) with
+      | inl i₁ =>
+        specialize hBB₁ i₁
+        cases hj : convertUnionSum (hMY ▸ j) with
+        | inl j₁ =>
+          specialize hBB₁ j₁
+          aesop
+        | inr j₂ =>
+          aesop
+      | inr i₂ =>
+        specialize hBB₂ i₂
+        cases hj : convertUnionSum (hMY ▸ j) with
+        | inl j₁ =>
+          aesop
+        | inr j₂ =>
+          specialize hBB₂ j₂
+          aesop
 
 /-- Any 2-sum of regular matroids is a regular matroid. -/
 theorem BinaryMatroid.Is2sum.isRegular {a : α} {M : BinaryMatroid α} {M₁ : BinaryMatroid α} {M₂ : BinaryMatroid α}
