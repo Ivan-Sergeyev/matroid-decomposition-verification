@@ -116,6 +116,7 @@ def BinaryMatroid.oneSum {M₁ M₂ : BinaryMatroid α}
   have dmY₁ := M₁.decmemY
   have dmX₂ := M₂.decmemX
   have dmY₂ := M₂.decmemY
+  -- TODO refactor using `Matrix.toMatrixUnionUnion`
   let B : Matrix ↑(M₁.X ∪ M₂.X) ↑(M₁.Y ∪ M₂.Y) Z2 := Matrix.of
     (fun i j =>
       Matrix.oneSumComposition M₁.B M₂.B (
@@ -151,6 +152,7 @@ def BinaryMatroid.twoSum {M₁ M₂ : BinaryMatroid α} {a : α}
   let A₂ : Matrix M₂.X (M₂.Y \ {a} : Set α) Z2 := (fun j => M₂.B · ⟨j.val, Set.mem_of_mem_diff j.property⟩) -- the right submatrix of `B₂`
   let x : M₁.Y → Z2 := M₁.B ⟨a, Set.mem_of_mem_inter_left (by rw [ha]; rfl)⟩ -- the bottom row of `B₁`
   let y : M₂.X → Z2 := (M₂.B · ⟨a, Set.mem_of_mem_inter_right (by rw [ha]; rfl)⟩) -- the left column of `B₂`
+  -- TODO try to refactor using `Matrix.toMatrixUnionUnion`
   let B : Matrix ↑((M₁.X \ {a} : Set α) ∪ M₂.X) ↑(M₁.Y ∪ (M₂.Y \ {a} : Set α)) Z2 := Matrix.of
     (fun i j =>
       Matrix.twoSumComposition A₁ x A₂ y (
@@ -287,10 +289,32 @@ def BinaryMatroid.Is3sum (M : BinaryMatroid α) (M₁ : BinaryMatroid α) (M₂ 
       let M₀ := BinaryMatroid.threeSum hXX hYY hXY hYX
       M = M₀.fst ∧ M₀.snd
 
+def convertUnionSum {S₁ S₂ : Set α} [∀ a, Decidable (a ∈ S₁)] [∀ a, Decidable (a ∈ S₂)] (i : Set.Elem (S₁ ∪ S₂)) :
+    Set.Elem S₁ ⊕ Set.Elem S₂ :=
+  if hi₁ : i.val ∈ S₁ then Sum.inl ⟨i, hi₁⟩ else
+  if hi₂ : i.val ∈ S₂ then Sum.inr ⟨i, hi₂⟩ else
+  ((i.property).elim hi₁ hi₂).elim
+
+def Matrix.toMatrixUnionUnion {T T₁ T₂ S S₁ S₂ : Set α} -- TODO why does it not work with `β` in place of `ℚ` ?!
+    [∀ a, Decidable (a ∈ T₁)] [∀ a, Decidable (a ∈ T₂)] [∀ a, Decidable (a ∈ S₁)] [∀ a, Decidable (a ∈ S₂)]
+    (C : Matrix (↑T₁ ⊕ ↑T₂) (↑S₁ ⊕ ↑S₂) ℚ) (hTTT : T = T₁ ∪ T₂) (hSSS : S = S₁ ∪ S₂) :
+    Matrix T S ℚ :=
+  Matrix.of (fun i j => C (convertUnionSum (hTTT ▸ i)) (convertUnionSum (hSSS ▸ j)))
+
+def Matrix.TU.toMatrixUnionUnion {T T₁ T₂ S S₁ S₂ : Set α}
+    [∀ a, Decidable (a ∈ T₁)] [∀ a, Decidable (a ∈ T₂)] [∀ a, Decidable (a ∈ S₁)] [∀ a, Decidable (a ∈ S₂)]
+    {C : Matrix (↑T₁ ⊕ ↑T₂) (↑S₁ ⊕ ↑S₂) ℚ} (hC : C.TU) (hTTT : T = T₁ ∪ T₂) (hSSS : S = S₁ ∪ S₂) :
+    (C.toMatrixUnionUnion hTTT hSSS).TU := by
+  sorry
+
 /-- Any 1-sum of regular matroids is a regular matroid. -/
 theorem BinaryMatroid.Is1sum.isRegular {M : BinaryMatroid α} {M₁ : BinaryMatroid α} {M₂ : BinaryMatroid α}
     (hM : M.Is1sum M₁ M₂) (hM₁ : M₁.IsRegular) (hM₂ : M₂.IsRegular) :
     M.IsRegular := by
+  have dmX₁ := M₁.decmemX
+  have dmY₁ := M₁.decmemY
+  have dmX₂ := M₂.decmemX
+  have dmY₂ := M₂.decmemY
   obtain ⟨hXX, hYY, hXY, hYX, hMsum⟩ := hM
   obtain ⟨B₁, hB₁, hBB₁⟩ := hM₁
   obtain ⟨B₂, hB₂, hBB₂⟩ := hM₂
@@ -301,8 +325,11 @@ theorem BinaryMatroid.Is1sum.isRegular {M : BinaryMatroid α} {M₁ : BinaryMatr
     · rwa [Matrix.TU_glue_iff] at hB₂
   have hMX : M.X = (M₁.X ∪ M₂.X) := by simp only [BinaryMatroid.oneSum, hMsum]
   have hMY : M.Y = (M₁.Y ∪ M₂.Y) := by simp only [BinaryMatroid.oneSum, hMsum]
-  --use B'
-  sorry
+  use B'.toMatrixUnionUnion hMX hMY
+  constructor
+  · rw [Matrix.TU_glue_iff]
+    exact hB'.toMatrixUnionUnion hMX hMY
+  · sorry
 
 /-- Any 2-sum of regular matroids is a regular matroid. -/
 theorem BinaryMatroid.Is2sum.isRegular {a : α} {M : BinaryMatroid α} {M₁ : BinaryMatroid α} {M₂ : BinaryMatroid α}
