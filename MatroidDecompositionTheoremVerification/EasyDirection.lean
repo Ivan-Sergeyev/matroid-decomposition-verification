@@ -14,16 +14,19 @@ section construction_from_matrices
 
 variable {α : Type} [DecidableEq α] {X Y : Set α} [∀ x, Decidable (x ∈ X)] [∀ y, Decidable (y ∈ Y)]
 
-def convertUnionSum (i : Set.Elem (X ∪ Y)) : Set.Elem X ⊕ Set.Elem Y :=
+def convertUnionSum (i : (X ∪ Y).Elem) : X.Elem ⊕ Y.Elem :=
   if hiX : i.val ∈ X then Sum.inl ⟨i, hiX⟩ else
   if hiY : i.val ∈ Y then Sum.inr ⟨i, hiY⟩ else
   ((i.property).elim hiX hiY).elim
+
+def subsetElem (hXY : X ⊆ Y) (x : X.Elem) : Y.Elem :=
+  ⟨x.val, hXY x.property⟩
 
 /-- Given matrix `B`, is the set of columns `S` in the (standard) representation [`1` | `B`] `Z2`-independent? -/
 def Matrix.IndepCols (B : Matrix X Y Z2) (S : Set α) : Prop :=
   ∃ hs : S ⊆ X ∪ Y,
     LinearIndependent Z2
-      ((Matrix.fromColumns 1 B).submatrix id (fun s : S => (convertUnionSum ⟨s.val, hs s.property⟩))).transpose
+      ((Matrix.fromColumns 1 B).submatrix id (convertUnionSum ∘ subsetElem hs)).transpose
 
 /-- The empty set of columns in linearly independent. -/
 theorem Matrix.IndepCols_empty (B : Matrix X Y Z2) : B.IndepCols ∅ := by
@@ -109,7 +112,7 @@ end matrix_level
 
 def Matrix.toMatrixUnionUnion {T T₁ T₂ S S₁ S₂ : Set α}
     [∀ a, Decidable (a ∈ T₁)] [∀ a, Decidable (a ∈ T₂)] [∀ a, Decidable (a ∈ S₁)] [∀ a, Decidable (a ∈ S₂)]
-    {β : Type} (C : Matrix (↑T₁ ⊕ ↑T₂) (↑S₁ ⊕ ↑S₂) β) (hT : T = T₁ ∪ T₂) (hS : S = S₁ ∪ S₂) :
+    {β : Type} (C : Matrix (T₁.Elem ⊕ T₂.Elem) (S₁.Elem ⊕ S₂.Elem) β) (hT : T = T₁ ∪ T₂) (hS : S = S₁ ∪ S₂) :
     Matrix T S β :=
   Matrix.of (fun i j => C (convertUnionSum (hT ▸ i)) (convertUnionSum (hS ▸ j)))
 
@@ -121,7 +124,7 @@ def BinaryMatroid.oneSum {M₁ M₂ : BinaryMatroid α}
   have dmY₁ := M₁.decmemY
   have dmX₂ := M₂.decmemX
   have dmY₂ := M₂.decmemY
-  let B : Matrix ↑(M₁.X ∪ M₂.X) ↑(M₁.Y ∪ M₂.Y) Z2 := (Matrix.oneSumComposition M₁.B M₂.B).toMatrixUnionUnion rfl rfl
+  let B : Matrix (M₁.X ∪ M₂.X).Elem (M₁.Y ∪ M₂.Y).Elem Z2 := (Matrix.oneSumComposition M₁.B M₂.B).toMatrixUnionUnion rfl rfl
   ⟨
     B.toMatroid,
     M₁.X ∪ M₂.X,
@@ -141,20 +144,18 @@ def BinaryMatroid.twoSum {M₁ M₂ : BinaryMatroid α} {a : α}
   have dmY₁ := M₁.decmemY
   have dmX₂ := M₂.decmemX
   have dmY₂ := M₂.decmemY
-  let A₁ : Matrix (M₁.X \ {a} : Set α) M₁.Y Z2 := -- the top submatrix of `B₁`
-    (fun i => M₁.B ⟨i.val, Set.mem_of_mem_diff i.property⟩)
-  let A₂ : Matrix M₂.X (M₂.Y \ {a} : Set α) Z2 := -- the right submatrix of `B₂`
-    (fun j => M₂.B · ⟨j.val, Set.mem_of_mem_diff j.property⟩)
-  let x : M₁.Y → Z2 := M₁.B ⟨a, Set.mem_of_mem_inter_left (by rw [ha]; rfl)⟩ -- the bottom row of `B₁`
-  let y : M₂.X → Z2 := (M₂.B · ⟨a, Set.mem_of_mem_inter_right (by rw [ha]; rfl)⟩) -- the left column of `B₂`
+  let A₁ : Matrix (M₁.X \ {a}).Elem M₁.Y.Elem Z2 := M₁.B ∘ subsetElem Set.diff_subset -- the top submatrix of `B₁`
+  let A₂ : Matrix M₂.X.Elem (M₂.Y \ {a}).Elem Z2 := (M₂.B · ∘ subsetElem Set.diff_subset) -- the right submatrix of `B₂`
+  let x : M₁.Y.Elem → Z2 := M₁.B ⟨a, Set.mem_of_mem_inter_left (by rw [ha]; rfl)⟩ -- the bottom row of `B₁`
+  let y : M₂.X.Elem → Z2 := (M₂.B · ⟨a, Set.mem_of_mem_inter_right (by rw [ha]; rfl)⟩) -- the left column of `B₂`
   --
-  let B : Matrix ↑((M₁.X \ {a} : Set α) ∪ M₂.X) ↑(M₁.Y ∪ (M₂.Y \ {a} : Set α)) Z2 :=
+  let B : Matrix ((M₁.X \ {a}) ∪ M₂.X).Elem (M₁.Y ∪ (M₂.Y \ {a})).Elem Z2 :=
     (Matrix.twoSumComposition A₁ x A₂ y).toMatrixUnionUnion rfl rfl
   ⟨
     ⟨
       B.toMatroid,
-      (M₁.X \ {a} : Set α) ∪ M₂.X,
-      M₁.Y ∪ (M₂.Y \ {a} : Set α),
+      (M₁.X \ {a}) ∪ M₂.X,
+      M₁.Y ∪ (M₂.Y \ {a}),
       (Set.decidableUnion _ _ ·),
       (Set.decidableUnion _ _ ·),
       by
@@ -191,26 +192,27 @@ noncomputable def BinaryMatroid.threeSum {M₁ M₂ : BinaryMatroid α} {x₁ x�
   have y₁inY₁ : y₁ ∈ M₁.Y := hyyy₁ (Set.mem_insert y₁ {y₂, y₃})
   have y₁inY₂ : y₁ ∈ M₂.Y := hyyy₂ (Set.mem_insert y₁ {y₂, y₃})
   --
-  let A₁ : Matrix (M₁.X \ {x₁, x₂, x₃} : Set α) ((M₁.Y \ {y₁, y₂, y₃} : Set α) ⊕ Fin 2) Z2 := -- the top left submatrix
+  -- TODO try to refactor `Set.mem_of_mem_diff` to `subsetElem Set.diff_subset`
+  let A₁ : Matrix (M₁.X \ {x₁, x₂, x₃}).Elem ((M₁.Y \ {y₁, y₂, y₃}).Elem ⊕ Fin 2) Z2 := -- the top left submatrix
     (fun i j => M₁.B ⟨i.val, Set.mem_of_mem_diff i.property⟩
         (j.casesOn (fun j' => ⟨j'.val, Set.mem_of_mem_diff j'.property⟩) ![⟨y₂, y₂inY₁⟩, ⟨y₁, y₁inY₁⟩]))
-  let A₂ : Matrix (Fin 2 ⊕ (M₂.X \ {x₁, x₂, x₃} : Set α)) (M₂.Y \ {y₁, y₂, y₃} : Set α) Z2 := -- the bottom right submatrix
+  let A₂ : Matrix (Fin 2 ⊕ (M₂.X \ {x₁, x₂, x₃}).Elem) (M₂.Y \ {y₁, y₂, y₃}).Elem Z2 := -- the bottom right submatrix
     (fun i j => M₂.B (i.casesOn ![⟨x₂, x₂inX₂⟩, ⟨x₃, x₃inX₂⟩] (fun i' => ⟨i'.val, Set.mem_of_mem_diff i'.property⟩))
         ⟨j.val, Set.mem_of_mem_diff j.property⟩)
-  let z₁ : (M₁.Y \ {y₁, y₂, y₃} : Set α) → Z2 := -- the middle left "row vector"
+  let z₁ : (M₁.Y \ {y₁, y₂, y₃}).Elem → Z2 := -- the middle left "row vector"
     (fun j => M₁.B ⟨x₁, x₁inX₁⟩ ⟨j.val, Set.mem_of_mem_diff j.property⟩)
-  let z₂ : (M₂.X \ {x₁, x₂, x₃} : Set α) → Z2 := -- the bottom middle "column vector"
+  let z₂ : (M₂.X \ {x₁, x₂, x₃}).Elem → Z2 := -- the bottom middle "column vector"
     (fun i => M₂.B ⟨i.val, Set.mem_of_mem_diff i.property⟩ ⟨y₃, y₃inY₂⟩)
   let D_₁ : Matrix (Fin 2) (Fin 2) Z2 := -- the bottom middle 2x2 submatrix
     (fun i j => M₁.B (![⟨x₂, x₂inX₁⟩, ⟨x₃, x₃inX₁⟩] i) (![⟨y₂, y₂inY₁⟩, ⟨y₁, y₁inY₁⟩] j))
   let D_₂ : Matrix (Fin 2) (Fin 2) Z2 := -- the middle left 2x2 submatrix
     (fun i j => M₂.B (![⟨x₂, x₂inX₂⟩, ⟨x₃, x₃inX₂⟩] i) (![⟨y₂, y₂inY₂⟩, ⟨y₁, y₁inY₂⟩] j))
-  let D₁ : Matrix (Fin 2) (M₁.Y \ {y₁, y₂, y₃} : Set α) Z2 := -- the bottom left submatrix
+  let D₁ : Matrix (Fin 2) (M₁.Y \ {y₁, y₂, y₃}).Elem Z2 := -- the bottom left submatrix
     (fun i j => M₁.B (![⟨x₂, x₂inX₁⟩, ⟨x₃, x₃inX₁⟩] i) ⟨j.val, Set.mem_of_mem_diff j.property⟩)
-  let D₂ : Matrix (M₂.X \ {x₁, x₂, x₃} : Set α) (Fin 2) Z2 := -- the bottom left submatrix
+  let D₂ : Matrix (M₂.X \ {x₁, x₂, x₃}).Elem (Fin 2) Z2 := -- the bottom left submatrix
     (fun i j => M₂.B ⟨i.val, Set.mem_of_mem_diff i.property⟩ (![⟨y₂, y₂inY₂⟩, ⟨y₁, y₁inY₂⟩] j))
   --
-  let B : Matrix ↑((M₁.X \ {x₁, x₂, x₃} : Set α) ∪ M₂.X) ↑(M₁.Y ∪ (M₂.Y \ {y₁, y₂, y₃} : Set α)) Z2 := Matrix.of
+  let B : Matrix ((M₁.X \ {x₁, x₂, x₃}) ∪ M₂.X).Elem (M₁.Y ∪ (M₂.Y \ {y₁, y₂, y₃})).Elem Z2 := Matrix.of
     (fun i j =>
       Matrix.threeSumComposition A₁ A₂ z₁ z₂ D_₁ D₁ D₂ (
         if hi₁ : i.val ∈ M₁.X \ {x₁, x₂, x₃} then Sum.inl (Sum.inl ⟨i, hi₁⟩) else
@@ -232,8 +234,8 @@ noncomputable def BinaryMatroid.threeSum {M₁ M₂ : BinaryMatroid α} {x₁ x�
   ⟨
     ⟨
       B.toMatroid,
-      (M₁.X \ {x₁, x₂, x₃} : Set α) ∪ M₂.X,
-      M₁.Y ∪ (M₂.Y \ {y₁, y₂, y₃} : Set α),
+      (M₁.X \ {x₁, x₂, x₃}) ∪ M₂.X,
+      M₁.Y ∪ (M₂.Y \ {y₁, y₂, y₃}),
       (Set.decidableUnion _ _ ·),
       (Set.decidableUnion _ _ ·),
       by
@@ -277,7 +279,7 @@ def BinaryMatroid.Is3sum (M : BinaryMatroid α) (M₁ : BinaryMatroid α) (M₂ 
 
 def Matrix.TU.toMatrixUnionUnion {T T₁ T₂ S S₁ S₂ : Set α}
     [∀ a, Decidable (a ∈ T₁)] [∀ a, Decidable (a ∈ T₂)] [∀ a, Decidable (a ∈ S₁)] [∀ a, Decidable (a ∈ S₂)]
-    {C : Matrix (↑T₁ ⊕ ↑T₂) (↑S₁ ⊕ ↑S₂) ℚ} (hC : C.TU) (hT : T = T₁ ∪ T₂) (hS : S = S₁ ∪ S₂) :
+    {C : Matrix (T₁ ⊕ T₂) (S₁ ⊕ S₂) ℚ} (hC : C.TU) (hT : T = T₁ ∪ T₂) (hS : S = S₁ ∪ S₂) :
     (C.toMatrixUnionUnion hT hS).TU := by
   rw [Matrix.TU_iff] at hC ⊢
   intros
