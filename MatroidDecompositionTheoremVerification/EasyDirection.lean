@@ -13,6 +13,7 @@ infix:61 " ⫗ " => Disjoint
 section construction_from_matrices
 
 variable {α : Type} [DecidableEq α] {X Y : Set α} [∀ x, Decidable (x ∈ X)] [∀ y, Decidable (y ∈ Y)]
+-- Do not refactor to `[DecidablePred X.Mem]` and so on!
 
 def convertUnionSum (i : (X ∪ Y).Elem) : X.Elem ⊕ Y.Elem :=
   if hiX : i.val ∈ X then Sum.inl ⟨i, hiX⟩ else
