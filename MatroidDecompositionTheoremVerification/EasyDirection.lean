@@ -31,11 +31,19 @@ def Matrix.IndepCols (B : Matrix X Y Z2) (S : Set α) : Prop :=
 
 /-- The empty set of columns in linearly independent. -/
 theorem Matrix.IndepCols_empty (B : Matrix X Y Z2) : B.IndepCols ∅ := by
-  sorry
+  use Set.empty_subset (X ∪ Y)
+  exact linearIndependent_empty_type
 
 /-- A subset of a linearly independent set of columns in linearly independent. -/
 theorem Matrix.IndepCols_subset (B : Matrix X Y Z2) (I J : Set α) (hBJ : B.IndepCols J) (hIJ : I ⊆ J) :
     B.IndepCols I := by
+  obtain ⟨hJ, hB⟩ := hBJ
+  use hIJ.trans hJ
+  let I' := { i : J.Elem // i.val ∈ I }
+  -- let f : I' → I := fun i => I.restrictPreimage Subtype.val i
+  let e : I' ≃ I := (Equiv.subtypeSubtypeEquivSubtype (by convert hIJ))
+  -- have he := e.injective
+  -- apply LinearIndependent.coe_range
   sorry
 
 /-- A nonmaximal linearly independent set of columns can be augmented with another linearly independent column. -/
@@ -302,8 +310,8 @@ theorem BinaryMatroid.Is1sum.isRegular {M : BinaryMatroid α} {M₁ : BinaryMatr
   · apply Matrix.fromBlocks_TU
     · rwa [Matrix.TU_adjoin_id_left_iff] at hB₁
     · rwa [Matrix.TU_adjoin_id_left_iff] at hB₂
-  have hMX : M.X = (M₁.X ∪ M₂.X) := by simp only [BinaryMatroid.oneSum, hMsum]
-  have hMY : M.Y = (M₁.Y ∪ M₂.Y) := by simp only [BinaryMatroid.oneSum, hMsum]
+  have hMX : M.X = M₁.X ∪ M₂.X := by simp only [BinaryMatroid.oneSum, hMsum]
+  have hMY : M.Y = M₁.Y ∪ M₂.Y := by simp only [BinaryMatroid.oneSum, hMsum]
   use B'.toMatrixUnionUnion hMX hMY
   constructor
   · rw [Matrix.TU_adjoin_id_left_iff]
@@ -333,6 +341,11 @@ theorem BinaryMatroid.Is1sum.isRegular {M : BinaryMatroid α} {M₁ : BinaryMatr
           specialize hBB₂ i₂ j₂
           aesop
 
+lemma does_this_hold {X₁ Y₁ : Set α} {X₂ Y₂ : Set α}
+    (A₁ : Matrix X₁ Y₁ ℚ) (x : Y₁ → ℚ) (A₂ : Matrix X₂ Y₂ ℚ) (y : X₂ → ℚ) (hA₁ : A₁.TU) (hA₂ : A₂.TU) :
+    (Matrix.twoSumComposition A₁ x A₂ y).TU := by
+  sorry
+
 /-- Any 2-sum of regular matroids is a regular matroid. -/
 theorem BinaryMatroid.Is2sum.isRegular {a : α} {M : BinaryMatroid α} {M₁ : BinaryMatroid α} {M₂ : BinaryMatroid α}
     (hM : M.Is2sum M₁ M₂) (hM₁ : M₁.IsRegular) (hM₂ : M₂.IsRegular) :
@@ -341,10 +354,51 @@ theorem BinaryMatroid.Is2sum.isRegular {a : α} {M : BinaryMatroid α} {M₁ : B
   have dmY₁ := M₁.decmemY
   have dmX₂ := M₂.decmemX
   have dmY₂ := M₂.decmemY
-  obtain ⟨eX, eY, hMXY⟩ := hM
-  obtain ⟨B₁', hB₁, hBB₁⟩ := hM₁
-  obtain ⟨B₂', hB₂, hBB₂⟩ := hM₂
-  sorry
+  obtain ⟨⟨hXX, hYY⟩, a, haY₁, haX₂, ha, hXY, hMXY⟩ := hM
+  simp [BinaryMatroid.twoSum] at hMXY
+  obtain ⟨hM, hx, hy⟩ := hMXY
+  obtain ⟨B₁, hB₁, hBB₁⟩ := hM₁
+  obtain ⟨B₂, hB₂, hBB₂⟩ := hM₂
+  have haXY : a ∈ M₁.X ∩ M₂.Y
+  · rewrite [ha]
+    rfl
+  have haX₁ : a ∈ M₁.X := Set.mem_of_mem_inter_left haXY
+  have haY₂ : a ∈ M₂.Y := Set.mem_of_mem_inter_right haXY
+  let x' : M₁.Y.Elem → ℚ := B₁ ⟨a, haX₁⟩
+  let y' : M₂.X.Elem → ℚ := (B₂ · ⟨a, haY₂⟩)
+  let B' := Matrix.twoSumComposition B₁ x' B₂ y'
+  have hB' : B'.TU
+  · apply does_this_hold
+    · rwa [Matrix.TU_adjoin_id_left_iff] at hB₁
+    · rwa [Matrix.TU_adjoin_id_left_iff] at hB₂
+  have hMX : M.X = (M₁.X \ {a}) ∪ M₂.X
+  · simp only [BinaryMatroid.twoSum, hM]
+  have hMY : M.Y = M₁.Y ∪ (M₂.Y \ {a})
+  · simp only [BinaryMatroid.twoSum, hM]
+  have hXuX : M₁.X \ {a} ∪ M₂.X = M₁.X ∪ M₂.X
+  · sorry -- Does not hold !!!
+  have hYuY : M₁.Y ∪ M₂.Y \ {a} = M₁.Y ∪ M₂.Y
+  · sorry -- Does not hold !!!
+  let B'' : Matrix ((M₁.X \ {a}) ∪ M₂.X).Elem (M₁.Y ∪ (M₂.Y \ {a})).Elem ℚ :=
+    B'.toMatrixUnionUnion hXuX hYuY -- TODO change (probably a diffrent signature is needed).
+  have hB'' : B''.TU
+  · exact Matrix.TU.toMatrixUnionUnion hB' hXuX hYuY
+  use hMX ▸ hMY ▸ B''
+  constructor
+  · rw [Matrix.TU_adjoin_id_left_iff]
+    convert hB''
+    simp only [Subtype.forall, eqRec_heq_iff_heq, heq_eq_eq]
+  · intro i j
+    let x : M₁.Y.Elem → Z2 := M₁.B ⟨a, haX₁⟩
+    let y : M₂.X.Elem → Z2 := (M₂.B · ⟨a, haY₂⟩)
+    have hMB : M.B = (Matrix.twoSumComposition M₁.B x M₂.B y).toMatrixUnionUnion (hMX.trans hXuX) (hMY.trans hYuY)
+    · subst hM
+      ext
+      simp [Matrix.twoSumComposition, Matrix.toMatrixUnionUnion, convertUnionSum]
+      sorry
+    rw [hMB]
+    simp only [Matrix.twoSumComposition, Matrix.toMatrixUnionUnion] at *
+    sorry
 
 /-- Any 3-sum of regular matroids is a regular matroid. -/
 theorem BinaryMatroid.Is3sum.isRegular {M : BinaryMatroid α} {M₁ : BinaryMatroid α} {M₂ : BinaryMatroid α}
