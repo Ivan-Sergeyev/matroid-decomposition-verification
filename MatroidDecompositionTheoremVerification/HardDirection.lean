@@ -9,9 +9,8 @@ def BinaryMatroid.IsGraphic (M : BinaryMatroid α) : Prop :=
 def BinaryMatroid.IsCographic (M : BinaryMatroid α) : Prop :=
   sorry
 
--- TODO separate the ground set from the type
-def MatroidR10 : BinaryMatroid (Fin 10) :=
-  sorry
+def MatroidR10 : BinaryMatroid α :=
+  sorry -- inside we have some `Fin 10 ↪ α` whose image is `E`
 
 inductive BinaryMatroid.IsGood : BinaryMatroid α → Prop
 -- leaf constructors
@@ -22,7 +21,6 @@ inductive BinaryMatroid.IsGood : BinaryMatroid α → Prop
 | is1sum {M₁ : BinaryMatroid α} {M₂ : BinaryMatroid α} {M : BinaryMatroid α} (hM : M.Is1sum M₁ M₂) : M.IsGood
 | is2sum {M₁ : BinaryMatroid α} {M₂ : BinaryMatroid α} {M : BinaryMatroid α} (hM : M.Is2sum M₁ M₂) : M.IsGood
 | is3sum {M₁ : BinaryMatroid α} {M₂ : BinaryMatroid α} {M : BinaryMatroid α} (hM : M.Is3sum M₁ M₂) : M.IsGood
--- TODO is additional `mapEquiv` constructor needed?
 
 theorem hardSeymour {M : BinaryMatroid α} (hM : M.IsRegular) : M.IsGood := by
   sorry
