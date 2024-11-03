@@ -4,7 +4,7 @@ The goal of this project is to formally verify Seymour's decomposition theorem i
 
 ## Blueprint
 
-You can find the blueprint on the [GitHub Pages site](https://ivan-sergeyev.github.io/matroid-decomposition-verification/)
+You can find the blueprint on the [GitHub Pages site](https://ivan-sergeyev.github.io/seymour/)
 
 ## References
 
