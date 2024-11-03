@@ -4,7 +4,7 @@
 
 % The theorem-like environments defined below are those that appear by default
 % in the dependency graph. See the README of leanblueprint if you need help to
-% customize this. 
+% customize this.
 % The configuration below use the theorem counter for all those environments
 % (this is what the [theorem] arguments mean) and never resets it.
 % If you want for instance to number them within chapters then you can add
@@ -16,3 +16,12 @@
 
 \theoremstyle{definition}
 \newtheorem{definition}[theorem]{Definition}
+
+% Custom shorthand macros
+\newcommand{\R}{\ensuremath{\mathbb{R}}} % reals
+\newcommand{\Z}{\ensuremath{\mathbb{Z}}} % integers
+
+\newcommand{\GFtwo}{\ensuremath{\mathrm{GF}(2)}} % field with two elements
+
+\newcommand{\M}{\ensuremath{\mathcal{M}}} % class of matroids
+\newcommand{\I}{\ensuremath{\mathcal{I}}} % family of independent sets

@@ -1,0 +1,132 @@
+\section{Chapter 8}
+
+\subsection{Chapter 8.2}
+
+This chapter is about deducing and manipulating $1$- and $2$-sum decompositions and compositions.
+
+\begin{proposition}[8.2.1] % todo: this defines 1-sum
+  \label{prop:8.2.1}
+  \uses{def:k_sep}
+  Matrix of $1$-separation.
+\end{proposition}
+
+\begin{lemma}[8.2.2]
+  \label{lem:8.2.2}
+  \uses{def:binary_matroid,def:1_sum,def:graphic_matroid,def:planar_matroid}
+  Let $M$ be a binary matroid. Assume $M$ to be a $1$-sum of two matroids $M_{1}$ and $M_{2}$.
+  \begin{itemize}
+    \item If $M$ is graphic, then there eixst graphs $G$, $G_{1}$, $G_{2}$ for $M$, $M_{1}$, $M_{2}$, respectively, such that identification of a node of $G_{1}$ with one of $G_{2}$ creates $G$.
+    \item If $M_{1}$ and $M_{2}$ are graphic (resp. planar), then $M$ is graphic (resp. planar).
+  \end{itemize}
+\end{lemma}
+
+\begin{proof}[Proof sketch]
+  \uses{thm:3.2.25.a}
+  Elementary application of Theorem 3.2.25.a.
+\end{proof}
+
+\begin{proposition}[8.2.3]
+  \label{prop:8.2.3}
+  \uses{def:k_sep}
+  Matrix of exact $2$-separation.
+\end{proposition}
+
+\begin{proposition}[8.2.4] % todo: this defines 2-sum
+  \label{prop:8.2.4}
+  \uses{prop:8.2.3}
+  Matrices $B^{1}$ and $B^{2}$ of $2$-sum.
+\end{proposition}
+
+\begin{lemma}[8.2.6]
+  \label{lem:8.2.6}
+  \uses{def:binary_matroid,def:k_sep,def:k_conn,def:2_sum}
+  Any $2$-separation of a connected binary matroid $M$ produces a $2$-sum with connected components $M_{1}$ and $M_{2}$.
+  Conversely, any $2$-sum of two connected binary matroids $M_{1}$ and $M_{2}$ is a connected binary matroid $M$.
+\end{lemma}
+
+\begin{proof}[Proof sketch]
+  \uses{prop:8.2.3,prop:8.2.4,lem:3.3.19}
+  \begin{itemize}
+    \item Definitions imply everything except connectedness.
+    \item It is easy to check that connectedness of (8.2.3) implies connectedness of (8.2.4) and vice versa.
+    \item By Lemma 3.3.19, connectedness of representation matrices is equivalent to connectedness of the corresponding matroids.
+  \end{itemize}
+\end{proof}
+
+\begin{lemma}[8.2.7]
+  \label{lem:8.2.7}
+  \uses{def:binary_matroid,def:k_conn,def:2_sum,prop:8.2.3,prop:8.2.4,def:graphic_matroid,def:planar_matroid}
+  Let $M$ be a connected binary matroid that is a $2$-sum of $M_{1}$ and $M_{2}$, as given via $B$, $B_1$, and $B_2$ of (8.2.3) and (8.2.4).
+  \begin{itemize}
+    \item If $M$ is graphic, then there exist $2$-connected graphs $G$, $G_{1}$, and $G_{2}$ for $M$, $M_{1}$, and $M_{2}$, respectively, with the following feature. The graph $G$ is produced when one identifies the edge $x$ of $G_{1}$ with the edge $y$ of $G_{2}$, and when subsequently the edge so created is deleted.
+    \item If $M_{1}$ and $M_{2}$ are graphic (resp. planar), then $M$ is graphic (resp. planar).
+  \end{itemize}
+\end{lemma}
+
+\begin{proof}[Proof sketch]
+  \uses{def:k_sep,thm:3.2.25.b,lem:8.2.6,prop:8.2.3,prop:8.2.4,switching op sec 3}
+  \begin{itemize}
+    \item Ingredients: look at a $2$-separation and the corresponding subgraphs, use Theorem 3.2.25.b, use the switching operation of Section 3.2, use Lemma 8.2.6 and representations (8.2.3) and (8.2.4).
+    \item Use the construction from the drawing, check that fundamental circuits match, conclude that $M$ is graphic. For planar graphs, the edge identification can be done in a planar way.
+  \end{itemize}
+\end{proof}
+
+
+\subsection{Chapter 8.3}
+
+\begin{proposition}[8.3.1] % todo: this defines 3-sum
+  \label{prop:8.3.1}
+  \uses{def:k_sep}
+  Matrix $B$ with exact $k$-separation.
+\end{proposition}
+
+\begin{proposition}[8.3.2] % todo: this defines 3-sum
+  \label{prop:8.3.2}
+  \uses{prop:8.3.1,def:3_sum}
+  Partition of $B$ displaying $k$-sum.
+\end{proposition}
+
+\begin{proposition}[8.3.9] % todo: this defines 3-sum
+  \label{prop:8.3.9}
+  \uses{prop:8.3.2,def:3_sum}
+  The (well-chosen) matrix $\overline{B}$ representing the connecting minor $\overline{M}$ of a $3$-sum.
+\end{proposition}
+
+\begin{proposition}[8.3.10] % todo: this defines 3-sum
+  \label{prop:8.3.10}
+  \uses{prop:8.3.2,prop:8.3.9,def:3_sum}
+  The matrix $B$ representing a $3$-sum (after reasoning).
+\end{proposition}
+
+\begin{proposition}[8.3.11]
+  \label{prop:8.3.11}
+  \uses{def:3_sum}
+  Representation matrices $B^{1}$ and $B^{2}$ of the components $M_{1}$ and $M_{2}$ of a $3$-sum (after reasoning).
+\end{proposition}
+
+\begin{lemma}[8.3.12]
+  \label{lem:8.3.12}
+  \uses{def:k_conn,def:k_sep,def:binary_matroid,def:3_sum}
+  Let $M$ be a $3$-connected binary matroid on a set $E$. Then any $3$-separation $(E_{1}, E_{2})$ of $M$ with $|E_{1}|, |E_{2}| \geq 4$ produces a $3$-sum, and vice versa.
+\end{lemma}
+
+\begin{proof}
+  \uses{prop:8.3.1,prop:8.3.10,lem:2.3.14,prop:8.3.9}
+  \begin{itemize}
+    \item The converse easily follows from (8.3.10), which directly produces a desired $3$-separation.
+    \item Take a $3$-separation. Since $M$ is $3$-connected, it must be exact. Consider the representation matrix (8.3.11). Reason about that matrix.
+    \item Analyse shortest paths in a bipartite graph based on the matrix.
+    \item Apply path shortening technique from Chapter 5 to reduce a shortest path by pivots to one with exactly two arcs.
+    \item Reason about the corresponding entries and about the effects of the pivots on the matrix.
+    \item Apply Lemma 2.3.14. Eventually get an instance of (8.3.10) with (8.3.9). Thus, $M$ is a $3$-sum.
+  \end{itemize}
+\end{proof}
+
+
+\subsection{Chapter 8.5}
+
+\begin{proposition}[8.5.3] % todo: this defines Delta sum
+  \label{prop:8.5.3}
+  \uses{prop:8.3.10,prop:8.3.11,prop:4.4.5}
+  Matrix $B^{2 \Delta}$ for $M_{2 \Delta}$.
+\end{proposition}

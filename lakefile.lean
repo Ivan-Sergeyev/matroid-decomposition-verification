@@ -1,15 +1,15 @@
 import Lake
 open Lake DSL
 
-package MatroidDecompositionTheoremVerification {
+package Seymour {
   leanOptions := #[⟨`autoImplicit, false⟩, ⟨`pp.structureInstances, false⟩, ⟨`linter.oldObtain, false⟩]
 }
 
 require "leanprover-community" / "mathlib" @ git "master"
 
 @[default_target]
-lean_lib MatroidDecompositionTheoremVerification {
-  globs := #[.submodules `MatroidDecompositionTheoremVerification]
+lean_lib Seymour {
+  globs := #[.submodules `Seymour]
 }
 
 require checkdecls from git "https://github.com/PatrickMassot/checkdecls.git"

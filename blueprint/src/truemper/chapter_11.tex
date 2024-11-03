@@ -1,0 +1,209 @@
+\section{Chapter 11}
+
+\subsection{Chapter 11.2}
+
+The goal of this chapter is to prove the ``simple'' direction of the regular matroid decomposition theorem.
+
+Ingredients from Section 9.2: % todo: move ingredients to respective sections, add them as ``uses'' clauses
+\begin{itemize}
+  \item A matrix is TU if all its subdeterminants are $0$, $\pm 1$.
+  \item A binary matroid is regular if it has a signing that is TU.
+  \item By Lemma 9.2.6 and Corollary 9.2.7, this signing is unique up to scaling by $\pm 1$ factors.
+  \item The signing can be accomplished by signing one arbitrarily selected row or column at a time.
+\end{itemize}
+
+Ingredients from minimal violation matrices: % todo: move ingredients to respective sections, add them as ``uses'' clauses
+\begin{itemize}
+  \item Definition: a minimal violation matrix of total unimodularity (minimal violation matrix, MVM) is a $\{0, \pm 1\}$ matrix that is not TU, but all its submatrices are TU.
+  \item MVMs are square and have determinant not equal to $0, \pm 1$.
+  \item In particular, a $2 \times 2$ violation matrix has four $\pm 1$'s.
+  \item Cosider a MVM of order $\ge 3$. Perform a pivot in it, then delete the pivot row and column. Then the resulting matrix is also MVM ("by a simple cofactor argument").
+  % Note: pivots are defined in Chapter 2.3, page 20. Also in Chapter 3.2, page 34 for graphic matroids.
+\end{itemize}
+
+\begin{lemma}[11.2.1]
+  \label{lem:11.2.1}
+  \uses{def:regular_matroid,def:1_sum,def:2_sum}
+  Any $1$- or $2$-sum of two regular matroids is also regular.
+\end{lemma}
+
+\begin{proof}[Proof sketch]
+  \uses{prop:8.2.1,prop:8.2.3,prop:8.2.4}
+  \begin{itemize}
+    \item $1$-sum case: $M_{1} \oplus_{1} M_{2}$ is represented by a matrix $B = \mathrm{diag} (A_{1}, A_{2})$ where $A_{1}$ and $A_{2}$ represent $M_{1}$ and $M_{2}$. Use the same signings for $A_{1}$ and $A_{2}$ in $B$ to prove that $B$ is TU and hence the $1$-sum is regular.
+    \item $2$-sum case: Slightly more complicated signing process. Similarly, reuse signings from $M_{1}$ and $M_{2}$, define signing on remaining nonzero elements via a concrete formula, then prove that the resulting matrix is TU.
+  \end{itemize}
+\end{proof}
+
+\begin{lemma}[11.2.7]
+  \label{lem:11.2.7}
+  \uses{prop:8.3.10,prop:8.3.11,prop:8.5.3}
+  $M_{2}$ of (8.3.10) and (8.3.11) is regular iff $M_{2\Delta}$ of (8.5.3) ($M_{2}$ converted by a $\Delta Y$ exchange) is regular.
+\end{lemma}
+
+\begin{proof}[Proof sketch]
+  Utilize signings, minimal violation matrices, intersections (inside matrices), column dependence, pivot, duality.
+\end{proof}
+
+\begin{corollary}[11.2.8]
+  \label{cor:11.2.8}
+  \uses{def:Delta_Y_exchange,def:regular_matroid}
+  $\Delta Y$ exchanges maintain regularity.
+\end{corollary}
+
+\begin{proof}
+  \uses{lem:11.2.7}
+  Follows by Lemma 11.2.7.
+\end{proof}
+
+\begin{lemma}[11.2.9]
+  \label{lem:11.2.9}
+  \uses{def:regular_matroid,def:3_sum}
+  Any $3$-sum of two regular matroids is also regular.
+\end{lemma}
+
+\begin{proof}[Proof sketch]
+  \uses{lem:11.2.7,cor:11.2.8}
+  Yet more complicated, but similar. Uses the result that ``$\Delta Y$ exchanges maintain regularity'' (Corollary 11.2.8 of Lemma 11.2.7). The rest of the arguments are similar to the $2$-sum case: prove that submatrices are TU, then prove that the whole matrix is TU.
+\end{proof}
+
+\begin{theorem}[11.2.10]
+  \label{thm:11.2.10}
+  \uses{def:regular_matroid,def:1_sum,def:2_sum,def:3_sum}
+  Any $1$-, $2$-, or $3$-sum of two regular matroids is regular.
+\end{theorem}
+
+\begin{proof}[Proof sketch]
+  \uses{lem:11.2.1,lem:11.2.9}
+  Combine Lemmas 11.2.1 and 11.2.9.
+\end{proof}
+
+\begin{corollary}[11.2.12]
+  \label{cor:11.2.12}
+  \uses{def:regular_matroid,def:Delta_sum,def:Y_sum}
+  Any $\Delta$-sum or $Y$-sum of two regular matroids is also regular.
+\end{corollary}
+
+\begin{proof}[Proof sketch]
+  \uses{def:Delta_sum,def:Y_sum,thm:11.2.10,cor:11.2.8}
+  Follows from definitions of $\Delta$-sums and $Y$-sum, together with Theorem 11.2.10 and Corollary 11.2.8.
+\end{proof}
+
+
+\subsection{Chapter 11.3}
+
+\begin{proposition}[11.3.3]
+  \label{prop:11.3.3}
+  \uses{prop:10.2.8}
+  Graph plus $T$ set representing $R_{10}$
+\end{proposition}
+
+\begin{proposition}[11.3.5]
+  \label{prop:11.3.5}
+  \uses{prop:10.2.4}
+  Graph plus $T$ set representing $F_{7}$.
+\end{proposition}
+
+\begin{proposition}[11.3.11]
+  \label{prop:11.3.11}
+  \uses{prop:9.2.14}
+  The binary representation matrix $B^{12}$ for $R_{12}$.
+\end{proposition}
+
+The goal of the chapter is to prove the ``hard'' direction of the regular matroid decomposition theorem.
+
+\begin{theorem}[11.3.2]
+  \label{thm:11.3.2}
+  \uses{def:regular_matroid,def:R10,def:splitter}
+  $R_{10}$ is a splitter of the class of regular matroids.
+
+  In short: up to isomorphism, the only $3$-connected regular matroid with $R_{10}$ minor is $R_{10}$.
+\end{theorem}
+
+\begin{proof}[Proof sketch]
+  \uses{thm:7.2.1.a,prop:11.3.3,def:isomorphism,def:1_elem_ext,prop:11.3.5,def:F7,def:contraction} % thm:11.3.1 = thm:7.2.1
+  \begin{itemize}
+    \item Splitter theorem case (a)
+    \item $R_{10}$ is self-dual, so it suffices to consider $1$-element additions.
+    \item Represent $R_{10}$ by (11.3.3)
+    \item Up to isomorphism, there are only $3$ distinct $3$-connected $1$-element extensions.
+    \item Case 1 (graphic): contract a certain edge, the resulting graph contains a subdivision of (11.3.5), which represents $F_{7}$. Thus, this extension is nonregular.
+    \item Cases 2, 3 (nongraphic): reduce instances to (11.3.5), same conclusion.
+  \end{itemize}
+\end{proof}
+
+\begin{theorem}[11.3.10]
+  \label{thm:11.3.10}
+  \uses{cor:6.3.24,def:R12}
+  In short: Restatement of \ref{cor:6.3.24} for $R_{12}$.
+  Replacements: $\M$ is the class of regular matroids, $N$ is $R_{12}$, (6.3.12) is (11.3.6), (6.3.21-23) are (11.3.7-9).
+\end{theorem}
+
+\begin{theorem}[11.3.12]
+  \label{thm:11.3.12}
+  \uses{def:regular_matroid,def:R12,def:minor,def:k_sep,prop:11.3.11,def:isomorphism}
+  Let $M$ be a regular matroid with $R_{12}$ minor. Then any $3$-separation of that minor corresponding to the $3$-separation $(X_{1} \cup Y_{1}, X_{2} \cup Y_{2})$ of $R_{12}$ (see (11.3.11) -- matrix $B^{12}$ for $R_{12}$ defining the $3$-separation) under one of the isomorphisms induces a $3$-separation of $M$.
+
+  In short: every regular matroid with $R_{12}$ minor is a $3$-sum of two proper minors.
+\end{theorem}
+
+\begin{proof}[Proof sketch]
+  \uses{def:1_elem_ext,prop:10.2.9,thm:11.3.10}
+  \begin{itemize}
+    \item Preparation: calculate all $3$-connected regular $1$-element additions of $R_{12}$. This involves somewhat tedious case checking. (Representation of $R_{12}$ in (10.2.9) helps a lot.) By the symmetry of $B^{12}$ and thus by duality, this effectively gives all $3$-connected $1$-element extensions as well.
+    \item Verify conditions of theorem 11.3.10 (which implies the result).
+    \item (11.3.7) and (11.3.9) are ruled out immediately from preparatory calculations.
+    \item The rest is case checking ((c.1) and (c.2)), simpified by preparatory calculations.
+  \end{itemize}
+\end{proof}
+
+\begin{theorem}[11.3.14 regular matroid decomposition, easy direction]
+  \label{thm:11.3.14.seymour_easy}
+  \uses{def:regular_matroid,def:graphic_matroid,def:cographic_matroid,def:isomorphism,def:R10,def:1_sum,def:2_sum,def:3_sum}
+  Every binary matroid produced from graphic, cographic, and matroids isomorphic to $R_{10}$ by repeated $1$-, $2$-, and $3$-sum compositions is regular.
+\end{theorem}
+
+\begin{proof}[Proof sketch]
+  \uses{thm:11.2.10}
+  Follows from theorem 11.2.10.
+\end{proof}
+
+\begin{theorem}[11.3.14 regular matroid decomposition, hard direction]
+  \label{thm:11.3.14.seymour_hard}
+  \uses{def:regular_matroid,def:graphic_matroid,def:cographic_matroid,def:isomorphism,def:R10,def:R12,def:1_sum,def:2_sum,def:3_sum,def:k_conn,def:k_sep,prop:11.3.11}
+  Every regular matroid $M$ can be decomposed into graphic and cographic matroids and matroids isomorphic to $R_{10}$ by repeated $1$-, $2$-, and $3$- sum decompositions.
+  Specifically: If $M$ is a regular $3$-connected matroid that is not graphic and not cographic, then $M$ is isomorphic to $R_{10}$ or has an $R_{12}$ minor. In the latter case, any $3$-separation of that minor corresponding to the 3-separation $(X_{1} \cup Y_{1}, X_{2} \cup Y_{2})$ of $R_{12}$ ((11.3.11)) under one of the isomorphisms induces a $3$-separation of $M$.
+\end{theorem}
+
+\begin{proof}[Proof sketch]
+  \uses{thm:10.4.1.if,thm:11.3.2,thm:11.3.12,lem:8.3.12}
+  \begin{itemize}
+    \item Let $M$ be a regular matroid. Assume $M$ is not graphic and not cographic.
+    \item If $M$ is $1$-separable, then it is a $1$-sum. If $M$ is $2$-separable, then it is a $2$-sum. Thus assume $M$ is $3$-connected.
+    \item By theorem 10.4.1, $M$ has an $R_{10}$ or an $R_{12}$ minor.
+    \item $R_{10}$ case: by theorem 11.3.2, $M$ is isomorphic to $R_{10}$.
+    \item $R_{12}$ case: by theorem 11.3.12, $M$ has an induced by $3$-separation, so by lemma 8.3.12, $M$ is a $3$-sum.
+  \end{itemize}
+\end{proof}
+
+
+\subsection{Extensions of Regular Matroid Decomposition}
+
+\begin{itemize}
+  \item Theorem 11.3.14 remains valid when $3$-sums are replaced by $\Delta$- and $Y$-sums (Theorem 11.3.16).
+  \item Theorem 11.3.14 (and 11.3.16) can also be proved for matroids with no $F_{7}$ minors or with no $F_{7}^{*}$ minors. (Uses Lemma 11.3.19: $F_{7}$ ($F_{7}^{*}$) is a splitter of the binary matroids with no $F_{7}^{*}$ ($F_{7}$) minors.)
+\end{itemize}
+
+
+\subsection{Applications of Regular Matroid Decomposition}
+
+\begin{itemize}
+  \item Efficient algorithm for testing if a binary matroid is regular (Section 11.4).
+  \item Efficient algorithm for deciding if a real matrix is TU (Section 11.4).
+  \item Constructing TU matrices (Theorem 11.5.9). (Translate $3$-sum version of theorem 11.3.16 into matrix language.)
+  \item Constructing ${0, 1}$ TU matrices (Theorem 11.5.13).
+  \item Characterization of the cycle polytope (theorem 11.5.17). (Problem: let $M$ be a connected binary matroid with ground set $E$ and element weighs $w_{e}$ for all $e \in E$. Find a disjoint union $C$ of circuits of $M$ such that $\sum_{e \in C} w_{e}$ is maximized.)
+  \item Number of nonzeros in TU matrices (Theorem 11.5.18).
+  \item Triples in circuits (Theorem 11.5.18).
+  \item Odd cycles (Theorem 11.5.20).
+\end{itemize}

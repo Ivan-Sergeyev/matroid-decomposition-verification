@@ -1,5 +1,5 @@
-import MatroidDecompositionTheoremVerification.ForMathlib.MatrixTU
-import MatroidDecompositionTheoremVerification.ForMathlib.Sets
+import Seymour.ForMathlib.MatrixTU
+import Seymour.ForMathlib.Sets
 
 open scoped Matrix
 

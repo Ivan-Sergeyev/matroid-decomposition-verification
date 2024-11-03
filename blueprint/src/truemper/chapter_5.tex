@@ -1,0 +1,66 @@
+\section{Chapter 5}
+
+\begin{lemma}[5.2.4]
+  \label{lem:5.2.4}
+  \uses{def:k_conn,def:minor,def:1_elem_ext}
+  Let $N$ be a connected minor of a connected binary matroid $M$. Let $z \in M \setminus N$. Then $M$ has a connected minor $N'$ that is a $1$-element extension of $N$ by $z$.
+\end{lemma}
+
+\begin{proof}[Proof sketch]
+  \uses{lem:3.3.12}
+  \begin{itemize}
+    \item By Lemma 3.3.12, $M$ has a representation matrix that displays $N$ via a submatrix.
+    \item Case distinction between $z$ being represented by a nonzero or a zero vector.
+    \item Nonzero case: immediately get submatrix representing $N'$.
+    \item Zero case: take a shortest path in the matrix, perform pivots, in one subcase use duality.
+  \end{itemize}
+\end{proof}
+
+\begin{proposition}[5.2.8]
+  \label{prop:5.2.8}
+  \uses{def:wheel}
+  Representation matrices for small wheels (from $M(W_{1})$ to $M(W_{4})$).
+\end{proposition}
+
+\begin{proposition}[5.2.9]
+  \label{prop:5.2.9}
+  \uses{def:wheel}
+  Representation matrix for $M(W_{n})$, $n \geq 3$.
+\end{proposition}
+
+\begin{lemma}[5.2.10]
+  \label{lem:5.2.10}
+  \uses{def:binary_matroid,def:minor,def:wheel}
+  Let $M$ be a binary matroid with a binary representation matrix $B$. Suppose the graph $BG(B)$ contains at least one cycle. Then $M$ has an $M(W_{2})$ minor.
+\end{lemma}
+
+\begin{proof}[Proof sketch]
+  \uses{prop:5.2.8,prop:5.2.9}
+  \begin{itemize}
+    \item $BG(B)$ is bipartite and has at least one cycle, so there is a cycle $C$ without chords with at least $4$ edges.
+    \item Up to indices, the submatrix corresponding to $C$ is either the matrix for $M(W_{2})$ from (5.2.8) or the matrix for some $M(W_{k})$, $k \geq 3$ from (5.2.9).
+    \item In the latter case, use path shortening pivots on $1$s to convert the submatrix to the former case.
+  \end{itemize}
+\end{proof}
+
+\begin{lemma}[5.2.11]
+  \label{lem:5.2.11}
+  \uses{def:binary_matroid,def:k_conn,def:k_sep,def:M_W_3,def:minor}
+  Let $M$ be a connected binary matroid with at least $4$ elements. Then $M$ has a $2$-separation or an $M(W_3)$ minor.
+\end{lemma}
+
+\begin{proof}[Proof sketch]
+  \uses{lem:5.2.10}
+  Use Lemma 5.2.10 and apply path shortening technique.
+\end{proof}
+
+\begin{corollary}[5.2.15]
+  \label{cor:5.2.15}
+  \uses{def:k_conn,def:binary_matroid,def:M_W_3,def:minor}
+  Every $3$-connected binary matroid $M$ with at least $6$ elements has an $M(W_3)$ minor.
+\end{corollary}
+
+\begin{proof}[Proof sketch]
+  \uses{lem:5.2.11}
+  By Lemma 5.2.11, $M$ has a $2$-separation or an $M(W_{3})$ minor. $M$ is $3$-connected, so the former case is impossible.
+\end{proof}

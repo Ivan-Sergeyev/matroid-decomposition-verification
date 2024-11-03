@@ -1,0 +1,5 @@
+Matrix.TU
+Matrix.TU.apply
+Matrix.TU.submatrix
+Matrix.fromBlocks_TU
+Matrix.TU.transpose

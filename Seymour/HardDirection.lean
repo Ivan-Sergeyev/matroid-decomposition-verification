@@ -1,4 +1,4 @@
-import MatroidDecompositionTheoremVerification.EasyDirection
+import Seymour.EasyDirection
 
 
 variable {α : Type} [DecidableEq α]
