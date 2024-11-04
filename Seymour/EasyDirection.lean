@@ -1,5 +1,5 @@
 import Seymour.ForMathlib.MatrixTU
-import Seymour.ForMathlib.Sets
+import Seymour.Mathlib.Sets
 
 open scoped Matrix
 
@@ -40,10 +40,7 @@ theorem Matrix.IndepCols_subset (B : Matrix X Y Z2) (I J : Set α) (hBJ : B.Inde
   obtain ⟨hJ, hB⟩ := hBJ
   use hIJ.trans hJ
   let I' := { i : J.Elem // i.val ∈ I }
-  -- let f : I' → I := fun i => I.restrictPreimage Subtype.val i
   let e : I' ≃ I := (Equiv.subtypeSubtypeEquivSubtype (by convert hIJ))
-  -- have he := e.injective
-  -- apply LinearIndependent.coe_range
   sorry
 
 /-- A nonmaximal linearly independent set of columns can be augmented with another linearly independent column. -/
@@ -73,20 +70,27 @@ def Matrix.toMatroid (B : Matrix X Y Z2) : Matroid α := B.toIndepMatroid.matroi
 end construction_from_matrices
 
 /-- Binary matroid on the ground set `X ∪ Y` where `X` and `Y` are bundled. -/
-structure BinaryMatroid (α : Type) [DecidableEq α] extends Matroid α where
+structure BinaryMatroid (α : Type) [DecidableEq α] where
   X : Set α
   Y : Set α
   decmemX : ∀ x, Decidable (x ∈ X)
   decmemY : ∀ y, Decidable (y ∈ Y)
   hXY : X ⫗ Y
   B : Matrix X Y Z2
-  hE : E = X ∪ Y
-  hB : toMatroid = B.toMatroid
 
 variable {α : Type} [DecidableEq α]
 
-theorem BinaryMatroid.Indep_eq (M : BinaryMatroid α) : have := M.decmemX; have := M.decmemY; M.Indep = M.B.IndepCols :=
-  M.hB ▸ rfl
+def BinaryMatroid.toMatroid (M : BinaryMatroid α) :=
+  have := M.decmemX
+  have := M.decmemY
+  M.B.toMatroid
+
+@[simp]
+lemma BinaryMatroid.indep_eq (M : BinaryMatroid α) : have := M.decmemX; have := M.decmemY; M.toMatroid.Indep = M.B.IndepCols :=
+  rfl
+
+instance : Coe (BinaryMatroid α) (Matroid α) where
+  coe := BinaryMatroid.toMatroid
 
 /-- The binary matroid on the ground set `X ∪ Y` is regular. -/
 def BinaryMatroid.IsRegular (M : BinaryMatroid α) : Prop :=
@@ -136,13 +140,12 @@ def BinaryMatroid.oneSum {M₁ M₂ : BinaryMatroid α} (hXY : M₁.X ⫗ M₂.Y
   let B : Matrix (M₁.X ∪ M₂.X).Elem (M₁.Y ∪ M₂.Y).Elem Z2 := (Matrix.oneSumComposition M₁.B M₂.B).toMatrixUnionUnion rfl rfl
   ⟨
     ⟨
-      B.toMatroid,
       M₁.X ∪ M₂.X,
       M₁.Y ∪ M₂.Y,
       (Set.decidableUnion _ _ ·),
       (Set.decidableUnion _ _ ·),
       by simp only [Set.disjoint_union_left, Set.disjoint_union_right]; exact ⟨⟨M₁.hXY, hYX.symm⟩, ⟨hXY, M₂.hXY⟩⟩,
-      B, rfl, rfl
+      B
     ⟩,
     M₁.X ⫗ M₂.X ∧ M₁.Y ⫗ M₂.Y
   ⟩
@@ -165,7 +168,6 @@ def BinaryMatroid.twoSum {M₁ M₂ : BinaryMatroid α} {a : α} (ha : M₁.X �
     (Matrix.twoSumComposition A₁ x A₂ y).toMatrixUnionUnion rfl rfl
   ⟨
     ⟨
-      B.toMatroid,
       (M₁.X \ {a}) ∪ M₂.X,
       M₁.Y ∪ (M₂.Y \ {a}),
       (Set.decidableUnion _ _ ·),
@@ -174,7 +176,7 @@ def BinaryMatroid.twoSum {M₁ M₂ : BinaryMatroid α} {a : α} (ha : M₁.X �
         rw [Set.disjoint_union_right, Set.disjoint_union_left, Set.disjoint_union_left]
         exact ⟨⟨disjoint_left_setminus M₁.hXY {a}, hXY⟩, ⟨disjoint_of_singleton_intersection_both_wo ha,
           disjoint_right_setminus M₂.hXY {a}⟩⟩,
-      B, rfl, rfl
+      B
     ⟩,
     (M₁.X ⫗ M₂.X ∧ M₁.Y ⫗ M₂.Y) ∧ (x ≠ 0 ∧ y ≠ 0)
   ⟩
@@ -245,7 +247,6 @@ noncomputable def BinaryMatroid.threeSum {M₁ M₂ : BinaryMatroid α} {x₁ x�
     )
   ⟨
     ⟨
-      B.toMatroid,
       (M₁.X \ {x₁, x₂, x₃}) ∪ M₂.X,
       M₁.Y ∪ (M₂.Y \ {y₁, y₂, y₃}),
       (Set.decidableUnion _ _ ·),
@@ -255,7 +256,7 @@ noncomputable def BinaryMatroid.threeSum {M₁ M₂ : BinaryMatroid α} {x₁ x�
         exact ⟨⟨disjoint_left_setminus M₁.hXY {x₁, x₂, x₃}, hYX.symm⟩, ⟨
           disjoint_left_setminus (disjoint_right_setminus hXY {y₁, y₂, y₃}) {x₁, x₂, x₃},
           disjoint_right_setminus M₂.hXY {y₁, y₂, y₃}⟩⟩,
-      B, rfl, rfl
+      B
     ⟩,
     IsUnit D_₁ ∧ D_₁ = D_₂ -- the matrix `D_₁ = D_₂` (called D-bar in the book) is invertible
     ∧ M₁.B ⟨x₁, x₁inX₁⟩ ⟨y₁, y₁inY₁⟩ = 1
@@ -305,7 +306,7 @@ theorem BinaryMatroid.Is1sum.isRegular {M : BinaryMatroid α} {M₁ : BinaryMatr
   have dmY₁ := M₁.decmemY
   have dmX₂ := M₂.decmemX
   have dmY₂ := M₂.decmemY
-  obtain ⟨hXY, hYX, hMsum, hXX, hYY⟩ := hM
+  obtain ⟨hXY, hYX, hMsum, -⟩ := hM
   obtain ⟨B₁, hB₁, hBB₁⟩ := hM₁
   obtain ⟨B₂, hB₂, hBB₂⟩ := hM₂
   let B' := Matrix.oneSumComposition B₁ B₂
@@ -376,30 +377,7 @@ theorem BinaryMatroid.Is2sum.isRegular {a : α} {M : BinaryMatroid α} {M₁ : B
   · simp only [BinaryMatroid.twoSum, hM]
   have hMY : M.Y = M₁.Y ∪ (M₂.Y \ {a})
   · simp only [BinaryMatroid.twoSum, hM]
-  have hXuX : M₁.X \ {a} ∪ M₂.X = M₁.X ∪ M₂.X
-  · sorry -- Does not hold !!!
-  have hYuY : M₁.Y ∪ M₂.Y \ {a} = M₁.Y ∪ M₂.Y
-  · sorry -- Does not hold !!!
-  let B'' : Matrix ((M₁.X \ {a}) ∪ M₂.X).Elem (M₁.Y ∪ (M₂.Y \ {a})).Elem ℚ :=
-    B'.toMatrixUnionUnion hXuX hYuY -- TODO change (probably a diffrent signature is needed).
-  have hB'' : B''.TU
-  · exact Matrix.TU.toMatrixUnionUnion hB' hXuX hYuY
-  use hMX ▸ hMY ▸ B''
-  constructor
-  · rw [Matrix.TU_adjoin_id_left_iff]
-    convert hB''
-    simp only [Subtype.forall, eqRec_heq_iff_heq, heq_eq_eq]
-  · intro i j
-    let x : M₁.Y.Elem → Z2 := M₁.B ⟨a, haX₁⟩
-    let y : M₂.X.Elem → Z2 := (M₂.B · ⟨a, haY₂⟩)
-    have hMB : M.B = (Matrix.twoSumComposition M₁.B x M₂.B y).toMatrixUnionUnion (hMX.trans hXuX) (hMY.trans hYuY)
-    · subst hM
-      ext
-      simp [Matrix.twoSumComposition, Matrix.toMatrixUnionUnion, convertUnionSum]
-      sorry
-    rw [hMB]
-    simp only [Matrix.twoSumComposition, Matrix.toMatrixUnionUnion] at *
-    sorry
+  sorry
 
 /-- Any 3-sum of regular matroids is a regular matroid. -/
 theorem BinaryMatroid.Is3sum.isRegular {M : BinaryMatroid α} {M₁ : BinaryMatroid α} {M₂ : BinaryMatroid α}

@@ -2,9 +2,9 @@ name = "Seymour"
 defaultTargets = ["Seymour"]
 
 [leanOptions]
-pp.unicode.fun = true
 autoImplicit = false
 relaxedAutoImplicit = false
+pp.structureInstances = false
 
 [[require]]
 name = "mathlib"
