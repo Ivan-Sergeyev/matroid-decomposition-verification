@@ -69,7 +69,7 @@ def Matrix.toMatroid (B : Matrix X Y Z2) : Matroid α := B.toIndepMatroid.matroi
 
 end construction_from_matrices
 
-/-- Binary matroid on the ground set `X ∪ Y` where `X` and `Y` are bundled. -/
+/-- Data describing a binary matroid on the ground set `X ∪ Y` where `X` and `Y` are bundled. -/
 structure BinaryMatroid (α : Type) [DecidableEq α] where
   X : Set α
   Y : Set α
@@ -78,15 +78,16 @@ structure BinaryMatroid (α : Type) [DecidableEq α] where
   hXY : X ⫗ Y
   B : Matrix X Y Z2
 
+attribute [instance] BinaryMatroid.decmemX
+attribute [instance] BinaryMatroid.decmemY
+
 variable {α : Type} [DecidableEq α]
 
 def BinaryMatroid.toMatroid (M : BinaryMatroid α) :=
-  have := M.decmemX
-  have := M.decmemY
   M.B.toMatroid
 
 @[simp]
-lemma BinaryMatroid.indep_eq (M : BinaryMatroid α) : have := M.decmemX; have := M.decmemY; M.toMatroid.Indep = M.B.IndepCols :=
+lemma BinaryMatroid.indep_eq (M : BinaryMatroid α) : M.toMatroid.Indep = M.B.IndepCols :=
   rfl
 
 instance : Coe (BinaryMatroid α) (Matroid α) where
@@ -133,10 +134,6 @@ def Matrix.toMatrixUnionUnion {T T₁ T₂ S S₁ S₂ : Set α}
 It checks that everything is disjoint. -/
 def BinaryMatroid.oneSum {M₁ M₂ : BinaryMatroid α} (hXY : M₁.X ⫗ M₂.Y) (hYX : M₁.Y ⫗ M₂.X) :
     BinaryMatroid α × Prop :=
-  have dmX₁ := M₁.decmemX
-  have dmY₁ := M₁.decmemY
-  have dmX₂ := M₂.decmemX
-  have dmY₂ := M₂.decmemY
   let B : Matrix (M₁.X ∪ M₂.X).Elem (M₁.Y ∪ M₂.Y).Elem Z2 := (Matrix.oneSumComposition M₁.B M₂.B).toMatrixUnionUnion rfl rfl
   ⟨
     ⟨
@@ -155,10 +152,6 @@ The ground sets of `M₁` and `M₂` are disjoint except for element a that lies
 moreover, the special row of `M₁` and the special column of `M₂` are nonzero. -/
 def BinaryMatroid.twoSum {M₁ M₂ : BinaryMatroid α} {a : α} (ha : M₁.X ∩ M₂.Y = {a}) (hXY : M₂.X ⫗ M₁.Y) :
     BinaryMatroid α × Prop :=
-  have dmX₁ := M₁.decmemX
-  have dmY₁ := M₁.decmemY
-  have dmX₂ := M₂.decmemX
-  have dmY₂ := M₂.decmemY
   let A₁ : Matrix (M₁.X \ {a}).Elem M₁.Y.Elem Z2 := M₁.B ∘ subsetElem Set.diff_subset -- the top submatrix of `B₁`
   let A₂ : Matrix M₂.X.Elem (M₂.Y \ {a}).Elem Z2 := (M₂.B · ∘ subsetElem Set.diff_subset) -- the right submatrix of `B₂`
   let x : M₁.Y.Elem → Z2 := M₁.B ⟨a, Set.mem_of_mem_inter_left (by rw [ha]; rfl)⟩ -- the bottom row of `B₁`
@@ -185,10 +178,6 @@ def BinaryMatroid.twoSum {M₁ M₂ : BinaryMatroid α} {a : α} (ha : M₁.X �
 noncomputable def BinaryMatroid.threeSum {M₁ M₂ : BinaryMatroid α} {x₁ x₂ x₃ y₁ y₂ y₃ : α}
     (hXX : M₁.X ∩ M₂.X = {x₁, x₂, x₃}) (hYY : M₁.Y ∩ M₂.Y = {y₁, y₂, y₃}) (hXY : M₁.X ⫗ M₂.Y) (hYX : M₁.Y ⫗ M₂.X) :
     BinaryMatroid α × Prop :=
-  have dmX₁ := M₁.decmemX
-  have dmY₁ := M₁.decmemY
-  have dmX₂ := M₂.decmemX
-  have dmY₂ := M₂.decmemY
   have hxxx₁ : {x₁, x₂, x₃} ⊆ M₁.X := hXX.symm.subset.trans Set.inter_subset_left
   have hxxx₂ : {x₁, x₂, x₃} ⊆ M₂.X := hXX.symm.subset.trans Set.inter_subset_right
   have hyyy₁ : {y₁, y₂, y₃} ⊆ M₁.Y := hYY.symm.subset.trans Set.inter_subset_left
@@ -302,10 +291,6 @@ def Matrix.TU.toMatrixUnionUnion {T T₁ T₂ S S₁ S₂ : Set α}
 theorem BinaryMatroid.Is1sum.isRegular {M : BinaryMatroid α} {M₁ : BinaryMatroid α} {M₂ : BinaryMatroid α}
     (hM : M.Is1sum M₁ M₂) (hM₁ : M₁.IsRegular) (hM₂ : M₂.IsRegular) :
     M.IsRegular := by
-  have dmX₁ := M₁.decmemX
-  have dmY₁ := M₁.decmemY
-  have dmX₂ := M₂.decmemX
-  have dmY₂ := M₂.decmemY
   obtain ⟨hXY, hYX, hMsum, -⟩ := hM
   obtain ⟨B₁, hB₁, hBB₁⟩ := hM₁
   obtain ⟨B₂, hB₂, hBB₂⟩ := hM₂
@@ -354,10 +339,6 @@ lemma Matrix.twoSumComposition_TU {X₁ Y₁ : Set α} {X₂ Y₂ : Set α}
 theorem BinaryMatroid.Is2sum.isRegular {a : α} {M : BinaryMatroid α} {M₁ : BinaryMatroid α} {M₂ : BinaryMatroid α}
     (hM : M.Is2sum M₁ M₂) (hM₁ : M₁.IsRegular) (hM₂ : M₂.IsRegular) :
     M.IsRegular := by
-  have dmX₁ := M₁.decmemX
-  have dmY₁ := M₁.decmemY
-  have dmX₂ := M₂.decmemX
-  have dmY₂ := M₂.decmemY
   obtain ⟨a, ha, haX₂, hM, ⟨hXX, hYY⟩, ⟨hx, hy⟩⟩ := hM
   obtain ⟨B₁, hB₁, hBB₁⟩ := hM₁
   obtain ⟨B₂, hB₂, hBB₂⟩ := hM₂
@@ -383,10 +364,6 @@ theorem BinaryMatroid.Is2sum.isRegular {a : α} {M : BinaryMatroid α} {M₁ : B
 theorem BinaryMatroid.Is3sum.isRegular {M : BinaryMatroid α} {M₁ : BinaryMatroid α} {M₂ : BinaryMatroid α}
     (hM : M.Is3sum M₁ M₂) (hM₁ : M₁.IsRegular) (hM₂ : M₂.IsRegular) :
     M.IsRegular := by
-  have dmX₁ := M₁.decmemX
-  have dmY₁ := M₁.decmemY
-  have dmX₂ := M₂.decmemX
-  have dmY₂ := M₂.decmemY
   obtain ⟨eX, eY, hMXY⟩ := hM
   obtain ⟨B₁', hB₁, hBB₁⟩ := hM₁
   obtain ⟨B₂', hB₂, hBB₂⟩ := hM₂
