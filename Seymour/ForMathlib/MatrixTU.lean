@@ -72,25 +72,27 @@ lemma Matrix.mapEquiv_TU {X' Y' : Type*} [DecidableEq X'] [DecidableEq Y']
   · simpa [Matrix.submatrix] using hA k (eX.symm ∘ f) (eY.symm ∘ g)
   · simpa [Matrix.submatrix] using hA k (eX ∘ f) (eY ∘ g)
 
--- TODO `[Inhabited X]` seems unnecessary
-lemma Matrix.TU_adjoin_row0s_iff (A : Matrix X Y ℚ) {X' : Type*} [Inhabited X] :
+lemma Matrix.TU_adjoin_row0s_iff (A : Matrix X Y ℚ) {X' : Type*} :
     (Matrix.fromRows A (Matrix.row X' 0)).TU ↔ A.TU := by
   rw [Matrix.TU_iff, Matrix.TU_iff]
   constructor <;> intro hA k f g
   · exact hA k (Sum.inl ∘ f) g
-  · if zerow : ∃ i, ∃ i', f i = Sum.inr i' then
+  · if zerow : ∃ i, ∃ x', f i = Sum.inr x' then
       obtain ⟨i, _, _⟩ := zerow
       left
       apply Matrix.det_eq_zero_of_row_eq_zero i
       intro
       simp_all
     else
-      obtain ⟨f', rfl⟩ : ∃ f₀ : Fin k → X, f = Sum.inl ∘ f₀
-      · use (fun i => (f i).elim id default)
-        ext i
-        cases hfi : f i with
-        | inl => simp [hfi]
-        | inr => exfalso; exact zerow ⟨i, _, hfi⟩
+      obtain ⟨_, rfl⟩ : ∃ f₀ : Fin k → X, f = Sum.inl ∘ f₀
+      · have hi (i : Fin k) : ∃ x, f i = Sum.inl x :=
+          match hfi : f i with
+          | .inl x => ⟨x, rfl⟩
+          | .inr x => (zerow ⟨i, x, hfi⟩).elim
+        choose f₀ hf₀ using hi
+        use f₀
+        ext
+        apply hf₀
       apply hA
 
 lemma Matrix.TU_adjoin_rowUnit_iff (A : Matrix X Y ℚ) [Inhabited X] (j' : Y) [DecidableEq Y] :
