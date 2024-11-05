@@ -1,4 +1,5 @@
-import Mathlib
+import Mathlib.Order.CompletePartialOrder
+import Mathlib.Tactic
 
 variable {α : Type*} {X Y : Set α}
 

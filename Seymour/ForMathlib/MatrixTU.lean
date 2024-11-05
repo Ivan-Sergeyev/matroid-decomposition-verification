@@ -1,4 +1,5 @@
-import Mathlib
+import Mathlib.Data.Matrix.ColumnRowPartitioned
+import Mathlib.Tactic
 
 open scoped Matrix
 
