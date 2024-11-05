@@ -61,6 +61,9 @@ lemma Matrix.TU.transpose {A : Matrix X Y ℚ} (hA : A.TU) : Aᵀ.TU := by
   simp only [←Matrix.transpose_submatrix, Matrix.det_transpose]
   apply hA <;> assumption
 
+lemma Matrix.TU_iff_transpose (A : Matrix X Y ℚ) : A.TU ↔ Aᵀ.TU := by
+  constructor <;> apply Matrix.TU.transpose
+
 lemma Matrix.mapEquiv_TU {X' Y' : Type*} [DecidableEq X'] [DecidableEq Y']
     (A : Matrix X Y ℚ) (eX : X' ≃ X) (eY : Y' ≃ Y) :
     Matrix.TU ((A · ∘ eY) ∘ eX) ↔ A.TU := by
@@ -69,12 +72,74 @@ lemma Matrix.mapEquiv_TU {X' Y' : Type*} [DecidableEq X'] [DecidableEq Y']
   · simpa [Matrix.submatrix] using hA k (eX.symm ∘ f) (eY.symm ∘ g)
   · simpa [Matrix.submatrix] using hA k (eX ∘ f) (eY ∘ g)
 
-lemma Matrix.TU_adjoin_id_left_iff [DecidableEq X] (A : Matrix X Y ℚ) :
-    (Matrix.fromColumns (1 : Matrix X X ℚ) A).TU ↔ A.TU := by
+-- TODO `[Inhabited X]` seems unnecessary
+lemma Matrix.TU_adjoin_row0s_iff (A : Matrix X Y ℚ) {X' : Type*} [Inhabited X] :
+    (Matrix.fromRows A (Matrix.row X' 0)).TU ↔ A.TU := by
   rw [Matrix.TU_iff, Matrix.TU_iff]
   constructor <;> intro hA k f g
-  · exact hA k f (Sum.inr ∘ g)
-  · sorry
+  · exact hA k (Sum.inl ∘ f) g
+  · if zerow : ∃ i, ∃ i', f i = Sum.inr i' then
+      obtain ⟨i, _, _⟩ := zerow
+      left
+      apply Matrix.det_eq_zero_of_row_eq_zero i
+      intro
+      simp_all
+    else
+      obtain ⟨f', rfl⟩ : ∃ f₀ : Fin k → X, f = Sum.inl ∘ f₀
+      · use (fun i => (f i).elim id default)
+        ext i
+        cases hfi : f i with
+        | inl => simp [hfi]
+        | inr => exfalso; exact zerow ⟨i, _, hfi⟩
+      apply hA
+
+lemma Matrix.TU_adjoin_rowUnit_iff (A : Matrix X Y ℚ) [Inhabited X] (j' : Y) [DecidableEq Y] :
+    (Matrix.fromRows A (Matrix.row Unit (fun j : Y => if j = j' then 1 else 0))).TU ↔ A.TU := by
+  rw [Matrix.TU_iff, Matrix.TU_iff]
+  constructor <;> intro hA k f g
+  · exact hA k (Sum.inl ∘ f) g
+  · if used_row : ∃ i, ∃ i', f i = Sum.inr i' then
+      obtain ⟨i, i', hii'⟩ := used_row
+      if hits_one : ∃ j, g j = j' then
+        -- TODO Laplacian expansion
+        sorry
+      else
+        left
+        apply Matrix.det_eq_zero_of_row_eq_zero i
+        intro
+        simp_all
+    else
+      obtain ⟨f', rfl⟩ : ∃ f₀ : Fin k → X, f = Sum.inl ∘ f₀
+      · use (fun i => (f i).elim id default)
+        ext i
+        cases hfi : f i with
+        | inl => simp [hfi]
+        | inr => exfalso; exact used_row ⟨i, _, hfi⟩
+      apply hA
+
+lemma Matrix.TU_adjoin_id_below_iff [DecidableEq X] [DecidableEq Y] (A : Matrix X Y ℚ) :
+    (Matrix.fromRows A (1 : Matrix Y Y ℚ)).TU ↔ A.TU := by
+  rw [Matrix.TU_iff, Matrix.TU_iff]
+  constructor <;> intro hA k f g
+  · exact hA k (Sum.inl ∘ f) g
+  · sorry -- TODO inductively apply `Matrix.TU_adjoin_rowUnit_iff`
+
+lemma Matrix.TU_adjoin_id_above_iff [DecidableEq X] [DecidableEq Y] (A : Matrix X Y ℚ) :
+    (Matrix.fromRows (1 : Matrix Y Y ℚ) A).TU ↔ A.TU := by
+  rw [←Matrix.mapEquiv_TU (Matrix.fromRows (1 : Matrix Y Y ℚ) A) (Equiv.sumComm X Y) (⟨id, id, congrFun rfl, congrFun rfl⟩)]
+  convert Matrix.TU_adjoin_id_below_iff A
+  aesop
+
+lemma Matrix.TU_adjoin_id_left_iff [DecidableEq X] [DecidableEq Y] (A : Matrix X Y ℚ) :
+    (Matrix.fromColumns (1 : Matrix X X ℚ) A).TU ↔ A.TU := by
+  rw [Matrix.TU_iff_transpose, Matrix.transpose_fromColumns, Matrix.transpose_one, Matrix.TU_iff_transpose A]
+  exact Matrix.TU_adjoin_id_above_iff Aᵀ
+
+lemma Matrix.TU_adjoin_id_right_iff [DecidableEq X] [DecidableEq Y] (A : Matrix X Y ℚ) :
+    (Matrix.fromColumns A (1 : Matrix X X ℚ)).TU ↔ A.TU := by
+  rw [←Matrix.mapEquiv_TU (Matrix.fromColumns A (1 : Matrix X X ℚ)) (⟨id, id, congrFun rfl, congrFun rfl⟩) (Equiv.sumComm X Y)]
+  convert Matrix.TU_adjoin_id_left_iff A
+  aesop
 
 variable {X₁ X₂ Y₁ Y₂ : Type}
 
