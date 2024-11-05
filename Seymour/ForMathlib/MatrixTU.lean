@@ -64,13 +64,26 @@ lemma Matrix.TU.transpose {A : Matrix X Y ℚ} (hA : A.TU) : Aᵀ.TU := by
 lemma Matrix.TU_iff_transpose (A : Matrix X Y ℚ) : A.TU ↔ Aᵀ.TU := by
   constructor <;> apply Matrix.TU.transpose
 
-lemma Matrix.mapEquiv_TU {X' Y' : Type*} [DecidableEq X'] [DecidableEq Y']
-    (A : Matrix X Y ℚ) (eX : X' ≃ X) (eY : Y' ≃ Y) :
-    Matrix.TU ((A · ∘ eY) ∘ eX) ↔ A.TU := by
+lemma Matrix.mapEquiv_rows_TU {X' : Type*} [DecidableEq X']
+    (A : Matrix X Y ℚ) (eX : X' ≃ X) :
+    Matrix.TU (A ∘ eX) ↔ A.TU := by
   rw [Matrix.TU_iff, Matrix.TU_iff]
   constructor <;> intro hA k f g
-  · simpa [Matrix.submatrix] using hA k (eX.symm ∘ f) (eY.symm ∘ g)
-  · simpa [Matrix.submatrix] using hA k (eX ∘ f) (eY ∘ g)
+  · simpa [Matrix.submatrix] using hA k (eX.symm ∘ f) g
+  · simpa [Matrix.submatrix] using hA k (eX ∘ f) g
+
+lemma Matrix.mapEquiv_cols_TU {Y' : Type*} [DecidableEq Y']
+    (A : Matrix X Y ℚ) (eY : Y' ≃ Y) :
+    Matrix.TU (A · ∘ eY) ↔ A.TU := by
+  rw [Matrix.TU_iff, Matrix.TU_iff]
+  constructor <;> intro hA k f g
+  · simpa [Matrix.submatrix] using hA k f (eY.symm ∘ g)
+  · simpa [Matrix.submatrix] using hA k f (eY ∘ g)
+
+lemma Matrix.mapEquiv_both_TU {X' Y' : Type*} [DecidableEq X'] [DecidableEq Y']
+    (A : Matrix X Y ℚ) (eX : X' ≃ X) (eY : Y' ≃ Y) :
+    Matrix.TU ((A · ∘ eY) ∘ eX) ↔ A.TU := by
+  rw [Matrix.mapEquiv_rows_TU, Matrix.mapEquiv_cols_TU]
 
 lemma Matrix.TU_adjoin_row0s_iff (A : Matrix X Y ℚ) {X' : Type*} :
     (Matrix.fromRows A (Matrix.row X' 0)).TU ↔ A.TU := by
@@ -95,13 +108,13 @@ lemma Matrix.TU_adjoin_row0s_iff (A : Matrix X Y ℚ) {X' : Type*} :
         apply hf₀
       apply hA
 
-lemma Matrix.TU_adjoin_rowUnit_iff (A : Matrix X Y ℚ) [Inhabited X] (j' : Y) [DecidableEq Y] :
+lemma Matrix.TU_adjoin_rowUnit_iff (A : Matrix X Y ℚ) (j' : Y) [DecidableEq Y] :
     (Matrix.fromRows A (Matrix.row Unit (fun j : Y => if j = j' then 1 else 0))).TU ↔ A.TU := by
   rw [Matrix.TU_iff, Matrix.TU_iff]
   constructor <;> intro hA k f g
   · exact hA k (Sum.inl ∘ f) g
-  · if used_row : ∃ i, ∃ i', f i = Sum.inr i' then
-      obtain ⟨i, i', hii'⟩ := used_row
+  · if used_row : ∃ i, ∃ x', f i = Sum.inr x' then
+      obtain ⟨i, x', hix'⟩ := used_row
       if hits_one : ∃ j, g j = j' then
         -- TODO Laplacian expansion
         sorry
@@ -111,12 +124,15 @@ lemma Matrix.TU_adjoin_rowUnit_iff (A : Matrix X Y ℚ) [Inhabited X] (j' : Y) [
         intro
         simp_all
     else
-      obtain ⟨f', rfl⟩ : ∃ f₀ : Fin k → X, f = Sum.inl ∘ f₀
-      · use (fun i => (f i).elim id default)
-        ext i
-        cases hfi : f i with
-        | inl => simp [hfi]
-        | inr => exfalso; exact used_row ⟨i, _, hfi⟩
+      obtain ⟨_, rfl⟩ : ∃ f₀ : Fin k → X, f = Sum.inl ∘ f₀
+      · have hi (i : Fin k) : ∃ x, f i = Sum.inl x :=
+          match hfi : f i with
+          | .inl x => ⟨x, rfl⟩
+          | .inr x => (used_row ⟨i, x, hfi⟩).elim
+        choose f₀ hf₀ using hi
+        use f₀
+        ext
+        apply hf₀
       apply hA
 
 lemma Matrix.TU_adjoin_id_below_iff [DecidableEq X] [DecidableEq Y] (A : Matrix X Y ℚ) :
@@ -128,7 +144,7 @@ lemma Matrix.TU_adjoin_id_below_iff [DecidableEq X] [DecidableEq Y] (A : Matrix 
 
 lemma Matrix.TU_adjoin_id_above_iff [DecidableEq X] [DecidableEq Y] (A : Matrix X Y ℚ) :
     (Matrix.fromRows (1 : Matrix Y Y ℚ) A).TU ↔ A.TU := by
-  rw [←Matrix.mapEquiv_TU (Matrix.fromRows (1 : Matrix Y Y ℚ) A) (Equiv.sumComm X Y) (⟨id, id, congrFun rfl, congrFun rfl⟩)]
+  rw [←Matrix.mapEquiv_rows_TU (Matrix.fromRows (1 : Matrix Y Y ℚ) A) (Equiv.sumComm X Y)]
   convert Matrix.TU_adjoin_id_below_iff A
   aesop
 
@@ -139,7 +155,7 @@ lemma Matrix.TU_adjoin_id_left_iff [DecidableEq X] [DecidableEq Y] (A : Matrix X
 
 lemma Matrix.TU_adjoin_id_right_iff [DecidableEq X] [DecidableEq Y] (A : Matrix X Y ℚ) :
     (Matrix.fromColumns A (1 : Matrix X X ℚ)).TU ↔ A.TU := by
-  rw [←Matrix.mapEquiv_TU (Matrix.fromColumns A (1 : Matrix X X ℚ)) (⟨id, id, congrFun rfl, congrFun rfl⟩) (Equiv.sumComm X Y)]
+  rw [←Matrix.mapEquiv_cols_TU (Matrix.fromColumns A (1 : Matrix X X ℚ)) (Equiv.sumComm X Y)]
   convert Matrix.TU_adjoin_id_left_iff A
   aesop
 
