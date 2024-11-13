@@ -50,6 +50,8 @@ lemma Matrix.TU.apply {A : Matrix X Y ℚ} (hA : A.TU) (i : X) (j : Y) :
   convert hA 1 f g (Function.injective_of_subsingleton f) (Function.injective_of_subsingleton g) <;>
   exact (det_fin_one (A.submatrix f g)).symm
 
+#check abs_eq_abs
+
 lemma Matrix.TU.submatrix {A : Matrix X Y ℚ} (hA : A.TU) (k : ℕ) (f : Fin k → X) (g : Fin k → Y) :
     (A.submatrix f g).TU := by
   intro _ _ _ _ _
@@ -178,22 +180,31 @@ lemma Matrix.submatrix_fromBlocks {α ι γ : Type*} (f : ι → X₁ ⊕ X₂) 
     ) := by
   aesop
 
-lemma todo {α β₁ β₂ : Type} (f : α → β₁ ⊕ β₂) :
+lemma Function.to_sum_to_parts {α β₁ β₂ : Type} (f : α → β₁ ⊕ β₂) :
     ∃ α₁ α₂ : Type, ∃ e : α ≃ α₁ ⊕ α₂, ∃ f₁ : α₁ → β₁, ∃ f₂ : α₂ → β₂,
-      ∀ i : α, f i = (Sum.elim (Sum.inl ∘ f₁) (Sum.inr ∘ f₂)) (e i) := by
-  classical
-  use { a : α // ∃ b₁ : β₁, f a = Sum.inl b₁ }
-  use { a : α // ∃ b₂ : β₂, f a = Sum.inr b₂ }
-  let e' : α → { a : α // ∃ b₁ : β₁, f a = Sum.inl b₁ } ⊕ { a : α // ∃ b₂ : β₂, f a = Sum.inr b₂ } :=
-    fun a : α =>
-      if hb₁ : ∃ b₁ : β₁, f a = Sum.inl b₁ then sorry else sorry
-  sorry
+      ∀ i : α, f i = (Sum.elim (Sum.inl ∘ f₁) (Sum.inr ∘ f₂)) (e i) :=
+  ⟨
+    { a : α // ∃ b₁ : β₁, f a = Sum.inl b₁ },
+    { a : α // ∃ b₂ : β₂, f a = Sum.inr b₂ },
+    Equiv.ofBijective (
+      fun a : α =>
+        match hfa : f a with
+        | .inl b₁ => Sum.inl ⟨a, b₁, hfa⟩
+        | .inr b₂ => Sum.inr ⟨a, b₂, hfa⟩
+      ) ⟨
+        fun _ _ _ => by aesop,
+        fun x => by cases' x with hx hx <;> use hx <;> aesop
+      ⟩,
+    fun ⟨_, hf⟩ => hf.choose,
+    fun ⟨_, hf⟩ => hf.choose,
+    by aesop
+  ⟩
 
 lemma Matrix.fromBlocks_TU {A₁ : Matrix X₁ Y₁ ℚ} {A₂ : Matrix X₂ Y₂ ℚ} (hA₁ : A₁.TU) (hA₂ : A₂.TU) :
     (Matrix.fromBlocks A₁ 0 0 A₂).TU := by
   intro k f g hf hg
-  obtain ⟨ι₁, ι₂, eι, f₁, f₂, hf⟩ := todo f
-  obtain ⟨γ₁, γ₂, eγ, g₁, g₂, hg⟩ := todo g
+  obtain ⟨ι₁, ι₂, eι, f₁, f₂, hf⟩ := f.to_sum_to_parts
+  obtain ⟨γ₁, γ₂, eγ, g₁, g₂, hg⟩ := g.to_sum_to_parts
   have todo_extract :
     (Matrix.fromBlocks A₁ 0 0 A₂).submatrix f g =
     ((Matrix.fromBlocks
