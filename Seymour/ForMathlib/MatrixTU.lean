@@ -88,6 +88,8 @@ lemma Matrix.mapEquiv_both_TU {X' Y' : Type*} [DecidableEq X'] [DecidableEq Y']
     Matrix.TU ((A · ∘ eY) ∘ eX) ↔ A.TU := by
   rw [Matrix.mapEquiv_rows_TU, Matrix.mapEquiv_cols_TU]
 
+#check Matrix.reindex
+
 lemma Matrix.TU_adjoin_row0s_iff (A : Matrix X Y ℚ) {X' : Type*} :
     (Matrix.fromRows A (Matrix.row X' 0)).TU ↔ A.TU := by
   rw [Matrix.TU_iff, Matrix.TU_iff]
@@ -111,23 +113,65 @@ lemma Matrix.TU_adjoin_row0s_iff (A : Matrix X Y ℚ) {X' : Type*} :
         apply hf₀
       apply hA
 
-lemma Matrix.TU_adjoin_rowUnit_iff (A : Matrix X Y ℚ) (j' : Y) [DecidableEq Y] :
-    (Matrix.fromRows A (Matrix.row Unit (fun j : Y => if j = j' then 1 else 0))).TU ↔ A.TU := by
+example {m n : ℕ} (A : Matrix (Fin m) (Fin n) ℚ) (j' : Fin n) :
+    (Matrix.of (Matrix.vecCons (fun j : Fin n => if j = j' then 1 else 0) A)).TU ↔
+    (Matrix.of (Matrix.vecCons 0 A)).TU := by
   rw [Matrix.TU_iff, Matrix.TU_iff]
   constructor <;> intro hA k f g
-  · exact hA k (Sum.inl ∘ f) g
-  · if used_row : ∃ i, ∃ x', f i = Sum.inr x' then
-      obtain ⟨i, x', hix'⟩ := used_row
+  · if used_row : ∃ i, f i = 0 then
+      obtain ⟨i, hi⟩ := used_row
+      left
+      apply Matrix.det_eq_zero_of_row_eq_zero i
+      intro
+      simp_all
+    else
+      obtain ⟨f₀, hf₀⟩ : ∃ f₀ : Fin k → Fin m, f = Fin.castSucc ∘ f₀
+      · use fun i =>
+          match hfi : (f i).val with
+          | 0 => False.elim (used_row ⟨i, Fin.eq_of_val_eq hfi⟩)
+          | i' + 1 => ⟨i', by omega⟩
+        ext i
+        simp
+        sorry
+      specialize hA k f g
+      have key (v : Fin n → ℚ) :
+        ((Matrix.of (Matrix.vecCons v A)).submatrix (Fin.castSucc ∘ f₀) g) =
+        (((Matrix.of (Matrix.vecCons v A)).submatrix Fin.castSucc id).submatrix f₀ g)
+      · simp
+      have wtf (v : Fin n → ℚ) :
+        ((Matrix.of (Matrix.vecCons v A)).submatrix Fin.castSucc id) = A
+      · ext i j
+        simp [Matrix.vecCons]
+        apply congr_fun
+        --rw [Fin.cons_succ]
+        sorry
+      rwa [hf₀, key, wtf] at hA ⊢
+  · if used_row : ∃ i, f i = 0 then
+      obtain ⟨i, hi⟩ := used_row
       if hits_one : ∃ j, g j = j' then
         -- TODO Laplacian expansion
         sorry
-      else
+      else -- copypaste
         left
         apply Matrix.det_eq_zero_of_row_eq_zero i
         intro
         simp_all
     else
-      obtain ⟨_, rfl⟩ : ∃ f₀ : Fin k → X, f = Sum.inl ∘ f₀
+      sorry
+
+lemma Matrix.TU_adjoin_rowUnit_aux (A : Matrix X Y ℚ) (j' : Y) [DecidableEq Y] :
+    (Matrix.fromRows A (Matrix.row Unit (fun j : Y => if j = j' then 1 else 0))).TU ↔
+    (Matrix.fromRows A (Matrix.row Unit 0)).TU := by
+  rw [Matrix.TU_iff, Matrix.TU_iff]
+  constructor <;> intro hA k f g
+  · if used_row : ∃ i, ∃ u, f i = Sum.inr u then
+      obtain ⟨i, u, hiu⟩ := used_row -- here `u = ()`
+      left
+      apply Matrix.det_eq_zero_of_row_eq_zero i
+      intro
+      simp_all
+    else
+      obtain ⟨f₀, hf₀⟩ : ∃ f₀ : Fin k → X, f = Sum.inl ∘ f₀
       · have hi (i : Fin k) : ∃ x, f i = Sum.inl x :=
           match hfi : f i with
           | .inl x => ⟨x, rfl⟩
@@ -136,7 +180,34 @@ lemma Matrix.TU_adjoin_rowUnit_iff (A : Matrix X Y ℚ) (j' : Y) [DecidableEq Y]
         use f₀
         ext
         apply hf₀
-      apply hA
+      specialize hA k f g
+      rwa [hf₀] at hA ⊢
+  · if used_row : ∃ i, ∃ u, f i = Sum.inr u then
+      obtain ⟨i, u, hiu⟩ := used_row -- here `u = ()`
+      if hits_one : ∃ j, g j = j' then
+        -- TODO Laplacian expansion
+        sorry
+      else -- copypaste all below
+        left
+        apply Matrix.det_eq_zero_of_row_eq_zero i
+        intro
+        simp_all
+    else
+      obtain ⟨f₀, hf₀⟩ : ∃ f₀ : Fin k → X, f = Sum.inl ∘ f₀
+      · have hi (i : Fin k) : ∃ x, f i = Sum.inl x :=
+          match hfi : f i with
+          | .inl x => ⟨x, rfl⟩
+          | .inr x => (used_row ⟨i, x, hfi⟩).elim
+        choose f₀ hf₀ using hi
+        use f₀
+        ext
+        apply hf₀
+      specialize hA k f g
+      rwa [hf₀] at hA ⊢
+
+lemma Matrix.TU_adjoin_rowUnit_iff (A : Matrix X Y ℚ) (j' : Y) [DecidableEq Y] :
+    (Matrix.fromRows A (Matrix.row Unit (fun j : Y => if j = j' then 1 else 0))).TU ↔ A.TU := by
+  rw [Matrix.TU_adjoin_rowUnit_aux, Matrix.TU_adjoin_row0s_iff]
 
 lemma Matrix.TU_adjoin_id_below_iff [DecidableEq X] [DecidableEq Y] (A : Matrix X Y ℚ) :
     (Matrix.fromRows A (1 : Matrix Y Y ℚ)).TU ↔ A.TU := by
