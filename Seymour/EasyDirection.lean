@@ -185,16 +185,15 @@ noncomputable def BinaryMatroid.threeSum {M₁ M₂ : BinaryMatroid α} {x₁ x�
   have x₁inX₂ : x₁ ∈ M₂.X := hxxx₂ (Set.mem_insert x₁ {x₂, x₃})
   have x₂inX₁ : x₂ ∈ M₁.X := hxxx₁ (Set.insert_comm x₁ x₂ {x₃} ▸ Set.mem_insert x₂ {x₁, x₃})
   have x₂inX₂ : x₂ ∈ M₂.X := hxxx₂ (Set.insert_comm x₁ x₂ {x₃} ▸ Set.mem_insert x₂ {x₁, x₃})
-  have x₃inX₁ : x₃ ∈ M₁.X := hxxx₁ (by simp_all)
-  have x₃inX₂ : x₃ ∈ M₂.X := hxxx₂ (by simp_all)
-  have y₃inY₁ : y₃ ∈ M₁.Y := hyyy₁ (by simp_all)
-  have y₃inY₂ : y₃ ∈ M₂.Y := hyyy₂ (by simp_all)
+  have x₃inX₁ : x₃ ∈ M₁.X := hxxx₁ (by simp)
+  have x₃inX₂ : x₃ ∈ M₂.X := hxxx₂ (by simp)
+  have y₃inY₁ : y₃ ∈ M₁.Y := hyyy₁ (by simp)
+  have y₃inY₂ : y₃ ∈ M₂.Y := hyyy₂ (by simp)
   have y₂inY₁ : y₂ ∈ M₁.Y := hyyy₁ (Set.insert_comm y₁ y₂ {y₃} ▸ Set.mem_insert y₂ {y₁, y₃})
   have y₂inY₂ : y₂ ∈ M₂.Y := hyyy₂ (Set.insert_comm y₁ y₂ {y₃} ▸ Set.mem_insert y₂ {y₁, y₃})
   have y₁inY₁ : y₁ ∈ M₁.Y := hyyy₁ (Set.mem_insert y₁ {y₂, y₃})
   have y₁inY₂ : y₁ ∈ M₂.Y := hyyy₂ (Set.mem_insert y₁ {y₂, y₃})
-  --
-  -- TODO try to refactor `Set.mem_of_mem_diff` to `subsetElem Set.diff_subset`
+  -- The actual definition starts here:
   let A₁ : Matrix (M₁.X \ {x₁, x₂, x₃}).Elem ((M₁.Y \ {y₁, y₂, y₃}).Elem ⊕ Fin 2) Z2 := -- the top left submatrix
     (fun i j => M₁.B ⟨i.val, Set.mem_of_mem_diff i.property⟩
         (j.casesOn (fun j' => ⟨j'.val, Set.mem_of_mem_diff j'.property⟩) ![⟨y₂, y₂inY₁⟩, ⟨y₁, y₁inY₁⟩]))
@@ -213,26 +212,6 @@ noncomputable def BinaryMatroid.threeSum {M₁ M₂ : BinaryMatroid α} {x₁ x�
     (fun i j => M₁.B (![⟨x₂, x₂inX₁⟩, ⟨x₃, x₃inX₁⟩] i) ⟨j.val, Set.mem_of_mem_diff j.property⟩)
   let D₂ : Matrix (M₂.X \ {x₁, x₂, x₃}).Elem (Fin 2) Z2 := -- the bottom left submatrix
     (fun i j => M₂.B ⟨i.val, Set.mem_of_mem_diff i.property⟩ (![⟨y₂, y₂inY₂⟩, ⟨y₁, y₁inY₂⟩] j))
-  --
-  let B : Matrix ((M₁.X \ {x₁, x₂, x₃}) ∪ M₂.X).Elem (M₁.Y ∪ (M₂.Y \ {y₁, y₂, y₃})).Elem Z2 := Matrix.of
-    (fun i j =>
-      Matrix.threeSumComposition A₁ A₂ z₁ z₂ D_₁ D₁ D₂ (
-        if hi₁ : i.val ∈ M₁.X \ {x₁, x₂, x₃} then Sum.inl (Sum.inl ⟨i, hi₁⟩) else
-        if hi₂ : i.val ∈ M₂.X \ {x₁, x₂, x₃} then Sum.inr (Sum.inr ⟨i, hi₂⟩) else
-        if hx₁ : i.val = x₁ then Sum.inl (Sum.inr ()) else
-        if hx₂ : i.val = x₂ then Sum.inr (Sum.inl 0) else
-        if hx₃ : i.val = x₃ then Sum.inr (Sum.inl 1) else
-        (i.property.elim hi₁ (by simp_all)).elim
-        -- TODO can `Matrix.toMatrixUnionUnion` be combined with something else to simplify this definition?
-      ) (
-        if hj₁ : j.val ∈ M₁.Y \ {y₁, y₂, y₃} then Sum.inl (Sum.inl ⟨j, hj₁⟩) else
-        if hj₂ : j.val ∈ M₂.Y \ {y₁, y₂, y₃} then Sum.inr (Sum.inr ⟨j, hj₂⟩) else
-        if hy₁ : j.val = y₁ then Sum.inl (Sum.inr 1) else
-        if hy₂ : j.val = y₂ then Sum.inl (Sum.inr 0) else
-        if hy₃ : j.val = y₃ then Sum.inr (Sum.inl ()) else
-        (j.property.elim (by simp_all) hj₂).elim
-      )
-    )
   ⟨
     ⟨
       (M₁.X \ {x₁, x₂, x₃}) ∪ M₂.X,
@@ -243,7 +222,24 @@ noncomputable def BinaryMatroid.threeSum {M₁ M₂ : BinaryMatroid α} {x₁ x�
         rw [Set.disjoint_union_right, Set.disjoint_union_left, Set.disjoint_union_left]
         exact
           ⟨⟨M₁.hXY.disjoint_sdiff_left, hYX.symm⟩, ⟨hXY.disjoint_sdiff_right.disjoint_sdiff_left, M₂.hXY.disjoint_sdiff_right⟩⟩,
-      B
+      Matrix.of (fun i j =>
+        Matrix.threeSumComposition A₁ A₂ z₁ z₂ D_₁ D₁ D₂ (
+          if hi₁ : i.val ∈ M₁.X \ {x₁, x₂, x₃} then Sum.inl (Sum.inl ⟨i, hi₁⟩) else
+          if hi₂ : i.val ∈ M₂.X \ {x₁, x₂, x₃} then Sum.inr (Sum.inr ⟨i, hi₂⟩) else
+          if hx₁ : i.val = x₁ then Sum.inl (Sum.inr ()) else
+          if hx₂ : i.val = x₂ then Sum.inr (Sum.inl 0) else
+          if hx₃ : i.val = x₃ then Sum.inr (Sum.inl 1) else
+          (i.property.elim hi₁ (by simp_all)).elim
+          -- TODO can `Matrix.toMatrixUnionUnion` be combined with something else to simplify this definition?
+        ) (
+          if hj₁ : j.val ∈ M₁.Y \ {y₁, y₂, y₃} then Sum.inl (Sum.inl ⟨j, hj₁⟩) else
+          if hj₂ : j.val ∈ M₂.Y \ {y₁, y₂, y₃} then Sum.inr (Sum.inr ⟨j, hj₂⟩) else
+          if hy₁ : j.val = y₁ then Sum.inl (Sum.inr 1) else
+          if hy₂ : j.val = y₂ then Sum.inl (Sum.inr 0) else
+          if hy₃ : j.val = y₃ then Sum.inr (Sum.inl ()) else
+          (j.property.elim (by simp_all) hj₂).elim
+        )
+      )
     ⟩,
     IsUnit D_₁ ∧ D_₁ = D_₂ -- the matrix `D_₁ = D_₂` (called D-bar in the book) is invertible
     ∧ M₁.B ⟨x₁, x₁inX₁⟩ ⟨y₁, y₁inY₁⟩ = 1
@@ -276,6 +272,110 @@ def BinaryMatroid.Is3sumOf (M : BinaryMatroid α) (M₁ M₂ : BinaryMatroid α)
     ∃ hXX : M₁.X ∩ M₂.X = {x₁, x₂, x₃}, ∃ hYY : M₁.Y ∩ M₂.Y = {y₁, y₂, y₃}, ∃ hXY : M₁.X ⫗ M₂.Y, ∃ hYX : M₁.Y ⫗ M₂.X,
       let M₀ := BinaryMatroid.threeSum hXX hYY hXY hYX
       M = M₀.fst ∧ M₀.snd
+
+section API_for_3sum
+
+variable {M M₁ M₂ : BinaryMatroid α}
+
+lemma BinaryMatroid.Is3sumOf.interXX (hM : M.Is3sumOf M₁ M₂) :
+    ∃ x₁ x₂ x₃ : α, M₁.X ∩ M₂.X = {x₁, x₂, x₃} := by
+  obtain ⟨x₁, x₂, x₃, -, -, -, hXX, -⟩ := hM
+  exact ⟨x₁, x₂, x₃, hXX⟩
+
+lemma BinaryMatroid.Is3sumOf.interYY (hM : M.Is3sumOf M₁ M₂) :
+    ∃ y₁ y₂ y₃ : α, M₁.Y ∩ M₂.Y = {y₁, y₂, y₃} := by
+  obtain ⟨-, -, -, y₁, y₂, y₃, -, hYY, -⟩ := hM
+  exact ⟨y₁, y₂, y₃, hYY⟩
+
+lemma BinaryMatroid.Is3sumOf.disjoXY (hM : M.Is3sumOf M₁ M₂) :
+    M₁.X ⫗ M₂.Y := by
+  obtain ⟨-, -, -, -, -, -, -, -, hXY, -⟩ := hM
+  exact hXY
+
+lemma BinaryMatroid.Is3sumOf.disjoYX (hM : M.Is3sumOf M₁ M₂) :
+    M₁.Y ⫗ M₂.X := by
+  obtain ⟨-, -, -, -, -, -, -, -, -, hYX, -⟩ := hM
+  exact hYX
+
+lemma BinaryMatroid.Is3sumOf.Indep (hM : M.Is3sumOf M₁ M₂) :
+    ∃ x₁ x₂ x₃ y₁ y₂ y₃ : α,
+      ∃ x₁inX₁ : x₁ ∈ M₁.X,
+      ∃ x₂inX₁ : x₂ ∈ M₁.X,
+      ∃ x₂inX₂ : x₂ ∈ M₂.X,
+      ∃ x₃inX₁ : x₃ ∈ M₁.X,
+      ∃ x₃inX₂ : x₃ ∈ M₂.X,
+      ∃ y₃inY₂ : y₃ ∈ M₂.Y,
+      ∃ y₂inY₁ : y₂ ∈ M₁.Y,
+      ∃ y₂inY₂ : y₂ ∈ M₂.Y,
+      ∃ y₁inY₁ : y₁ ∈ M₁.Y,
+      ∃ y₁inY₂ : y₁ ∈ M₂.Y,
+      let A₁ : Matrix (M₁.X \ {x₁, x₂, x₃}).Elem ((M₁.Y \ {y₁, y₂, y₃}).Elem ⊕ Fin 2) Z2 := -- the top left submatrix
+        (fun i j => M₁.B ⟨i.val, Set.mem_of_mem_diff i.property⟩
+            (j.casesOn (fun j' => ⟨j'.val, Set.mem_of_mem_diff j'.property⟩) ![⟨y₂, y₂inY₁⟩, ⟨y₁, y₁inY₁⟩]))
+      let A₂ : Matrix (Fin 2 ⊕ (M₂.X \ {x₁, x₂, x₃}).Elem) (M₂.Y \ {y₁, y₂, y₃}).Elem Z2 := -- the bottom right submatrix
+        (fun i j => M₂.B (i.casesOn ![⟨x₂, x₂inX₂⟩, ⟨x₃, x₃inX₂⟩] (fun i' => ⟨i'.val, Set.mem_of_mem_diff i'.property⟩))
+            ⟨j.val, Set.mem_of_mem_diff j.property⟩)
+      let z₁ : (M₁.Y \ {y₁, y₂, y₃}).Elem → Z2 := -- the middle left "row vector"
+        (fun j => M₁.B ⟨x₁, x₁inX₁⟩ ⟨j.val, Set.mem_of_mem_diff j.property⟩)
+      let z₂ : (M₂.X \ {x₁, x₂, x₃}).Elem → Z2 := -- the bottom middle "column vector"
+        (fun i => M₂.B ⟨i.val, Set.mem_of_mem_diff i.property⟩ ⟨y₃, y₃inY₂⟩)
+      let D_₁ : Matrix (Fin 2) (Fin 2) Z2 := -- the bottom middle 2x2 submatrix
+        (fun i j => M₁.B (![⟨x₂, x₂inX₁⟩, ⟨x₃, x₃inX₁⟩] i) (![⟨y₂, y₂inY₁⟩, ⟨y₁, y₁inY₁⟩] j))
+      let D₁ : Matrix (Fin 2) (M₁.Y \ {y₁, y₂, y₃}).Elem Z2 := -- the bottom left submatrix
+        (fun i j => M₁.B (![⟨x₂, x₂inX₁⟩, ⟨x₃, x₃inX₁⟩] i) ⟨j.val, Set.mem_of_mem_diff j.property⟩)
+      let D₂ : Matrix (M₂.X \ {x₁, x₂, x₃}).Elem (Fin 2) Z2 := -- the bottom left submatrix
+        (fun i j => M₂.B ⟨i.val, Set.mem_of_mem_diff i.property⟩ (![⟨y₂, y₂inY₂⟩, ⟨y₁, y₁inY₂⟩] j))
+      (Matrix.of (
+        fun i : ((M₁.X \ {x₁, x₂, x₃}) ∪ M₂.X).Elem =>
+        fun j : (M₁.Y ∪ (M₂.Y \ {y₁, y₂, y₃})).Elem =>
+          Matrix.threeSumComposition A₁ A₂ z₁ z₂ D_₁ D₁ D₂ (
+            if hi₁ : i.val ∈ M₁.X \ {x₁, x₂, x₃} then Sum.inl (Sum.inl ⟨i, hi₁⟩) else
+            if hi₂ : i.val ∈ M₂.X \ {x₁, x₂, x₃} then Sum.inr (Sum.inr ⟨i, hi₂⟩) else
+            if hx₁ : i.val = x₁ then Sum.inl (Sum.inr ()) else
+            if hx₂ : i.val = x₂ then Sum.inr (Sum.inl 0) else
+            if hx₃ : i.val = x₃ then Sum.inr (Sum.inl 1) else
+            (i.property.elim hi₁ (by simp_all)).elim
+          ) (
+            if hj₁ : j.val ∈ M₁.Y \ {y₁, y₂, y₃} then Sum.inl (Sum.inl ⟨j, hj₁⟩) else
+            if hj₂ : j.val ∈ M₂.Y \ {y₁, y₂, y₃} then Sum.inr (Sum.inr ⟨j, hj₂⟩) else
+            if hy₁ : j.val = y₁ then Sum.inl (Sum.inr 1) else
+            if hy₂ : j.val = y₂ then Sum.inl (Sum.inr 0) else
+            if hy₃ : j.val = y₃ then Sum.inr (Sum.inl ()) else
+            (j.property.elim (by simp_all) hj₂).elim
+          )
+        )
+      ).IndepCols = M.toMatroid.Indep := by
+  obtain ⟨x₁, x₂, x₃, y₁, y₂, y₃, hXX, hYY, -, -, rfl, -⟩ := hM
+  have hxxx₁ : {x₁, x₂, x₃} ⊆ M₁.X := hXX.symm.subset.trans Set.inter_subset_left
+  have hxxx₂ : {x₁, x₂, x₃} ⊆ M₂.X := hXX.symm.subset.trans Set.inter_subset_right
+  have hyyy₁ : {y₁, y₂, y₃} ⊆ M₁.Y := hYY.symm.subset.trans Set.inter_subset_left
+  have hyyy₂ : {y₁, y₂, y₃} ⊆ M₂.Y := hYY.symm.subset.trans Set.inter_subset_right
+  exact ⟨x₁, x₂, x₃, y₁, y₂, y₃,
+    hxxx₁ (Set.mem_insert x₁ {x₂, x₃}),
+    hxxx₁ (Set.insert_comm x₁ x₂ {x₃} ▸ Set.mem_insert x₂ {x₁, x₃}),
+    hxxx₂ (Set.insert_comm x₁ x₂ {x₃} ▸ Set.mem_insert x₂ {x₁, x₃}),
+    hxxx₁ (by simp),
+    hxxx₂ (by simp),
+    hyyy₂ (by simp),
+    hyyy₁ (Set.insert_comm y₁ y₂ {y₃} ▸ Set.mem_insert y₂ {y₁, y₃}),
+    hyyy₂ (Set.insert_comm y₁ y₂ {y₃} ▸ Set.mem_insert y₂ {y₁, y₃}),
+    hyyy₁ (Set.mem_insert y₁ {y₂, y₃}),
+    hyyy₂ (Set.mem_insert y₁ {y₂, y₃}),
+    rfl⟩
+
+lemma BinaryMatroid.Is3sumOf.invertibilityDbar (hM : M.Is3sumOf M₁ M₂) :
+    ∃ x₂ x₃ y₁ y₂ : α, ∃ x₂inX₁ : x₂ ∈ M₁.X, ∃ x₃inX₁ : x₃ ∈ M₁.X, ∃ y₂inY₁ : y₂ ∈ M₁.Y, ∃ y₁inY₁ : y₁ ∈ M₁.Y,
+      IsUnit (Matrix.of (fun i j => M₁.B (![⟨x₂, x₂inX₁⟩, ⟨x₃, x₃inX₁⟩] i) (![⟨y₂, y₂inY₁⟩, ⟨y₁, y₁inY₁⟩] j))) := by
+  obtain ⟨x₁, x₂, x₃, y₁, y₂, y₃, hXX, hYY, _, _, rfl, valid⟩ := hM
+  use x₂, x₃, y₁, y₂
+  have hxxx₁ : {x₁, x₂, x₃} ⊆ M₁.X := hXX.symm.subset.trans Set.inter_subset_left
+  use hxxx₁ (Set.insert_comm x₁ x₂ {x₃} ▸ Set.mem_insert x₂ {x₁, x₃}), hxxx₁ (by simp)
+  have hyyy₁ : {y₁, y₂, y₃} ⊆ M₁.Y := hYY.symm.subset.trans Set.inter_subset_left
+  use hyyy₁ (Set.insert_comm y₁ y₂ {y₃} ▸ Set.mem_insert y₂ {y₁, y₃}), hyyy₁ (Set.mem_insert y₁ {y₂, y₃})
+  unfold BinaryMatroid.threeSum at valid
+  aesop
+
+end API_for_3sum
 
 def Matrix.TU.toMatrixUnionUnion {T T₁ T₂ S S₁ S₂ : Set α}
     [∀ a, Decidable (a ∈ T₁)] [∀ a, Decidable (a ∈ T₂)] [∀ a, Decidable (a ∈ S₁)] [∀ a, Decidable (a ∈ S₂)]
