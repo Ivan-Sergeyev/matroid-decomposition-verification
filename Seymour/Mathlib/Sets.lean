@@ -3,12 +3,6 @@ import Mathlib.Tactic
 
 variable {α : Type*} {X Y : Set α}
 
-lemma disjoint_left_setminus (hXY : Disjoint X Y) (Z : Set α) : Disjoint (X \ Z) Y :=
-  Set.disjoint_of_subset_left Set.diff_subset hXY
-
-lemma disjoint_right_setminus (hXY : Disjoint X Y) (Z : Set α) : Disjoint X (Y \ Z) :=
-  Set.disjoint_of_subset_right Set.diff_subset hXY
-
 lemma disjoint_of_singleton_intersection_left_wo {a : α} (hXY : X ∩ Y = {a}) : Disjoint (X \ {a}) Y := by
   rw [Set.disjoint_iff_forall_ne]
   intro u huXa v hvY huv
@@ -26,4 +20,4 @@ lemma disjoint_of_singleton_intersection_right_wo {a : α} (hXY : X ∩ Y = {a})
   exact disjoint_of_singleton_intersection_left_wo hXY
 
 lemma disjoint_of_singleton_intersection_both_wo {a : α} (hXY : X ∩ Y = {a}) : Disjoint (X \ {a}) (Y \ {a}) :=
-  disjoint_left_setminus (disjoint_of_singleton_intersection_right_wo hXY) {a}
+  Disjoint.disjoint_sdiff_left (disjoint_of_singleton_intersection_right_wo hXY)

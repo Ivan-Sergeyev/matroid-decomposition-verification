@@ -19,9 +19,9 @@ inductive BinaryMatroid.IsGood : BinaryMatroid α → Prop
 | cographic {M : BinaryMatroid α} (hM : M.IsCographic) : M.IsGood
 | theR10 {M : BinaryMatroid α} {e : α ≃ Fin 10} (hM : M.toMatroid.mapEquiv e = MatroidR10.toMatroid) : M.IsGood
 -- fork constructors
-| is1sum {M₁ : BinaryMatroid α} {M₂ : BinaryMatroid α} {M : BinaryMatroid α} (hM : M.Is1sum M₁ M₂) : M.IsGood
-| is2sum {M₁ : BinaryMatroid α} {M₂ : BinaryMatroid α} {M : BinaryMatroid α} (hM : M.Is2sum M₁ M₂) : M.IsGood
-| is3sum {M₁ : BinaryMatroid α} {M₂ : BinaryMatroid α} {M : BinaryMatroid α} (hM : M.Is3sum M₁ M₂) : M.IsGood
+| is1sum {M₁ : BinaryMatroid α} {M₂ : BinaryMatroid α} {M : BinaryMatroid α} (hM : M.Is1sumOf M₁ M₂) : M.IsGood
+| is2sum {M₁ : BinaryMatroid α} {M₂ : BinaryMatroid α} {M : BinaryMatroid α} (hM : M.Is2sumOf M₁ M₂) : M.IsGood
+| is3sum {M₁ : BinaryMatroid α} {M₂ : BinaryMatroid α} {M : BinaryMatroid α} (hM : M.Is3sumOf M₁ M₂) : M.IsGood
 
 theorem hardSeymour {M : BinaryMatroid α} (hM : M.IsRegular) : M.IsGood := by
   sorry
