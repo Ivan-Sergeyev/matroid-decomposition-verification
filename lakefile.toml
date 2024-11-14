@@ -9,7 +9,7 @@ pp.structureInstances = false
 [[require]]
 name = "mathlib"
 git = "https://github.com/leanprover-community/mathlib4.git"
-
+rev = "v4.13.0"
 
 [[require]]
 name = "checkdecls"
@@ -18,6 +18,7 @@ git = "https://github.com/PatrickMassot/checkdecls.git"
 [[require]]
 name = "«doc-gen4»"
 git = "https://github.com/leanprover/doc-gen4"
-rev = "main"
+rev = "v4.13.0"
+
 [[lean_lib]]
 name = "Seymour"
