@@ -156,7 +156,7 @@ def Matrix.toMatrixElemElem (C : Matrix (T₁ ⊕ T₂) (S₁ ⊕ S₂) β) (hT 
 omit [DecidableEq α] in
 lemma Matrix.toMatrixElemElem_eq (C : Matrix (T₁ ⊕ T₂) (S₁ ⊕ S₂) β) (hT : T = T₁ ∪ T₂) (hS : S = S₁ ∪ S₂) :
     C.toMatrixElemElem hT hS = Matrix.of (fun i j => C (hT ▸ i).toSum (hS ▸ j).toSum) := by
-  subst hS hT
+  subst hT hS
   rfl
 
 end matrix_conversions
@@ -301,9 +301,53 @@ def BinaryMatroid.Is3sumOf (M : BinaryMatroid α) (M₁ M₂ : BinaryMatroid α)
       let M₀ := BinaryMatroid.threeSum hXX hYY hXY hYX
       M = M₀.fst ∧ M₀.snd
 
-section API_for_3sum
+
+section API_for_matroid_sums
 
 variable {M M₁ M₂ : BinaryMatroid α}
+
+lemma BinaryMatroid.Is2sumOf.disjoXX (hM : M.Is2sumOf M₁ M₂) :
+    M₁.X ⫗ M₂.X := by
+  obtain ⟨a, -, -, -, ⟨hXX, -⟩, -⟩ := hM
+  exact hXX
+
+lemma BinaryMatroid.Is2sumOf.disjoYY (hM : M.Is2sumOf M₁ M₂) :
+    M₁.Y ⫗ M₂.Y := by
+  obtain ⟨a, -, -, -, ⟨-, hYY⟩, -⟩ := hM
+  exact hYY
+
+lemma BinaryMatroid.Is2sumOf.interXY (hM : M.Is2sumOf M₁ M₂) :
+    ∃ a : α, M₁.X ∩ M₂.Y = {a} := by
+  obtain ⟨a, ha, -⟩ := hM
+  exact ⟨a, ha⟩
+
+lemma BinaryMatroid.Is2sumOf.disjoYX (hM : M.Is2sumOf M₁ M₂) :
+    M₁.Y ⫗ M₂.X := by
+  obtain ⟨a, -, hXY, -⟩ := hM
+  exact hXY.symm
+
+lemma BinaryMatroid.Is2sumOf.Indep (hM : M.Is2sumOf M₁ M₂) :
+    ∃ a : α, ∃ ha : M₁.X ∩ M₂.Y = {a},
+      let A₁ : Matrix (M₁.X \ {a}).Elem M₁.Y.Elem Z2 := M₁.B ∘ Set.diff_subset.elem -- the top submatrix of `B₁`
+      let A₂ : Matrix M₂.X.Elem (M₂.Y \ {a}).Elem Z2 := (M₂.B · ∘ Set.diff_subset.elem) -- the right submatrix of `B₂`
+      let x : M₁.Y.Elem → Z2 := M₁.B ⟨a, Set.mem_of_mem_inter_left (by rw [ha]; rfl)⟩ -- the bottom row of `B₁`
+      let y : M₂.X.Elem → Z2 := (M₂.B · ⟨a, Set.mem_of_mem_inter_right (by rw [ha]; rfl)⟩) -- the left column of `B₂`
+      (Matrix.twoSumComposition A₁ x A₂ y).toMatrixUnionUnion.IndepCols =
+      M.toMatroid.Indep := by
+  obtain ⟨a, ha, _, rfl, -⟩ := hM
+  exact ⟨a, ha, rfl⟩
+
+lemma BinaryMatroid.Is2sumOf.x_nonzero (hM : M.Is2sumOf M₁ M₂) :
+    ∃ a : α, ∃ ha : M₁.X ∩ M₂.Y = {a},
+      M₁.B ⟨a, Set.mem_of_mem_inter_left (by rw [ha]; rfl)⟩ ≠ 0 := by
+  obtain ⟨a, ha, _, rfl, -, hx, -⟩ := hM
+  exact ⟨a, ha, hx⟩
+
+lemma BinaryMatroid.Is2sumOf.y_nonzero (hM : M.Is2sumOf M₁ M₂) :
+    ∃ a : α, ∃ ha : M₁.X ∩ M₂.Y = {a},
+      (M₂.B · ⟨a, Set.mem_of_mem_inter_right (by rw [ha]; rfl)⟩) ≠ 0 := by
+  obtain ⟨a, ha, _, rfl, -, -, hy⟩ := hM
+  exact ⟨a, ha, hy⟩
 
 lemma BinaryMatroid.Is3sumOf.interXX (hM : M.Is3sumOf M₁ M₂) :
     ∃ x₁ x₂ x₃ : α, M₁.X ∩ M₂.X = {x₁, x₂, x₃} := by
@@ -416,7 +460,7 @@ M₂.B ⟨x₃, x₃inX₂⟩ ⟨y₃, y₃inY₂⟩ = 1
 (∀ y : α, ∀ hy : y ∈ M₂.Y, y ≠ y₂ ∧ y ≠ y₁ → M₂.B ⟨x₁, x₁inX₂⟩ ⟨y, hy⟩ = 0)
 -/
 
-end API_for_3sum
+end API_for_matroid_sums
 
 
 def Matrix.TU.toMatrixElemElem {T T₁ T₂ S S₁ S₂ : Set α}
