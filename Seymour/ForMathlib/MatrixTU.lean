@@ -3,16 +3,16 @@ import Mathlib.Tactic
 
 open scoped Matrix
 
-variable {X Y : Type*}
+variable {X Y R : Type*} [CommRing R]
 
 /-- Is the matrix `A` totally unimodular? -/
-def Matrix.TU (A : Matrix X Y ℚ) : Prop :=
+def Matrix.TU (A : Matrix X Y R) : Prop :=
   ∀ k : ℕ, ∀ f : Fin k → X, ∀ g : Fin k → Y, f.Injective → g.Injective →
     (A.submatrix f g).det = 0 ∨
     (A.submatrix f g).det = 1 ∨
     (A.submatrix f g).det = -1
 
-lemma Matrix.TU_iff (A : Matrix X Y ℚ) : A.TU ↔
+lemma Matrix.TU_iff (A : Matrix X Y R) : A.TU ↔
     ∀ k : ℕ, ∀ f : Fin k → X, ∀ g : Fin k → Y,
       (A.submatrix f g).det = 0 ∨
       (A.submatrix f g).det = 1 ∨
@@ -43,7 +43,7 @@ lemma Matrix.TU_iff (A : Matrix X Y ℚ) : A.TU ↔
   · intro _ _ _ _ _
     apply hA
 
-lemma Matrix.TU.apply {A : Matrix X Y ℚ} (hA : A.TU) (i : X) (j : Y) :
+lemma Matrix.TU.apply {A : Matrix X Y R} (hA : A.TU) (i : X) (j : Y) :
     A i j = 0 ∨ A i j = 1 ∨ A i j = -1 := by
   let f : Fin 1 → X := (fun _ => i)
   let g : Fin 1 → Y := (fun _ => j)
@@ -52,23 +52,23 @@ lemma Matrix.TU.apply {A : Matrix X Y ℚ} (hA : A.TU) (i : X) (j : Y) :
 
 #check abs_eq_abs
 
-lemma Matrix.TU.submatrix {A : Matrix X Y ℚ} (hA : A.TU) (k : ℕ) (f : Fin k → X) (g : Fin k → Y) :
+lemma Matrix.TU.submatrix {A : Matrix X Y R} (hA : A.TU) (k : ℕ) (f : Fin k → X) (g : Fin k → Y) :
     (A.submatrix f g).TU := by
   intro _ _ _ _ _
   rw [Matrix.submatrix_submatrix]
   rw [Matrix.TU_iff] at hA
   apply hA
 
-lemma Matrix.TU.transpose {A : Matrix X Y ℚ} (hA : A.TU) : Aᵀ.TU := by
+lemma Matrix.TU.transpose {A : Matrix X Y R} (hA : A.TU) : Aᵀ.TU := by
   intro _ _ _ _ _
   simp only [←Matrix.transpose_submatrix, Matrix.det_transpose]
   apply hA <;> assumption
 
-lemma Matrix.TU_iff_transpose (A : Matrix X Y ℚ) : A.TU ↔ Aᵀ.TU := by
+lemma Matrix.TU_iff_transpose (A : Matrix X Y R) : A.TU ↔ Aᵀ.TU := by
   constructor <;> apply Matrix.TU.transpose
 
 lemma Matrix.mapEquiv_rows_TU {X' : Type*} [DecidableEq X']
-    (A : Matrix X Y ℚ) (eX : X' ≃ X) :
+    (A : Matrix X Y R) (eX : X' ≃ X) :
     Matrix.TU (A ∘ eX) ↔ A.TU := by
   rw [Matrix.TU_iff, Matrix.TU_iff]
   constructor <;> intro hA k f g
@@ -76,7 +76,7 @@ lemma Matrix.mapEquiv_rows_TU {X' : Type*} [DecidableEq X']
   · simpa [Matrix.submatrix] using hA k (eX ∘ f) g
 
 lemma Matrix.mapEquiv_cols_TU {Y' : Type*} [DecidableEq Y']
-    (A : Matrix X Y ℚ) (eY : Y' ≃ Y) :
+    (A : Matrix X Y R) (eY : Y' ≃ Y) :
     Matrix.TU (A · ∘ eY) ↔ A.TU := by
   rw [Matrix.TU_iff, Matrix.TU_iff]
   constructor <;> intro hA k f g
@@ -84,13 +84,13 @@ lemma Matrix.mapEquiv_cols_TU {Y' : Type*} [DecidableEq Y']
   · simpa [Matrix.submatrix] using hA k f (eY ∘ g)
 
 lemma Matrix.mapEquiv_both_TU {X' Y' : Type*} [DecidableEq X'] [DecidableEq Y']
-    (A : Matrix X Y ℚ) (eX : X' ≃ X) (eY : Y' ≃ Y) :
+    (A : Matrix X Y R) (eX : X' ≃ X) (eY : Y' ≃ Y) :
     Matrix.TU ((A · ∘ eY) ∘ eX) ↔ A.TU := by
   rw [Matrix.mapEquiv_rows_TU, Matrix.mapEquiv_cols_TU]
 
 #check Matrix.reindex
 
-lemma Matrix.TU_adjoin_row0s_iff (A : Matrix X Y ℚ) {X' : Type*} :
+lemma Matrix.TU_adjoin_row0s_iff (A : Matrix X Y R) {X' : Type*} :
     (Matrix.fromRows A (Matrix.row X' 0)).TU ↔ A.TU := by
   rw [Matrix.TU_iff, Matrix.TU_iff]
   constructor <;> intro hA k f g
@@ -113,7 +113,7 @@ lemma Matrix.TU_adjoin_row0s_iff (A : Matrix X Y ℚ) {X' : Type*} :
         apply hf₀
       apply hA
 
-example {m n : ℕ} (A : Matrix (Fin m) (Fin n) ℚ) (j' : Fin n) :
+example {m n : ℕ} (A : Matrix (Fin m) (Fin n) R) (j' : Fin n) :
     (Matrix.of (Matrix.vecCons (fun j : Fin n => if j = j' then 1 else 0) A)).TU ↔
     (Matrix.of (Matrix.vecCons 0 A)).TU := by
   rw [Matrix.TU_iff, Matrix.TU_iff]
@@ -134,11 +134,11 @@ example {m n : ℕ} (A : Matrix (Fin m) (Fin n) ℚ) (j' : Fin n) :
         simp
         sorry
       specialize hA k f g
-      have key (v : Fin n → ℚ) :
+      have key (v : Fin n → R) :
         ((Matrix.of (Matrix.vecCons v A)).submatrix (Fin.castSucc ∘ f₀) g) =
         (((Matrix.of (Matrix.vecCons v A)).submatrix Fin.castSucc id).submatrix f₀ g)
       · simp
-      have wtf (v : Fin n → ℚ) :
+      have wtf (v : Fin n → R) :
         ((Matrix.of (Matrix.vecCons v A)).submatrix Fin.castSucc id) = A
       · ext i j
         simp [Matrix.vecCons]
@@ -159,7 +159,7 @@ example {m n : ℕ} (A : Matrix (Fin m) (Fin n) ℚ) (j' : Fin n) :
     else
       sorry
 
-lemma Matrix.TU_adjoin_rowUnit_aux (A : Matrix X Y ℚ) (j' : Y) [DecidableEq Y] :
+lemma Matrix.TU_adjoin_rowUnit_aux (A : Matrix X Y R) (j' : Y) [DecidableEq Y] :
     (Matrix.fromRows A (Matrix.row Unit (fun j : Y => if j = j' then 1 else 0))).TU ↔
     (Matrix.fromRows A (Matrix.row Unit 0)).TU := by
   rw [Matrix.TU_iff, Matrix.TU_iff]
@@ -205,35 +205,35 @@ lemma Matrix.TU_adjoin_rowUnit_aux (A : Matrix X Y ℚ) (j' : Y) [DecidableEq Y]
       specialize hA k f g
       rwa [hf₀] at hA ⊢
 
-lemma Matrix.TU_adjoin_rowUnit_iff (A : Matrix X Y ℚ) (j' : Y) [DecidableEq Y] :
+lemma Matrix.TU_adjoin_rowUnit_iff (A : Matrix X Y R) (j' : Y) [DecidableEq Y] :
     (Matrix.fromRows A (Matrix.row Unit (fun j : Y => if j = j' then 1 else 0))).TU ↔ A.TU := by
   rw [Matrix.TU_adjoin_rowUnit_aux, Matrix.TU_adjoin_row0s_iff]
 
-lemma Matrix.TU_adjoin_id_below_iff [DecidableEq X] [DecidableEq Y] (A : Matrix X Y ℚ) :
-    (Matrix.fromRows A (1 : Matrix Y Y ℚ)).TU ↔ A.TU := by
+lemma Matrix.TU_adjoin_id_below_iff [DecidableEq X] [DecidableEq Y] (A : Matrix X Y R) :
+    (Matrix.fromRows A (1 : Matrix Y Y R)).TU ↔ A.TU := by
   rw [Matrix.TU_iff, Matrix.TU_iff]
   constructor <;> intro hA k f g
   · exact hA k (Sum.inl ∘ f) g
   · sorry -- TODO inductively apply `Matrix.TU_adjoin_rowUnit_iff`
 
-lemma Matrix.TU_adjoin_id_above_iff [DecidableEq X] [DecidableEq Y] (A : Matrix X Y ℚ) :
-    (Matrix.fromRows (1 : Matrix Y Y ℚ) A).TU ↔ A.TU := by
-  rw [←Matrix.mapEquiv_rows_TU (Matrix.fromRows (1 : Matrix Y Y ℚ) A) (Equiv.sumComm X Y)]
+lemma Matrix.TU_adjoin_id_above_iff [DecidableEq X] [DecidableEq Y] (A : Matrix X Y R) :
+    (Matrix.fromRows (1 : Matrix Y Y R) A).TU ↔ A.TU := by
+  rw [←Matrix.mapEquiv_rows_TU (Matrix.fromRows (1 : Matrix Y Y R) A) (Equiv.sumComm X Y)]
   convert Matrix.TU_adjoin_id_below_iff A
   aesop
 
-lemma Matrix.TU_adjoin_id_left_iff [DecidableEq X] [DecidableEq Y] (A : Matrix X Y ℚ) :
-    (Matrix.fromColumns (1 : Matrix X X ℚ) A).TU ↔ A.TU := by
+lemma Matrix.TU_adjoin_id_left_iff [DecidableEq X] [DecidableEq Y] (A : Matrix X Y R) :
+    (Matrix.fromColumns (1 : Matrix X X R) A).TU ↔ A.TU := by
   rw [Matrix.TU_iff_transpose, Matrix.transpose_fromColumns, Matrix.transpose_one, Matrix.TU_iff_transpose A]
   exact Matrix.TU_adjoin_id_above_iff Aᵀ
 
-lemma Matrix.TU_adjoin_id_right_iff [DecidableEq X] [DecidableEq Y] (A : Matrix X Y ℚ) :
-    (Matrix.fromColumns A (1 : Matrix X X ℚ)).TU ↔ A.TU := by
-  rw [←Matrix.mapEquiv_cols_TU (Matrix.fromColumns A (1 : Matrix X X ℚ)) (Equiv.sumComm X Y)]
+lemma Matrix.TU_adjoin_id_right_iff [DecidableEq X] [DecidableEq Y] (A : Matrix X Y R) :
+    (Matrix.fromColumns A (1 : Matrix X X R)).TU ↔ A.TU := by
+  rw [←Matrix.mapEquiv_cols_TU (Matrix.fromColumns A (1 : Matrix X X R)) (Equiv.sumComm X Y)]
   convert Matrix.TU_adjoin_id_left_iff A
   aesop
 
-variable {X₁ X₂ Y₁ Y₂ : Type}
+variable {X₁ X₂ Y₁ Y₂ : Type*}
 
 lemma Matrix.submatrix_fromBlocks {α ι γ : Type*} (f : ι → X₁ ⊕ X₂) (g : γ → Y₁ ⊕ Y₂)
     (A₁₁ : Matrix X₁ Y₁ α) (A₁₂ : Matrix X₁ Y₂ α) (A₂₁ : Matrix X₂ Y₁ α) (A₂₂ : Matrix X₂ Y₂ α) :
@@ -251,38 +251,7 @@ lemma Matrix.submatrix_fromBlocks {α ι γ : Type*} (f : ι → X₁ ⊕ X₂) 
     ) := by
   aesop
 
-lemma Function.to_sum_to_parts {α β₁ β₂ : Type} (f : α → β₁ ⊕ β₂) :
-    ∃ α₁ α₂ : Type, ∃ e : α ≃ α₁ ⊕ α₂, ∃ f₁ : α₁ → β₁, ∃ f₂ : α₂ → β₂,
-      ∀ i : α, f i = (Sum.elim (Sum.inl ∘ f₁) (Sum.inr ∘ f₂)) (e i) :=
-  ⟨
-    { a : α // ∃ b₁ : β₁, f a = Sum.inl b₁ },
-    { a : α // ∃ b₂ : β₂, f a = Sum.inr b₂ },
-    Equiv.ofBijective (
-      fun a : α =>
-        match hfa : f a with
-        | .inl b₁ => Sum.inl ⟨a, b₁, hfa⟩
-        | .inr b₂ => Sum.inr ⟨a, b₂, hfa⟩
-      ) ⟨
-        fun _ _ _ => by aesop,
-        fun x => by cases' x with hx hx <;> use hx <;> aesop
-      ⟩,
-    fun ⟨_, hf⟩ => hf.choose,
-    fun ⟨_, hf⟩ => hf.choose,
-    by aesop
-  ⟩
-
-lemma Matrix.fromBlocks_TU {A₁ : Matrix X₁ Y₁ ℚ} {A₂ : Matrix X₂ Y₂ ℚ} (hA₁ : A₁.TU) (hA₂ : A₂.TU) :
+lemma Matrix.fromBlocks_TU {A₁ : Matrix X₁ Y₁ R} {A₂ : Matrix X₂ Y₂ R} (hA₁ : A₁.TU) (hA₂ : A₂.TU) :
     (Matrix.fromBlocks A₁ 0 0 A₂).TU := by
   intro k f g hf hg
-  obtain ⟨ι₁, ι₂, eι, f₁, f₂, hf⟩ := f.to_sum_to_parts
-  obtain ⟨γ₁, γ₂, eγ, g₁, g₂, hg⟩ := g.to_sum_to_parts
-  have todo_extract :
-    (Matrix.fromBlocks A₁ 0 0 A₂).submatrix f g =
-    ((Matrix.fromBlocks
-      (A₁.submatrix f₁ g₁) 0
-      0 (A₂.submatrix f₂ g₂)
-    ) · ∘ eγ) ∘ eι
-  · ext i j
-    cases hi : eι i <;> cases hj : eγ j <;> simp [hi, hj] <;> aesop
-  rw [todo_extract]
   sorry
