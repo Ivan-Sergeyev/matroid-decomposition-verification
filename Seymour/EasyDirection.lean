@@ -5,12 +5,16 @@ import Seymour.Mathlib.Sets
 open scoped Matrix
 
 
+section custom_notation
+
 /-- The finite field on two elements. -/
 abbrev Z2 : Type := ZMod 2
 
 infixr:66 " ᕃ " => Insert.insert -- TODO (low priority) use `syntax` and write a custom delaborator
 
 infix:61 " ⫗ " => Disjoint
+
+end custom_notation
 
 
 section construction_from_matrices
@@ -76,6 +80,8 @@ def Matrix.toMatroid (B : Matrix X Y Z2) : Matroid α := B.toIndepMatroid.matroi
 end construction_from_matrices
 
 
+section define_binary_matroid
+
 /-- Data describing a binary matroid on the ground set `X ∪ Y` where `X` and `Y` are bundled. -/
 structure BinaryMatroid (α : Type*) [DecidableEq α] where
   X : Set α
@@ -88,8 +94,12 @@ structure BinaryMatroid (α : Type*) [DecidableEq α] where
 attribute [instance] BinaryMatroid.decmemX
 attribute [instance] BinaryMatroid.decmemY
 
+end define_binary_matroid
+
 
 variable {α : Type*} [DecidableEq α]
+
+section about_binary_matroids
 
 def BinaryMatroid.toMatroid (M : BinaryMatroid α) :=
   M.B.toMatroid
@@ -107,8 +117,10 @@ def BinaryMatroid.IsRegular (M : BinaryMatroid α) : Prop :=
     (Matrix.fromColumns (1 : Matrix M.X M.X ℤ) B').TU ∧ -- the matrix is totally unimodular
     ∀ i : M.X, ∀ j : M.Y, if M.B i j = 0 then B' i j = 0 else B' i j = 1 ∨ B' i j = -1 -- `B'` matches `B`
 
+end about_binary_matroids
 
-section matrix_level
+
+section sums_matrix_level
 
 variable {X₁ Y₁ : Set α} {X₂ Y₂ : Set α} {β : Type*} [CommRing β]
 
@@ -132,7 +144,13 @@ noncomputable abbrev Matrix.threeSumComposition (A₁ : Matrix X₁ (Y₁ ⊕ Fi
     (Matrix.fromRows A₁ (Matrix.row Unit (Sum.elim z₁ ![1, 1]))) 0
     (Matrix.fromBlocks D₁ D D₁₂ D₂) (Matrix.fromColumns (Matrix.col Unit (Sum.elim ![1, 1] z₂)) A₂)
 
-end matrix_level
+-- TODO where should this lemma go?
+lemma Matrix.twoSumComposition_TU {A₁ : Matrix X₁ Y₁ ℤ} {A₂ : Matrix X₂ Y₂ ℤ}
+    (hA₁ : A₁.TU) (hA₂ : A₂.TU) (x : Y₁ → ℤ) (y : X₂ → ℤ) :
+    (Matrix.twoSumComposition A₁ x A₂ y).TU := by
+  sorry
+
+end sums_matrix_level
 
 
 section matrix_conversions
@@ -153,17 +171,29 @@ def Matrix.toMatrixElemElem (C : Matrix (T₁ ⊕ T₂) (S₁ ⊕ S₂) β) (hT 
     Matrix T S β :=
   hT ▸ hS ▸ C.toMatrixUnionUnion
 
-omit [DecidableEq α] in
+omit [DecidableEq α]
+
 lemma Matrix.toMatrixElemElem_eq (C : Matrix (T₁ ⊕ T₂) (S₁ ⊕ S₂) β) (hT : T = T₁ ∪ T₂) (hS : S = S₁ ∪ S₂) :
     C.toMatrixElemElem hT hS = Matrix.of (fun i j => C (hT ▸ i).toSum (hS ▸ j).toSum) := by
   subst hT hS
   rfl
 
+lemma Matrix.TU.toMatrixElemElem {C : Matrix (T₁ ⊕ T₂) (S₁ ⊕ S₂) ℤ} (hC : C.TU) (hT : T = T₁ ∪ T₂) (hS : S = S₁ ∪ S₂) :
+    (C.toMatrixElemElem hT hS).TU := by
+  rw [Matrix.TU_iff] at hC ⊢
+  intros
+  rw [Matrix.toMatrixElemElem_eq]
+  apply hC
+
 end matrix_conversions
 
 
+section sums_matroid_level
+
+variable {M₁ M₂ : BinaryMatroid α}
+
 /-- BinaryMatroid-level 1-sum of two matroids. It checks that everything is disjoint (returned as `.snd` of the output). -/
-def BinaryMatroid.oneSum {M₁ M₂ : BinaryMatroid α} (hXY : M₁.X ⫗ M₂.Y) (hYX : M₁.Y ⫗ M₂.X) :
+def BinaryMatroid.oneSum (hXY : M₁.X ⫗ M₂.Y) (hYX : M₁.Y ⫗ M₂.X) :
     BinaryMatroid α × Prop :=
   ⟨
     ⟨
@@ -180,7 +210,7 @@ def BinaryMatroid.oneSum {M₁ M₂ : BinaryMatroid α} (hXY : M₁.X ⫗ M₂.Y
 /-- BinaryMatroid-level 2-sum of two matroids.
 Second part check legitimacy: the ground sets of `M₁` and `M₂` are disjoint except for element `a` that lies in `M₁.X ∩ M₂.Y`,
 and the bottom-most row of `M₁` and the left-most column of `M₂` are each nonzero vectors. -/
-def BinaryMatroid.twoSum {M₁ M₂ : BinaryMatroid α} {a : α} (ha : M₁.X ∩ M₂.Y = {a}) (hXY : M₂.X ⫗ M₁.Y) :
+def BinaryMatroid.twoSum {a : α} (ha : M₁.X ∩ M₂.Y = {a}) (hXY : M₂.X ⫗ M₁.Y) :
     BinaryMatroid α × Prop :=
   let A₁ : Matrix (M₁.X \ {a}).Elem M₁.Y.Elem Z2 := M₁.B ∘ Set.diff_subset.elem -- the top submatrix of `B₁`
   let A₂ : Matrix M₂.X.Elem (M₂.Y \ {a}).Elem Z2 := (M₂.B · ∘ Set.diff_subset.elem) -- the right submatrix of `B₂`
@@ -202,7 +232,7 @@ def BinaryMatroid.twoSum {M₁ M₂ : BinaryMatroid α} {a : α} (ha : M₁.X �
 
 /-- BinaryMatroid-level 3-sum of two matroids.
 Second part check legitimacy: some very specific conditions about the standard representation matrices. -/
-noncomputable def BinaryMatroid.threeSum {M₁ M₂ : BinaryMatroid α} {x₁ x₂ x₃ y₁ y₂ y₃ : α}
+noncomputable def BinaryMatroid.threeSum {x₁ x₂ x₃ y₁ y₂ y₃ : α}
     (hXX : M₁.X ∩ M₂.X = {x₁, x₂, x₃}) (hYY : M₁.Y ∩ M₂.Y = {y₁, y₂, y₃}) (hXY : M₁.X ⫗ M₂.Y) (hYX : M₁.Y ⫗ M₂.X) :
     BinaryMatroid α × Prop :=
   have hxxx₁ : {x₁, x₂, x₃} ⊆ M₁.X := hXX.symm.subset.trans Set.inter_subset_left
@@ -282,6 +312,11 @@ noncomputable def BinaryMatroid.threeSum {M₁ M₂ : BinaryMatroid α} {x₁ x�
     ∧ (∀ y : α, ∀ hy : y ∈ M₂.Y, y ≠ y₂ ∧ y ≠ y₁ → M₂.B ⟨x₁, x₁inX₂⟩ ⟨y, hy⟩ = 0) -- the rest of the topmost row is `0`s
   ⟩
 
+end sums_matroid_level
+
+
+section sums_propositional_level
+
 /-- Matroid `M` is a result of 1-summing `M₁` and `M₂` (should be equivalent to direct sums). -/
 def BinaryMatroid.Is1sumOf (M : BinaryMatroid α) (M₁ M₂ : BinaryMatroid α) : Prop :=
   ∃ hXY : M₁.X ⫗ M₂.Y, ∃ hYX : M₁.Y ⫗ M₂.X,
@@ -300,6 +335,8 @@ def BinaryMatroid.Is3sumOf (M : BinaryMatroid α) (M₁ M₂ : BinaryMatroid α)
     ∃ hXX : M₁.X ∩ M₂.X = {x₁, x₂, x₃}, ∃ hYY : M₁.Y ∩ M₂.Y = {y₁, y₂, y₃}, ∃ hXY : M₁.X ⫗ M₂.Y, ∃ hYX : M₁.Y ⫗ M₂.X,
       let M₀ := BinaryMatroid.threeSum hXX hYY hXY hYX
       M = M₀.fst ∧ M₀.snd
+
+end sums_propositional_level
 
 
 section API_for_matroid_sums
@@ -472,7 +509,7 @@ lemma BinaryMatroid.Is3sumOf.invertibilityDbar (hM : M.Is3sumOf M₁ M₂) :
   unfold BinaryMatroid.threeSum at valid
   aesop
 
-/- TODO missing API for all of the following:
+/- TODO missing API for all of the following parts of the 3-sum definition:
 M₁.B ⟨x₁, x₁inX₁⟩ ⟨y₁, y₁inY₁⟩ = 1
 M₁.B ⟨x₁, x₁inX₁⟩ ⟨y₂, y₂inY₁⟩ = 1
 M₁.B ⟨x₂, x₂inX₁⟩ ⟨y₃, y₃inY₁⟩ = 1
@@ -484,22 +521,15 @@ M₂.B ⟨x₃, x₃inX₂⟩ ⟨y₃, y₃inY₂⟩ = 1
 (∀ x : α, ∀ hx : x ∈ M₁.X, x ≠ x₂ ∧ x ≠ x₃ → M₁.B ⟨x, hx⟩ ⟨y₃, y₃inY₁⟩ = 0)
 (∀ y : α, ∀ hy : y ∈ M₂.Y, y ≠ y₂ ∧ y ≠ y₁ → M₂.B ⟨x₁, x₁inX₂⟩ ⟨y, hy⟩ = 0)
 -/
-
 end API_for_matroid_sums
 
 
-lemma Matrix.TU.toMatrixElemElem {T T₁ T₂ S S₁ S₂ : Set α}
-    [∀ a, Decidable (a ∈ T₁)] [∀ a, Decidable (a ∈ T₂)] [∀ a, Decidable (a ∈ S₁)] [∀ a, Decidable (a ∈ S₂)]
-    {C : Matrix (T₁ ⊕ T₂) (S₁ ⊕ S₂) ℤ} (hC : C.TU) (hT : T = T₁ ∪ T₂) (hS : S = S₁ ∪ S₂) :
-    (C.toMatrixElemElem hT hS).TU := by
-  rw [Matrix.TU_iff] at hC ⊢
-  intros
-  rw [Matrix.toMatrixElemElem_eq]
-  apply hC
+section main_results
+
+variable {M M₁ M₂ : BinaryMatroid α}
 
 /-- Any 1-sum of regular matroids is a regular matroid. -/
-theorem BinaryMatroid.Is1sum.isRegular {M M₁ M₂ : BinaryMatroid α}
-    (hM : M.Is1sumOf M₁ M₂) (hM₁ : M₁.IsRegular) (hM₂ : M₂.IsRegular) :
+theorem BinaryMatroid.Is1sum.isRegular (hM : M.Is1sumOf M₁ M₂) (hM₁ : M₁.IsRegular) (hM₂ : M₂.IsRegular) :
     M.IsRegular := by
   obtain ⟨B₁, hB₁, hBB₁⟩ := hM₁
   obtain ⟨B₂, hB₂, hBB₂⟩ := hM₂
@@ -534,15 +564,8 @@ theorem BinaryMatroid.Is1sum.isRegular {M M₁ M₂ : BinaryMatroid α}
           specialize hBB₂ i₂ j₂
           aesop
 
--- TODO where should it be?
-lemma Matrix.twoSumComposition_TU {X₁ Y₁ : Set α} {X₂ Y₂ : Set α} {A₁ : Matrix X₁ Y₁ ℤ} {A₂ : Matrix X₂ Y₂ ℤ}
-    (hA₁ : A₁.TU) (hA₂ : A₂.TU) (x : Y₁ → ℤ) (y : X₂ → ℤ) :
-    (Matrix.twoSumComposition A₁ x A₂ y).TU := by
-  sorry
-
 /-- Any 2-sum of regular matroids is a regular matroid. -/
-theorem BinaryMatroid.Is2sum.isRegular {M M₁ M₂ : BinaryMatroid α}
-    (hM : M.Is2sumOf M₁ M₂) (hM₁ : M₁.IsRegular) (hM₂ : M₂.IsRegular) :
+theorem BinaryMatroid.Is2sum.isRegular (hM : M.Is2sumOf M₁ M₂) (hM₁ : M₁.IsRegular) (hM₂ : M₂.IsRegular) :
     M.IsRegular := by
   obtain ⟨a, ha, haX₂, hM, ⟨hXX, hYY⟩, ⟨hx, hy⟩⟩ := hM
   obtain ⟨B₁, hB₁, hBB₁⟩ := hM₁
@@ -559,17 +582,18 @@ theorem BinaryMatroid.Is2sum.isRegular {M M₁ M₂ : BinaryMatroid α}
   · apply Matrix.twoSumComposition_TU
     · rwa [Matrix.TU_adjoin_id_left_iff] at hB₁
     · rwa [Matrix.TU_adjoin_id_left_iff] at hB₂
-  have hMX : M.X = (M₁.X \ {a}) ∪ M₂.X
+  have hMX : M.X = (M₁.X \ {a}) ∪ M₂.X -- TODO either API or remove
   · simp only [BinaryMatroid.twoSum, hM]
-  have hMY : M.Y = M₁.Y ∪ (M₂.Y \ {a})
+  have hMY : M.Y = M₁.Y ∪ (M₂.Y \ {a}) -- TODO either API or remove
   · simp only [BinaryMatroid.twoSum, hM]
   sorry
 
 /-- Any 3-sum of regular matroids is a regular matroid. -/
-theorem BinaryMatroid.Is3sum.isRegular {M M₁ M₂ : BinaryMatroid α}
-    (hM : M.Is3sumOf M₁ M₂) (hM₁ : M₁.IsRegular) (hM₂ : M₂.IsRegular) :
+theorem BinaryMatroid.Is3sum.isRegular (hM : M.Is3sumOf M₁ M₂) (hM₁ : M₁.IsRegular) (hM₂ : M₂.IsRegular) :
     M.IsRegular := by
   obtain ⟨eX, eY, hMXY⟩ := hM
   obtain ⟨B₁', hB₁, hBB₁⟩ := hM₁
   obtain ⟨B₂', hB₂, hBB₂⟩ := hM₂
   sorry
+
+end main_results
