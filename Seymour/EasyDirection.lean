@@ -20,7 +20,7 @@ variable {α : Type*} {X Y : Set α}
 def HasSubset.Subset.elem (hXY : X ⊆ Y) (x : X.Elem) : Y.Elem :=
   ⟨x.val, hXY x.property⟩
 
-variable [∀ a, Decidable (a ∈ X)] [∀ a, Decidable (a ∈ Y)] -- Do not refactor to `[DecidablePred X.Mem]` and so on!
+variable [∀ a, Decidable (a ∈ X)] [∀ a, Decidable (a ∈ Y)] -- Do not refactor to `[DecidablePred X.Mem] [DecidablePred Y.Mem]`
 
 def Subtype.toSum (i : (X ∪ Y).Elem) : X.Elem ⊕ Y.Elem :=
   if hiX : i.val ∈ X then Sum.inl ⟨i, hiX⟩ else
@@ -306,6 +306,21 @@ section API_for_matroid_sums
 
 variable {M M₁ M₂ : BinaryMatroid α}
 
+lemma BinaryMatroid.Is1sumOf.X_eq (hM : M.Is1sumOf M₁ M₂) :
+    M.X = M₁.X ∪ M₂.X := by
+  obtain ⟨_, _, rfl, -⟩ := hM
+  rfl
+
+lemma BinaryMatroid.Is1sumOf.Y_eq (hM : M.Is1sumOf M₁ M₂) :
+    M.Y = M₁.Y ∪ M₂.Y := by
+  obtain ⟨_, _, rfl, -⟩ := hM
+  rfl
+
+lemma BinaryMatroid.Is1sumOf.B_eq (hM : M.Is1sumOf M₁ M₂) :
+    M.B = hM.X_eq ▸ hM.Y_eq ▸ (Matrix.oneSumComposition M₁.B M₂.B).toMatrixUnionUnion := by
+  obtain ⟨_, _, rfl, -⟩ := hM
+  rfl
+
 lemma BinaryMatroid.Is2sumOf.disjoXX (hM : M.Is2sumOf M₁ M₂) :
     M₁.X ⫗ M₂.X := by
   obtain ⟨a, -, -, -, ⟨hXX, -⟩, -⟩ := hM
@@ -348,6 +363,16 @@ lemma BinaryMatroid.Is2sumOf.y_nonzero (hM : M.Is2sumOf M₁ M₂) :
       (M₂.B · ⟨a, Set.mem_of_mem_inter_right (by rw [ha]; rfl)⟩) ≠ 0 := by
   obtain ⟨a, ha, _, rfl, -, -, hy⟩ := hM
   exact ⟨a, ha, hy⟩
+
+lemma BinaryMatroid.Is3sumOf.X_eq (hM : M.Is3sumOf M₁ M₂) :
+    M.X = M₁.X ∪ M₂.X := by
+  obtain ⟨_, _, _, _, _, _, hXX, _, _, _, rfl, -⟩ := hM
+  simp [BinaryMatroid.threeSum, ←hXX, setminus_inter_union_eq_union]
+
+lemma BinaryMatroid.Is3sumOf.Y_eq (hM : M.Is3sumOf M₁ M₂) :
+    M.Y = M₁.Y ∪ M₂.Y := by
+  obtain ⟨_, _, _, _, _, _, _, hYY, _, _, rfl, -⟩ := hM
+  simp [BinaryMatroid.threeSum, ←hYY, setminus_inter_union_eq_union]
 
 lemma BinaryMatroid.Is3sumOf.interXX (hM : M.Is3sumOf M₁ M₂) :
     ∃ x₁ x₂ x₃ : α, M₁.X ∩ M₂.X = {x₁, x₂, x₃} := by
@@ -463,7 +488,7 @@ M₂.B ⟨x₃, x₃inX₂⟩ ⟨y₃, y₃inY₂⟩ = 1
 end API_for_matroid_sums
 
 
-def Matrix.TU.toMatrixElemElem {T T₁ T₂ S S₁ S₂ : Set α}
+lemma Matrix.TU.toMatrixElemElem {T T₁ T₂ S S₁ S₂ : Set α}
     [∀ a, Decidable (a ∈ T₁)] [∀ a, Decidable (a ∈ T₂)] [∀ a, Decidable (a ∈ S₁)] [∀ a, Decidable (a ∈ S₂)]
     {C : Matrix (T₁ ⊕ T₂) (S₁ ⊕ S₂) ℤ} (hC : C.TU) (hT : T = T₁ ∪ T₂) (hS : S = S₁ ∪ S₂) :
     (C.toMatrixElemElem hT hS).TU := by
@@ -476,7 +501,6 @@ def Matrix.TU.toMatrixElemElem {T T₁ T₂ S S₁ S₂ : Set α}
 theorem BinaryMatroid.Is1sum.isRegular {M M₁ M₂ : BinaryMatroid α}
     (hM : M.Is1sumOf M₁ M₂) (hM₁ : M₁.IsRegular) (hM₂ : M₂.IsRegular) :
     M.IsRegular := by
-  obtain ⟨hXY, hYX, hMsum, -⟩ := hM
   obtain ⟨B₁, hB₁, hBB₁⟩ := hM₁
   obtain ⟨B₂, hB₂, hBB₂⟩ := hM₂
   let B' := Matrix.oneSumComposition B₁ B₂
@@ -484,29 +508,26 @@ theorem BinaryMatroid.Is1sum.isRegular {M M₁ M₂ : BinaryMatroid α}
   · apply Matrix.fromBlocks_TU
     · rwa [Matrix.TU_adjoin_id_left_iff] at hB₁
     · rwa [Matrix.TU_adjoin_id_left_iff] at hB₂
-  have hMX : M.X = M₁.X ∪ M₂.X := by simp only [BinaryMatroid.oneSum, hMsum]
-  have hMY : M.Y = M₁.Y ∪ M₂.Y := by simp only [BinaryMatroid.oneSum, hMsum]
-  use B'.toMatrixElemElem hMX hMY
+  have hMB : M.B = (Matrix.oneSumComposition M₁.B M₂.B).toMatrixElemElem hM.X_eq hM.Y_eq
+  · rewrite [hM.B_eq]
+    rfl
+  use B'.toMatrixElemElem hM.X_eq hM.Y_eq
   constructor
   · rw [Matrix.TU_adjoin_id_left_iff]
-    exact hB'.toMatrixElemElem hMX hMY
+    exact hB'.toMatrixElemElem hM.X_eq hM.Y_eq
   · intro i j
-    have hMB : M.B = (Matrix.oneSumComposition M₁.B M₂.B).toMatrixElemElem hMX hMY
-    · subst hMsum
-      rewrite [Matrix.toMatrixElemElem_eq]
-      rfl
     simp only [hMB, Matrix.oneSumComposition, Matrix.toMatrixElemElem_eq]
     split <;>
-    · cases hi : (hMX ▸ i).toSum with
+    · cases hi : (hM.X_eq ▸ i).toSum with
       | inl i₁ =>
-        cases hj : (hMY ▸ j).toSum with
+        cases hj : (hM.Y_eq ▸ j).toSum with
         | inl j₁ =>
           specialize hBB₁ i₁ j₁
           aesop
         | inr j₂ =>
           aesop
       | inr i₂ =>
-        cases hj : (hMY ▸ j).toSum with
+        cases hj : (hM.Y_eq ▸ j).toSum with
         | inl j₁ =>
           aesop
         | inr j₂ =>

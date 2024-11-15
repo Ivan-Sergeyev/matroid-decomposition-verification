@@ -21,3 +21,16 @@ lemma disjoint_of_singleton_intersection_right_wo {a : α} (hXY : X ∩ Y = {a})
 
 lemma disjoint_of_singleton_intersection_both_wo {a : α} (hXY : X ∩ Y = {a}) : Disjoint (X \ {a}) (Y \ {a}) :=
   Disjoint.disjoint_sdiff_left (disjoint_of_singleton_intersection_right_wo hXY)
+
+lemma setminus_inter_union_eq_union : X \ (X ∩ Y) ∪ Y = X ∪ Y := by
+  ext a
+  constructor
+  · intro ha
+    cases ha with
+    | inl ha' =>
+      left
+      exact Set.mem_of_mem_diff ha'
+    | inr haY =>
+      right
+      exact haY
+  · simp
