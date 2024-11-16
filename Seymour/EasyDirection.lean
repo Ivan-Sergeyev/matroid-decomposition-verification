@@ -567,21 +567,30 @@ theorem BinaryMatroid.Is1sum.isRegular (hM : M.Is1sumOf M₁ M₂) (hM₁ : M₁
 /-- Any 2-sum of regular matroids is a regular matroid. -/
 theorem BinaryMatroid.Is2sum.isRegular (hM : M.Is2sumOf M₁ M₂) (hM₁ : M₁.IsRegular) (hM₂ : M₂.IsRegular) :
     M.IsRegular := by
+  -- TODO "move to API for 2-sum" starts here
   obtain ⟨a, ha, haX₂, hM, -, -⟩ := hM
-  obtain ⟨B₁, hB₁, hBB₁⟩ := hM₁
-  obtain ⟨B₂, hB₂, hBB₂⟩ := hM₂
   have haXY : a ∈ M₁.X ∩ M₂.Y
-  · rewrite [ha]
+  · rewrite [ha] -- `haXY` can be removed afterwards
     rfl
   have haX₁ : a ∈ M₁.X := Set.mem_of_mem_inter_left haXY
   have haY₂ : a ∈ M₂.Y := Set.mem_of_mem_inter_right haXY
   let x : M₁.Y.Elem → Z2 := M₁.B ⟨a, haX₁⟩
-  let x' : M₁.Y.Elem → ℤ := B₁ ⟨a, haX₁⟩
   let y : M₂.X.Elem → Z2 := (M₂.B · ⟨a, haY₂⟩)
-  let y' : M₂.X.Elem → ℤ := (B₂ · ⟨a, haY₂⟩)
   let A₁ : Matrix (M₁.X \ {a}).Elem M₁.Y.Elem Z2 := M₁.B ∘ Set.diff_subset.elem
-  let A₁' : Matrix (M₁.X \ {a}).Elem M₁.Y.Elem ℤ := B₁ ∘ Set.diff_subset.elem
   let A₂ : Matrix M₂.X.Elem (M₂.Y \ {a}).Elem Z2 := (M₂.B · ∘ Set.diff_subset.elem)
+  have hMX : M.X = (M₁.X \ {a}) ∪ M₂.X
+  · simp only [BinaryMatroid.twoSum, hM]
+  have hMY : M.Y = M₁.Y ∪ (M₂.Y \ {a})
+  · simp only [BinaryMatroid.twoSum, hM]
+  have hMB : M.B = (Matrix.twoSumComposition A₁ x A₂ y).toMatrixElemElem hMX hMY
+  · subst hM
+    simp [BinaryMatroid.twoSum, Matrix.toMatrixElemElem]
+  -- TODO "move to API for 2-sum" ends here (the proofs til now depends on `hM` only)
+  obtain ⟨B₁, hB₁, hBB₁⟩ := hM₁
+  obtain ⟨B₂, hB₂, hBB₂⟩ := hM₂
+  let x' : M₁.Y.Elem → ℤ := B₁ ⟨a, haX₁⟩
+  let y' : M₂.X.Elem → ℤ := (B₂ · ⟨a, haY₂⟩)
+  let A₁' : Matrix (M₁.X \ {a}).Elem M₁.Y.Elem ℤ := B₁ ∘ Set.diff_subset.elem
   let A₂' : Matrix M₂.X.Elem (M₂.Y \ {a}).Elem ℤ := (B₂ · ∘ Set.diff_subset.elem)
   let B' := Matrix.twoSumComposition A₁' x' A₂' y'
   have hB' : B'.TU
@@ -590,13 +599,6 @@ theorem BinaryMatroid.Is2sum.isRegular (hM : M.Is2sumOf M₁ M₂) (hM₁ : M₁
       apply hB₁.comp_rows
     · rw [Matrix.TU_adjoin_id_left_iff] at hB₂
       apply hB₂.comp_cols
-  have hMX : M.X = (M₁.X \ {a}) ∪ M₂.X -- TODO API
-  · simp only [BinaryMatroid.twoSum, hM]
-  have hMY : M.Y = M₁.Y ∪ (M₂.Y \ {a}) -- TODO API
-  · simp only [BinaryMatroid.twoSum, hM]
-  have hMB : M.B = (Matrix.twoSumComposition A₁ x A₂ y).toMatrixElemElem hMX hMY -- TODO API
-  · subst hM
-    simp [BinaryMatroid.twoSum, Matrix.toMatrixElemElem]
   use B'.toMatrixElemElem hMX hMY
   have hAA₁ : ∀ i j, if A₁ i j = 0 then A₁' i j = 0 else A₁' i j = 1 ∨ A₁' i j = -1
   · intro i j
