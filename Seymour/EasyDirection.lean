@@ -1,7 +1,6 @@
 import Mathlib.Data.Matroid.IndepAxioms
 import Seymour.ForMathlib.MatrixTU
 import Seymour.Mathlib.Sets
-import Seymour.Mathlib.ZMod
 
 open scoped Matrix
 
@@ -628,9 +627,9 @@ theorem BinaryMatroid.Is2sum.isRegular (hM : M.Is2sumOf M₁ M₂) (hM₁ : M₁
       | inr i₂ =>
         cases hj : (hMY ▸ j).toSum with
         | inl j₁ =>
-          rename_i hh
-          simp only [Matrix.of_apply, Matrix.fromBlocks_apply₂₁, mul_eq_zero, B', hi, hj] at hh ⊢
-          cases hh with
+          rename_i h0
+          simp only [Matrix.of_apply, Matrix.fromBlocks_apply₂₁, mul_eq_zero, B', hi, hj] at h0 ⊢
+          cases h0 with
           | inl hi₂ =>
             left
             specialize hBB₂ i₂ ⟨a, haY₂⟩
@@ -659,10 +658,8 @@ theorem BinaryMatroid.Is2sum.isRegular (hM : M.Is2sumOf M₁ M₂) (hM₁ : M₁
           obtain ⟨hyi₂, hxj₁⟩ := h0
           specialize hyy' i₂
           specialize hxx' j₁
-          have hyi₂' : y i₂ = 1 := Z2_eq_1_of_ne_0 hyi₂
-          have hxj₁' : x j₁ = 1 := Z2_eq_1_of_ne_0 hxj₁
-          simp only [hyi₂', ite_false] at hyy'
-          simp only [hxj₁', ite_false] at hxx'
+          simp only [hyi₂, ite_false] at hyy'
+          simp only [hxj₁, ite_false] at hxx'
           cases hxx' <;> cases hyy' <;> simp_all
         | inr j₂ =>
           specialize hAA₂ i₂ j₂
