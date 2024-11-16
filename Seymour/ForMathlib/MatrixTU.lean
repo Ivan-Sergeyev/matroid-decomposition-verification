@@ -75,6 +75,13 @@ lemma Matrix.mapEquiv_rows_TU {X' : Type*} [DecidableEq X']
   · simpa [Matrix.submatrix] using hA k (eX.symm ∘ f) g
   · simpa [Matrix.submatrix] using hA k (eX ∘ f) g
 
+lemma Matrix.TU.comp_rows {X' : Type*} {A : Matrix X Y R}
+    (hA : A.TU) (e : X' → X) :
+    Matrix.TU (A ∘ e) := by
+  rw [Matrix.TU_iff] at hA ⊢
+  intro k f g
+  exact hA k (e ∘ f) g
+
 lemma Matrix.mapEquiv_cols_TU {Y' : Type*} [DecidableEq Y']
     (A : Matrix X Y R) (eY : Y' ≃ Y) :
     Matrix.TU (A · ∘ eY) ↔ A.TU := by
@@ -82,6 +89,13 @@ lemma Matrix.mapEquiv_cols_TU {Y' : Type*} [DecidableEq Y']
   constructor <;> intro hA k f g
   · simpa [Matrix.submatrix] using hA k f (eY.symm ∘ g)
   · simpa [Matrix.submatrix] using hA k f (eY ∘ g)
+
+lemma Matrix.TU.comp_cols {Y' : Type*} {A : Matrix X Y R}
+    (hA : A.TU) (e : Y' → Y) :
+    Matrix.TU (A · ∘ e) := by
+  rw [Matrix.TU_iff] at hA ⊢
+  intro k f g
+  exact hA k f (e ∘ g)
 
 lemma Matrix.mapEquiv_both_TU {X' Y' : Type*} [DecidableEq X'] [DecidableEq Y']
     (A : Matrix X Y R) (eX : X' ≃ X) (eY : Y' ≃ Y) :

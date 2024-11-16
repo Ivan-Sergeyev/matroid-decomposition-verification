@@ -1,6 +1,7 @@
 import Mathlib.Data.Matroid.IndepAxioms
 import Seymour.ForMathlib.MatrixTU
 import Seymour.Mathlib.Sets
+import Seymour.Mathlib.ZMod
 
 open scoped Matrix
 
@@ -553,21 +554,21 @@ theorem BinaryMatroid.Is1sum.isRegular (hM : M.Is1sumOf M₁ M₂) (hM₁ : M₁
         cases hj : (hM.Y_eq ▸ j).toSum with
         | inl j₁ =>
           specialize hBB₁ i₁ j₁
-          aesop
+          simp_all [B']
         | inr j₂ =>
-          aesop
+          simp_all [B']
       | inr i₂ =>
         cases hj : (hM.Y_eq ▸ j).toSum with
         | inl j₁ =>
-          aesop
+          simp_all [B']
         | inr j₂ =>
           specialize hBB₂ i₂ j₂
-          aesop
+          simp_all [B']
 
 /-- Any 2-sum of regular matroids is a regular matroid. -/
 theorem BinaryMatroid.Is2sum.isRegular (hM : M.Is2sumOf M₁ M₂) (hM₁ : M₁.IsRegular) (hM₂ : M₂.IsRegular) :
     M.IsRegular := by
-  obtain ⟨a, ha, haX₂, hM, ⟨hXX, hYY⟩, ⟨hx, hy⟩⟩ := hM -- TODO can this line be avoided?
+  obtain ⟨a, ha, haX₂, hM, -, -⟩ := hM
   obtain ⟨B₁, hB₁, hBB₁⟩ := hM₁
   obtain ⟨B₂, hB₂, hBB₂⟩ := hM₂
   have haXY : a ∈ M₁.X ∩ M₂.Y
@@ -586,14 +587,10 @@ theorem BinaryMatroid.Is2sum.isRegular (hM : M.Is2sumOf M₁ M₂) (hM₁ : M₁
   let B' := Matrix.twoSumComposition A₁' x' A₂' y'
   have hB' : B'.TU
   · apply Matrix.twoSumComposition_TU
-    · sorry/-
-      apply Matrix.TU.submatrix
-      rwa [Matrix.TU_adjoin_id_left_iff] at hB₁
-      -/
-    · sorry/-
-      apply Matrix.TU.submatrix
-      rwa [Matrix.TU_adjoin_id_left_iff] at hB₂
-      -/
+    · rw [Matrix.TU_adjoin_id_left_iff] at hB₁
+      apply hB₁.comp_rows
+    · rw [Matrix.TU_adjoin_id_left_iff] at hB₂
+      apply hB₂.comp_cols
   have hMX : M.X = (M₁.X \ {a}) ∪ M₂.X -- TODO API
   · simp only [BinaryMatroid.twoSum, hM]
   have hMY : M.Y = M₁.Y ∪ (M₂.Y \ {a}) -- TODO API
@@ -602,7 +599,74 @@ theorem BinaryMatroid.Is2sum.isRegular (hM : M.Is2sumOf M₁ M₂) (hM₁ : M₁
   · subst hM
     simp [BinaryMatroid.twoSum, Matrix.toMatrixElemElem]
   use B'.toMatrixElemElem hMX hMY
-  sorry
+  have hAA₁ : ∀ i j, if A₁ i j = 0 then A₁' i j = 0 else A₁' i j = 1 ∨ A₁' i j = -1
+  · intro i j
+    exact hBB₁ ⟨i.val, Set.mem_of_mem_inter_left i.property⟩ j
+  have hAA₂ : ∀ i j, if A₂ i j = 0 then A₂' i j = 0 else A₂' i j = 1 ∨ A₂' i j = -1
+  · intro i j
+    exact hBB₂ i ⟨j.val, Set.mem_of_mem_inter_left j.property⟩
+  have hxx' : ∀ j, if x j = 0 then x' j = 0 else x' j = 1 ∨ x' j = -1
+  · intro j
+    exact hBB₁ ⟨a, haX₁⟩ j
+  have hyy' : ∀ i, if y i = 0 then y' i = 0 else y' i = 1 ∨ y' i = -1
+  · intro i
+    exact hBB₂ i ⟨a, haY₂⟩
+  constructor
+  · rw [Matrix.TU_adjoin_id_left_iff]
+    exact hB'.toMatrixElemElem hMX hMY
+  · intro i j
+    simp only [hMB, Matrix.twoSumComposition, Matrix.toMatrixElemElem_eq]
+    split
+    · cases hi : (hMX ▸ i).toSum with
+      | inl i₁ =>
+        cases hj : (hMY ▸ j).toSum with
+        | inl j₁ =>
+          specialize hAA₁ i₁ j₁
+          simp_all [B']
+        | inr j₂ =>
+          simp_all [B']
+      | inr i₂ =>
+        cases hj : (hMY ▸ j).toSum with
+        | inl j₁ =>
+          rename_i hh
+          simp only [Matrix.of_apply, Matrix.fromBlocks_apply₂₁, mul_eq_zero, B', hi, hj] at hh ⊢
+          cases hh with
+          | inl hi₂ =>
+            left
+            specialize hBB₂ i₂ ⟨a, haY₂⟩
+            simp_all [x, x', y, y', A₁, A₁', A₂, A₂', B']
+          | inr hj₁ =>
+            right
+            specialize hBB₁ ⟨a, haX₁⟩ j₁
+            simp_all [x, x', y, y', A₁, A₁', A₂, A₂', B']
+        | inr j₂ =>
+          specialize hAA₂ i₂ j₂
+          simp_all [x, x', y, y', A₁, A₁', A₂, A₂', B']
+    · cases hi : (hMX ▸ i).toSum with
+      | inl i₁ =>
+        cases hj : (hMY ▸ j).toSum with
+        | inl j₁ =>
+          specialize hAA₁ i₁ j₁
+          simp_all [B']
+        | inr j₂ =>
+          simp_all [B']
+      | inr i₂ =>
+        cases hj : (hMY ▸ j).toSum with
+        | inl j₁ =>
+          rename_i h0
+          simp only [Matrix.of_apply, Matrix.fromBlocks_apply₂₁, mul_eq_zero, B', hi, hj] at h0 ⊢
+          rw [not_or] at h0
+          obtain ⟨hyi₂, hxj₁⟩ := h0
+          specialize hyy' i₂
+          specialize hxx' j₁
+          have hyi₂' : y i₂ = 1 := Z2_eq_1_of_ne_0 hyi₂
+          have hxj₁' : x j₁ = 1 := Z2_eq_1_of_ne_0 hxj₁
+          simp only [hyi₂', ite_false] at hyy'
+          simp only [hxj₁', ite_false] at hxx'
+          cases hxx' <;> cases hyy' <;> simp_all
+        | inr j₂ =>
+          specialize hAA₂ i₂ j₂
+          simp_all [x, x', y, y', A₁, A₁', A₂, A₂', B']
 
 /-- Any 3-sum of regular matroids is a regular matroid. -/
 theorem BinaryMatroid.Is3sum.isRegular (hM : M.Is3sumOf M₁ M₂) (hM₁ : M₁.IsRegular) (hM₂ : M₂.IsRegular) :
