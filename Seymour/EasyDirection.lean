@@ -24,7 +24,8 @@ variable {α : Type*} {X Y : Set α}
 def HasSubset.Subset.elem (hXY : X ⊆ Y) (x : X.Elem) : Y.Elem :=
   ⟨x.val, hXY x.property⟩
 
-variable [∀ a, Decidable (a ∈ X)] [∀ a, Decidable (a ∈ Y)] -- Do not refactor to `[DecidablePred X.Mem] [DecidablePred Y.Mem]`
+variable [∀ a, Decidable (a ∈ X)] [∀ a, Decidable (a ∈ Y)]
+-- Note that `variable [DecidablePred X.Mem] [DecidablePred Y.Mem]` does not work.
 
 def Subtype.toSum (i : (X ∪ Y).Elem) : X.Elem ⊕ Y.Elem :=
   if hiX : i.val ∈ X then Sum.inl ⟨i, hiX⟩ else
@@ -547,22 +548,21 @@ theorem BinaryMatroid.Is1sum.isRegular (hM : M.Is1sumOf M₁ M₂) (hM₁ : M₁
     exact hB'.toMatrixElemElem hM.X_eq hM.Y_eq
   · intro i j
     simp only [hMB, Matrix.oneSumComposition, Matrix.toMatrixElemElem_eq]
-    split <;>
-    · cases hi : (hM.X_eq ▸ i).toSum with
-      | inl i₁ =>
-        cases hj : (hM.Y_eq ▸ j).toSum with
-        | inl j₁ =>
-          specialize hBB₁ i₁ j₁
-          simp_all [B']
-        | inr j₂ =>
-          simp_all [B']
-      | inr i₂ =>
-        cases hj : (hM.Y_eq ▸ j).toSum with
-        | inl j₁ =>
-          simp_all [B']
-        | inr j₂ =>
-          specialize hBB₂ i₂ j₂
-          simp_all [B']
+    cases hi : (hM.X_eq ▸ i).toSum with
+    | inl i₁ =>
+      cases hj : (hM.Y_eq ▸ j).toSum with
+      | inl j₁ =>
+        specialize hBB₁ i₁ j₁
+        simp_all [B']
+      | inr j₂ =>
+        simp_all [B']
+    | inr i₂ =>
+      cases hj : (hM.Y_eq ▸ j).toSum with
+      | inl j₁ =>
+        simp_all [B']
+      | inr j₂ =>
+        specialize hBB₂ i₂ j₂
+        simp_all [B']
 
 /-- Any 2-sum of regular matroids is a regular matroid. -/
 theorem BinaryMatroid.Is2sum.isRegular (hM : M.Is2sumOf M₁ M₂) (hM₁ : M₁.IsRegular) (hM₂ : M₂.IsRegular) :
@@ -615,21 +615,19 @@ theorem BinaryMatroid.Is2sum.isRegular (hM : M.Is2sumOf M₁ M₂) (hM₁ : M₁
     exact hB'.toMatrixElemElem hMX hMY
   · intro i j
     simp only [hMB, Matrix.twoSumComposition, Matrix.toMatrixElemElem_eq]
-    split
-    · cases hi : (hMX ▸ i).toSum with
-      | inl i₁ =>
-        cases hj : (hMY ▸ j).toSum with
-        | inl j₁ =>
-          specialize hAA₁ i₁ j₁
-          simp_all [B']
-        | inr j₂ =>
-          simp_all [B']
-      | inr i₂ =>
-        cases hj : (hMY ▸ j).toSum with
-        | inl j₁ =>
-          rename_i h0
-          simp only [Matrix.of_apply, Matrix.fromBlocks_apply₂₁, mul_eq_zero, B', hi, hj] at h0 ⊢
-          cases h0 with
+    cases hi : (hMX ▸ i).toSum with
+    | inl i₁ =>
+      cases hj : (hMY ▸ j).toSum with
+      | inl j₁ =>
+        specialize hAA₁ i₁ j₁
+        simp_all [B']
+      | inr j₂ =>
+        simp_all [B']
+    | inr i₂ =>
+      cases hj : (hMY ▸ j).toSum with
+      | inl j₁ =>
+        split <;> rename_i h0 <;> simp only [Matrix.of_apply, Matrix.fromBlocks_apply₂₁, mul_eq_zero, B', hi, hj] at h0 ⊢
+        · cases h0 with
           | inl hi₂ =>
             left
             specialize hBB₂ i₂ ⟨a, haY₂⟩
@@ -638,32 +636,16 @@ theorem BinaryMatroid.Is2sum.isRegular (hM : M.Is2sumOf M₁ M₂) (hM₁ : M₁
             right
             specialize hBB₁ ⟨a, haX₁⟩ j₁
             simp_all [x, x', y, y', A₁, A₁', A₂, A₂', B']
-        | inr j₂ =>
-          specialize hAA₂ i₂ j₂
-          simp_all [x, x', y, y', A₁, A₁', A₂, A₂', B']
-    · cases hi : (hMX ▸ i).toSum with
-      | inl i₁ =>
-        cases hj : (hMY ▸ j).toSum with
-        | inl j₁ =>
-          specialize hAA₁ i₁ j₁
-          simp_all [B']
-        | inr j₂ =>
-          simp_all [B']
-      | inr i₂ =>
-        cases hj : (hMY ▸ j).toSum with
-        | inl j₁ =>
-          rename_i h0
-          simp only [Matrix.of_apply, Matrix.fromBlocks_apply₂₁, mul_eq_zero, B', hi, hj] at h0 ⊢
-          rw [not_or] at h0
+        · rw [not_or] at h0
           obtain ⟨hyi₂, hxj₁⟩ := h0
           specialize hyy' i₂
           specialize hxx' j₁
           simp only [hyi₂, ite_false] at hyy'
           simp only [hxj₁, ite_false] at hxx'
           cases hxx' <;> cases hyy' <;> simp_all
-        | inr j₂ =>
-          specialize hAA₂ i₂ j₂
-          simp_all [x, x', y, y', A₁, A₁', A₂, A₂', B']
+      | inr j₂ =>
+        specialize hAA₂ i₂ j₂
+        simp_all [x, x', y, y', A₁, A₁', A₂, A₂', B']
 
 /-- Any 3-sum of regular matroids is a regular matroid. -/
 theorem BinaryMatroid.Is3sum.isRegular (hM : M.Is3sumOf M₁ M₂) (hM₁ : M₁.IsRegular) (hM₂ : M₂.IsRegular) :
