@@ -3,6 +3,7 @@
 \begin{definition}[TU matrix]
   \label{def:code_tu_matrix}
   \lean{Matrix.TU}
+  \leanok
   A real matrix is \emph{totally unimodular (TU)} if its every subdeterminant (i.e., determinant of every square submatrix) is $0$ or $\pm 1$.
 \end{definition}
 
@@ -10,18 +11,83 @@
   \label{lem:code_tu_entries}
   \uses{def:code_tu_matrix}
   \lean{Matrix.TU.apply}
+  \leanok
   If $A$ is TU, then every entry of $A$ is $0$ or $\pm 1$.
 \end{lemma}
 
 \begin{proof}[Proof sketch]
   \uses{def:code_tu_matrix}
-  Every entry is a square submatrix of size $1$.
+  \leanok
+  Every entry is a square submatrix of size $1$, and therefore has determinant (and value) $0$ or $\pm 1$.
+\end{proof}
+
+\begin{lemma}[any submatrix of a TU matrix is TU]
+  \label{lem:code_submatrix_of_tu}
+  \uses{def:code_tu_matrix}
+  \lean{Matrix.TU.submatrix}
+  \leanok
+  Let $A$ be a real matrix that is TU and let $B$ be a submatrix of $A$. Then $B$ is TU.
+\end{lemma}
+
+\begin{proof}[Proof sketch]
+  \uses{def:code_tu_matrix}
+  \leanok
+  Any square submatrix of $B$ is a submatrix of $A$, so its determinant is $0$ or $\pm 1$. Thus, $B$ is TU.
+\end{proof}
+
+\begin{lemma}[transpose of TU is TU]
+  \label{lem:code_tu_transpose}
+  \uses{def:code_tu_matrix}
+  \lean{Matrix.TU.transpose}
+  \leanok
+  Let $A$ be a TU matrix. Then $A^{T}$ is TU.
+\end{lemma}
+
+\begin{proof}[Proof sketch]
+  \uses{def:code_tu_matrix}
+  \leanok
+  A submatrix $T$ of $A^{T}$ is a transpose of a submatrix of $A$, so $\det T \in \{0, \pm 1\}$.
+\end{proof}
+
+\begin{lemma}[appending zero vector to TU]
+  \label{lem:code_tu_add_zero_row}
+  \uses{def:code_tu_matrix}
+  \lean{Matrix.TU_adjoin_row0s_iff}
+  \leanok
+  Let $A$ be a matrix. Let $a$ be a zero row. Then $C = \left[ A / a \right]$ is TU exactly when $A$ is.
+\end{lemma}
+
+\begin{proof}[Proof sketch]
+  \uses{def:code_tu_matrix,lem:code_submatrix_of_tu}
+  \leanok
+  Let $T$ be a square submatrix of $C$, and suppose $A$ is TU. If $T$ contains a zero row, then $\det T = 0$. Otherwise $T$ is a submatrix of $A$, so $\det T \in \{0, \pm 1\}$.
+  For the other direction, because $A$ is a submatrix of $C$, we can apply lemma \ref{lem:code_submatrix_of_tu}.
+\end{proof}
+
+\begin{lemma}[appending unit vector to TU]
+  \label{lem:code_tu_add_unit_row}
+  \uses{def:code_tu_matrix}
+  \lean{Matrix.TU_adjoin_rowUnit_iff}
+  \leanok
+  Let $A$ be a matrix. Let $a$ be a unit row. Then $C = \left[ A / a \right]$ is TU exactly when $A$ is.
+\end{lemma}
+
+\begin{proof}[Proof sketch]
+  \uses{def:code_tu_matrix,lem:code_submatrix_of_tu}
+  Let $T$ be a square submatrix of $C$, and suppose $A$ is TU.
+  If $T$ contains the $\pm 1$ entry of the unit row,
+  then $\det T$ equals the determinant of some submatrix of $A$ times $\pm 1$,
+  so $\det T \in \{0, \pm 1\}$.
+  If $T$ contains some entries of the unit row except the $\pm 1$, then $\det T = 0$.
+  Otherwise $T$ is a submatrix of $A$, so $\det T \in \{0, \pm 1\}$.
+  For the other direction, simply note that $A$ is a submatrix of $C$, and use lemma \ref{lem:code_submatrix_of_tu}.
 \end{proof}
 
 \begin{lemma}[TUness with adjoint identity matrix]
   \label{lem:code_tu_adjoin_id}
   \uses{def:code_tu_matrix}
-  % \lean{} % todo: add reference to corresponding lemma in lean
+  \lean{Matrix.TU_adjoin_id_below_iff,Matrix.TU_adjoin_id_above_iff,Matrix.TU_adjoin_id_left_iff,Matrix.TU_adjoin_id_right_iff}
+  \leanok
   $A$ is TU iff every basis matrix of $\left[ I \mid A \right]$ has determinant $\pm 1$.
 \end{lemma}
 
@@ -30,22 +96,11 @@
   Gaussian elimination. Basis submatrix: its columns form a basis of all columns, its rows form a basis of all rows.
 \end{proof}
 
-\begin{lemma}[any submatrix of a TU matrix is TU]
-  \label{lem:code_submatrix_of_tu}
-  \uses{def:code_tu_matrix}
-  \lean{Matrix.TU.submatrix}
-  Let $A$ be a real matrix that is TU and let $B$ be a submatrix of $A$. Then $B$ is TU.
-\end{lemma}
-
-\begin{proof}[Proof sketch]
-  \uses{def:code_tu_matrix}
-  Any square submatrix of $B$ is a submatrix of $A$, so its determinant is $0$ or $\pm 1$. Thus, $B$ is TU.
-\end{proof}
-
 \begin{lemma}[block-diagonal matrix with TU blocks is TU]
   \label{lem:code_diagonal_with_tu_blocks}
   \uses{def:code_tu_matrix}
   \lean{Matrix.fromBlocks_TU}
+  \leanok
   Let $A$ be a matrix of the form
   \begin{tabular}{cc}
     \cline{1-2}
@@ -69,42 +124,6 @@
     \item If $T_{1}$ has more rows than columns, then the rows of $T$ containing $T_{1}$ are linearly dependent, so $\det T = 0$.
     \item Similar if $T_{1}$ has more columns than rows.
   \end{itemize}
-\end{proof}
-
-\begin{lemma}[transpose of TU is TU]
-  \label{lem:code_tu_transpose}
-  \uses{def:code_tu_matrix}
-  \lean{Matrix.TU.transpose}
-  Let $A$ be a TU matrix. Then $A^{T}$ is TU.
-\end{lemma}
-
-\begin{proof}[Proof sketch]
-  \uses{def:code_tu_matrix}
-  A submatrix $T$ of $A^{T}$ is a transpose of a submatrix of $A$, so $\det T \in \{0, \pm 1\}$.
-\end{proof}
-
-\begin{lemma}[appending zero vector to TU]
-  \label{lem:code_tu_add_zero_row}
-  \uses{def:code_tu_matrix}
-  % \lean{} % todo: add reference to corresponding lemma in lean
-  Let $A$ be a TU matrix. Let $a$ be a zero row. Then $C = \left[ A / a \right]$ is TU.
-\end{lemma}
-
-\begin{proof}[Proof sketch]
-  \uses{def:code_tu_matrix}
-  Let $T$ be a square submatrix of $C$. If $T$ contains a zero row, then $\det T = 0$. Otherwise $T$ is a submatrix of $A$, so $\det T \in \{0, \pm 1\}$.
-\end{proof}
-
-\begin{lemma}[appending unit vector to TU]
-  \label{lem:code_tu_add_unit_row}
-  \uses{def:code_tu_matrix}
-  % \lean{} % todo: add reference to corresponding lemma in lean
-  Let $A$ be a TU matrix. Let $a$ be a unit row. Then $C = \left[ A / a \right]$ is TU.
-\end{lemma}
-
-\begin{proof}[Proof sketch]
-  \uses{def:code_tu_matrix}
-  Let $T$ be a square submatrix of $C$. If $T$ contains the $\pm 1$ entry of the unit row, then $\det T$ equals the determinant of some submatrix of $A$ times $\pm 1$, so $\det T \in \{0, \pm 1\}$. If $T$ contains some entries of the unit row except the $\pm 1$, then $\det T = 0$. Otherwise $T$ is a submatrix of $A$, so $\det T \in \{0, \pm 1\}$.
 \end{proof}
 
 \begin{lemma}[appending parallel element to TU]
