@@ -1,20 +1,9 @@
 import Mathlib.Data.Matrix.ColumnRowPartitioned
-import Mathlib.Tactic
+import Seymour.ForMathlib.Basic
 
-lemma todo {α β₁ β₂ : Type*} (f : α → β₁ ⊕ β₂) :
-    ∃ α₁ α₂ : Type, ∃ e : α ≃ α₁ ⊕ α₂, ∃ f₁ : α₁ → β₁, ∃ f₂ : α₂ → β₂,
-      f = (fun i => (Sum.elim (Sum.inl ∘ f₁) (Sum.inr ∘ f₂)) (e i)) := by
-  sorry
-
-variable {R : Type*} [CommRing R]
-
-lemma easy_mul {x y : R} (hx : x = 0 ∨ x = 1 ∨ x = -1) (hy : y = 0 ∨ y = 1 ∨ y = -1) :
-    x*y = 0 ∨ x*y = 1 ∨ x*y = -1 := by
-  aesop
+variable {X Y R : Type*} [CommRing R]
 
 open scoped Matrix
-
-variable {X Y : Type*}
 
 /-- Is the matrix `A` totally unimodular? -/
 def Matrix.TU (A : Matrix X Y R) : Prop :=
@@ -246,9 +235,9 @@ lemma Matrix.fromBlocks_TU {A₁ : Matrix X₁ Y₁ R} {A₂ : Matrix X₂ Y₂ 
         ((Matrix.fromBlocks A₁ 0 0 A₂).submatrix f g).det =
         (A₁.submatrix (f₁ ∘ eι₁) (g₁ ∘ eγ₁)).det * (A₂.submatrix (f₂ ∘ eι₂) (g₂ ∘ eγ₂)).det
       by
-        rw [←Matrix.det_fromBlocks_zero₂₁ (B := 0), hff, hgg]
+        rw [←Matrix.det_fromBlocks_zero₂₁ _ 0, hff, hgg]
         sorry]
-    apply easy_mul
+    apply zom_mul_zom
     · apply hA₁
     · apply hA₂
   else
