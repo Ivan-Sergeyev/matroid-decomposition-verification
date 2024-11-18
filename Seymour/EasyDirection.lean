@@ -144,12 +144,6 @@ noncomputable abbrev Matrix.threeSumComposition (A₁ : Matrix X₁ (Y₁ ⊕ Fi
     (Matrix.fromRows A₁ (Matrix.row Unit (Sum.elim z₁ ![1, 1]))) 0
     (Matrix.fromBlocks D₁ D D₁₂ D₂) (Matrix.fromColumns (Matrix.col Unit (Sum.elim ![1, 1] z₂)) A₂)
 
--- TODO where should this lemma go?
-lemma Matrix.twoSumComposition_TU {A₁ : Matrix X₁ Y₁ β} {A₂ : Matrix X₂ Y₂ β}
-    (hA₁ : A₁.TU) (hA₂ : A₂.TU) (x : Y₁ → β) (y : X₂ → β) :
-    (Matrix.twoSumComposition A₁ x A₂ y).TU := by
-  sorry
-
 end sums_matrix_level
 
 
@@ -176,12 +170,15 @@ lemma Matrix.toMatrixElemElem_eq (C : Matrix (T₁ ⊕ T₂) (S₁ ⊕ S₂) β)
   subst hT hS
   rfl
 
-lemma Matrix.TU.toMatrixElemElem {C : Matrix (T₁ ⊕ T₂) (S₁ ⊕ S₂) ℤ} (hC : C.TU) (hT : T = T₁ ∪ T₂) (hS : S = S₁ ∪ S₂) :
-    (C.toMatrixElemElem hT hS).TU := by
+lemma Matrix.TU.toMatrixUnionUnion {C : Matrix (T₁ ⊕ T₂) (S₁ ⊕ S₂) ℤ} (hC : C.TU) :
+    C.toMatrixUnionUnion.TU := by
   rw [Matrix.TU_iff] at hC ⊢
   intros
-  rw [Matrix.toMatrixElemElem_eq]
   apply hC
+
+lemma Matrix.TU.toMatrixElemElem {C : Matrix (T₁ ⊕ T₂) (S₁ ⊕ S₂) ℤ} (hC : C.TU) (hT : T = T₁ ∪ T₂) (hS : S = S₁ ∪ S₂) :
+    (C.toMatrixElemElem hT hS).TU :=
+  hT ▸ hS ▸ hC.toMatrixUnionUnion
 
 end matrix_conversions
 
@@ -524,6 +521,100 @@ M₂.B ⟨x₃, x₃inX₂⟩ ⟨y₃, y₃inY₂⟩ = 1
 end API_for_matroid_sums
 
 
+section lemmas_2sum
+
+lemma Matrix_twoSumComposition_TU {X₁ Y₁ : Set α} {X₂ Y₂ : Set α} {A₁ : Matrix X₁ Y₁ ℤ} {A₂ : Matrix X₂ Y₂ ℤ}
+    (hA₁ : A₁.TU) (hA₂ : A₂.TU) (x : Y₁ → ℤ) (y : X₂ → ℤ) :
+    (Matrix.twoSumComposition A₁ x A₂ y).TU := by
+  sorry -- Does it hold without further preconditions?
+
+variable {M₁ M₂ : BinaryMatroid α} {a : α}
+
+lemma BinaryMatroid_twoSum_B (ha : M₁.X ∩ M₂.Y = {a}) (hXY : M₂.X ⫗ M₁.Y) :
+    ∃ haX₁ : a ∈ M₁.X, ∃ haY₂ : a ∈ M₂.Y,
+      (BinaryMatroid.twoSum ha hXY).fst.B =
+      (Matrix.twoSumComposition
+        (M₁.B ∘ Set.diff_subset.elem)
+        (M₁.B ⟨a, haX₁⟩)
+        (M₂.B · ∘ Set.diff_subset.elem)
+        (M₂.B · ⟨a, haY₂⟩)
+      ).toMatrixUnionUnion :=
+  have haXY : a ∈ M₁.X ∩ M₂.Y := ha ▸ rfl
+  ⟨Set.mem_of_mem_inter_left haXY, Set.mem_of_mem_inter_right haXY, rfl⟩
+
+lemma BinaryMatroid_twoSum_isRegular (ha : M₁.X ∩ M₂.Y = {a}) (hXY : M₂.X ⫗ M₁.Y)
+    (hM₁ : M₁.IsRegular) (hM₂ : M₂.IsRegular) :
+    (BinaryMatroid.twoSum ha hXY).fst.IsRegular := by
+  obtain ⟨B₁, hB₁, hBB₁⟩ := hM₁
+  obtain ⟨B₂, hB₂, hBB₂⟩ := hM₂
+  obtain ⟨haX₁, haY₂, hB⟩ := BinaryMatroid_twoSum_B ha hXY
+  let x' : M₁.Y.Elem → ℤ := B₁ ⟨a, haX₁⟩
+  let y' : M₂.X.Elem → ℤ := (B₂ · ⟨a, haY₂⟩)
+  let A₁' : Matrix (M₁.X \ {a}).Elem M₁.Y.Elem ℤ := B₁ ∘ Set.diff_subset.elem
+  let A₂' : Matrix M₂.X.Elem (M₂.Y \ {a}).Elem ℤ := (B₂ · ∘ Set.diff_subset.elem)
+  have hB' : (Matrix.twoSumComposition A₁' x' A₂' y').TU
+  · apply Matrix_twoSumComposition_TU
+    · rw [Matrix.TU_adjoin_id_left_iff] at hB₁
+      apply hB₁.comp_rows
+    · rw [Matrix.TU_adjoin_id_left_iff] at hB₂
+      apply hB₂.comp_cols
+  have hA₁ : -- cannot be inlined
+    ∀ i : (M₁.X \ {a}).Elem, ∀ j : M₁.Y.Elem,
+      if M₁.B (Set.diff_subset.elem i) j = 0 then A₁' i j = 0 else A₁' i j = 1 ∨ A₁' i j = -1
+  · intro i j
+    exact hBB₁ (Set.diff_subset.elem i) j
+  have hA₂ : -- cannot be inlined
+    ∀ i : M₂.X.Elem, ∀ j : (M₂.Y \ {a}).Elem,
+      if M₂.B i (Set.diff_subset.elem j) = 0 then A₂' i j = 0 else A₂' i j = 1 ∨ A₂' i j = -1
+  · intro i j
+    exact hBB₂ i (Set.diff_subset.elem j)
+  have hx' : ∀ j, if M₁.B ⟨a, haX₁⟩ j = 0 then x' j = 0 else x' j = 1 ∨ x' j = -1
+  · intro j
+    exact hBB₁ ⟨a, haX₁⟩ j
+  have hy' : ∀ i, if M₂.B i ⟨a, haY₂⟩ = 0 then y' i = 0 else y' i = 1 ∨ y' i = -1
+  · intro i
+    exact hBB₂ i ⟨a, haY₂⟩
+  use (Matrix.twoSumComposition A₁' x' A₂' y').toMatrixUnionUnion
+  constructor
+  · rw [Matrix.TU_adjoin_id_left_iff]
+    exact hB'.toMatrixUnionUnion
+  · intro i j
+    simp only [hB, Matrix.toMatrixUnionUnion, Function.comp_apply]
+    cases hi : i.toSum with
+    | inl i₁ =>
+      cases j.toSum with
+      | inl j₁ =>
+        specialize hA₁ i₁ j₁
+        simp_all
+      | inr j₂ =>
+        simp_all
+    | inr i₂ =>
+      cases hj : j.toSum with
+      | inl j₁ =>
+        split <;> rename_i h0 <;> simp only [Matrix.of_apply, Matrix.fromBlocks_apply₂₁, mul_eq_zero, hi, hj] at h0 ⊢
+        · cases h0 with
+          | inl hi₂ =>
+            left
+            specialize hy' i₂
+            simp_all [x', y', A₁', A₂']
+          | inr hj₁ =>
+            right
+            specialize hx' j₁
+            simp_all [x', y', A₁', A₂']
+        · rw [not_or] at h0
+          obtain ⟨hyi₂, hxj₁⟩ := h0
+          specialize hy' i₂
+          specialize hx' j₁
+          simp only [hyi₂, ite_false] at hy'
+          simp only [hxj₁, ite_false] at hx'
+          cases hx' <;> cases hy' <;> simp_all
+      | inr j₂ =>
+        specialize hA₂ i₂ j₂
+        simp_all [x', y', A₁', A₂']
+
+end lemmas_2sum
+
+
 section main_results
 
 variable {M M₁ M₂ : BinaryMatroid α}
@@ -566,94 +657,12 @@ theorem BinaryMatroid.Is1sum.isRegular (hM : M.Is1sumOf M₁ M₂) (hM₁ : M₁
 /-- Any 2-sum of regular matroids is a regular matroid. -/
 theorem BinaryMatroid.Is2sum.isRegular (hM : M.Is2sumOf M₁ M₂) (hM₁ : M₁.IsRegular) (hM₂ : M₂.IsRegular) :
     M.IsRegular := by
-  -- TODO "move to API for 2-sum" starts here
-  obtain ⟨a, ha, haX₂, hM, -, -⟩ := hM
-  have haXY : a ∈ M₁.X ∩ M₂.Y
-  · rewrite [ha] -- `haXY` can be removed after refactoring
-    rfl
-  have haX₁ : a ∈ M₁.X := Set.mem_of_mem_inter_left haXY
-  have haY₂ : a ∈ M₂.Y := Set.mem_of_mem_inter_right haXY
-  let x : M₁.Y.Elem → Z2 := M₁.B ⟨a, haX₁⟩
-  let y : M₂.X.Elem → Z2 := (M₂.B · ⟨a, haY₂⟩)
-  let A₁ : Matrix (M₁.X \ {a}).Elem M₁.Y.Elem Z2 := M₁.B ∘ Set.diff_subset.elem
-  let A₂ : Matrix M₂.X.Elem (M₂.Y \ {a}).Elem Z2 := (M₂.B · ∘ Set.diff_subset.elem)
-  have hMX : M.X = (M₁.X \ {a}) ∪ M₂.X
-  · simp only [BinaryMatroid.twoSum, hM]
-  have hMY : M.Y = M₁.Y ∪ (M₂.Y \ {a})
-  · simp only [BinaryMatroid.twoSum, hM]
-  have hMB : M.B = (Matrix.twoSumComposition A₁ x A₂ y).toMatrixElemElem hMX hMY
-  · subst hM
-    simp [BinaryMatroid.twoSum, Matrix.toMatrixElemElem]
-  -- TODO "move to API for 2-sum" ends here (the proofs til now depend on `hM` only)
-  obtain ⟨B₁, hB₁, hBB₁⟩ := hM₁
-  obtain ⟨B₂, hB₂, hBB₂⟩ := hM₂
-  let x' : M₁.Y.Elem → ℤ := B₁ ⟨a, haX₁⟩
-  let y' : M₂.X.Elem → ℤ := (B₂ · ⟨a, haY₂⟩)
-  let A₁' : Matrix (M₁.X \ {a}).Elem M₁.Y.Elem ℤ := B₁ ∘ Set.diff_subset.elem
-  let A₂' : Matrix M₂.X.Elem (M₂.Y \ {a}).Elem ℤ := (B₂ · ∘ Set.diff_subset.elem)
-  let B' := Matrix.twoSumComposition A₁' x' A₂' y'
-  have hB' : B'.TU
-  · apply Matrix.twoSumComposition_TU
-    · rw [Matrix.TU_adjoin_id_left_iff] at hB₁
-      apply hB₁.comp_rows
-    · rw [Matrix.TU_adjoin_id_left_iff] at hB₂
-      apply hB₂.comp_cols
-  use B'.toMatrixElemElem hMX hMY
-  have hAA₁ : ∀ i j, if A₁ i j = 0 then A₁' i j = 0 else A₁' i j = 1 ∨ A₁' i j = -1
-  · intro i j
-    exact hBB₁ ⟨i.val, Set.mem_of_mem_inter_left i.property⟩ j
-  have hAA₂ : ∀ i j, if A₂ i j = 0 then A₂' i j = 0 else A₂' i j = 1 ∨ A₂' i j = -1
-  · intro i j
-    exact hBB₂ i ⟨j.val, Set.mem_of_mem_inter_left j.property⟩
-  have hxx' : ∀ j, if x j = 0 then x' j = 0 else x' j = 1 ∨ x' j = -1
-  · intro j
-    exact hBB₁ ⟨a, haX₁⟩ j
-  have hyy' : ∀ i, if y i = 0 then y' i = 0 else y' i = 1 ∨ y' i = -1
-  · intro i
-    exact hBB₂ i ⟨a, haY₂⟩
-  constructor
-  · rw [Matrix.TU_adjoin_id_left_iff]
-    exact hB'.toMatrixElemElem hMX hMY
-  · intro i j
-    simp only [hMB, Matrix.twoSumComposition, Matrix.toMatrixElemElem_eq]
-    cases hi : (hMX ▸ i).toSum with
-    | inl i₁ =>
-      cases hj : (hMY ▸ j).toSum with
-      | inl j₁ =>
-        specialize hAA₁ i₁ j₁
-        simp_all [B']
-      | inr j₂ =>
-        simp_all [B']
-    | inr i₂ =>
-      cases hj : (hMY ▸ j).toSum with
-      | inl j₁ =>
-        split <;> rename_i h0 <;> simp only [Matrix.of_apply, Matrix.fromBlocks_apply₂₁, mul_eq_zero, B', hi, hj] at h0 ⊢
-        · cases h0 with
-          | inl hi₂ =>
-            left
-            specialize hBB₂ i₂ ⟨a, haY₂⟩
-            simp_all [x, x', y, y', A₁, A₁', A₂, A₂', B']
-          | inr hj₁ =>
-            right
-            specialize hBB₁ ⟨a, haX₁⟩ j₁
-            simp_all [x, x', y, y', A₁, A₁', A₂, A₂', B']
-        · rw [not_or] at h0
-          obtain ⟨hyi₂, hxj₁⟩ := h0
-          specialize hyy' i₂
-          specialize hxx' j₁
-          simp only [hyi₂, ite_false] at hyy'
-          simp only [hxj₁, ite_false] at hxx'
-          cases hxx' <;> cases hyy' <;> simp_all
-      | inr j₂ =>
-        specialize hAA₂ i₂ j₂
-        simp_all [x, x', y, y', A₁, A₁', A₂, A₂', B']
+  obtain ⟨a, ha, hXY, rfl, -⟩ := hM
+  exact BinaryMatroid_twoSum_isRegular ha hXY hM₁ hM₂
 
 /-- Any 3-sum of regular matroids is a regular matroid. -/
 theorem BinaryMatroid.Is3sum.isRegular (hM : M.Is3sumOf M₁ M₂) (hM₁ : M₁.IsRegular) (hM₂ : M₂.IsRegular) :
     M.IsRegular := by
-  obtain ⟨eX, eY, hMXY⟩ := hM
-  obtain ⟨B₁', hB₁, hBB₁⟩ := hM₁
-  obtain ⟨B₂', hB₂, hBB₂⟩ := hM₂
   sorry
 
 end main_results
