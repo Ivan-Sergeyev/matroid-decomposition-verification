@@ -1,9 +1,20 @@
 import Mathlib.Data.Matrix.ColumnRowPartitioned
 import Mathlib.Tactic
 
+lemma todo {α β₁ β₂ : Type*} (f : α → β₁ ⊕ β₂) :
+    ∃ α₁ α₂ : Type, ∃ e : α ≃ α₁ ⊕ α₂, ∃ f₁ : α₁ → β₁, ∃ f₂ : α₂ → β₂,
+      f = (fun i => (Sum.elim (Sum.inl ∘ f₁) (Sum.inr ∘ f₂)) (e i)) := by
+  sorry
+
+variable {R : Type*} [CommRing R]
+
+lemma easy_mul {x y : R} (hx : x = 0 ∨ x = 1 ∨ x = -1) (hy : y = 0 ∨ y = 1 ∨ y = -1) :
+    x*y = 0 ∨ x*y = 1 ∨ x*y = -1 := by
+  aesop
+
 open scoped Matrix
 
-variable {X Y R : Type*} [CommRing R]
+variable {X Y : Type*}
 
 /-- Is the matrix `A` totally unimodular? -/
 def Matrix.TU (A : Matrix X Y R) : Prop :=
@@ -25,16 +36,14 @@ lemma Matrix.TU_iff (A : Matrix X Y R) : A.TU ↔
         exact hA k f g hf hg
       else
         left
-        unfold Function.Injective at hg
-        push_neg at hg
+        rw [g.not_injective_iff] at hg
         obtain ⟨i, j, hqij, hij⟩ := hg
         apply Matrix.det_zero_of_column_eq hij
         intro
         simp [hqij]
     else
       left
-      unfold Function.Injective at hf
-      push_neg at hf
+      rw [f.not_injective_iff] at hf
       obtain ⟨i, j, hpij, hij⟩ := hf
       apply Matrix.det_zero_of_row_eq
       · exact hij
@@ -216,4 +225,39 @@ lemma Matrix.fromBlocks_submatrix_apply {β ι γ : Type*} (f : ι → X₁ ⊕ 
 lemma Matrix.fromBlocks_TU {A₁ : Matrix X₁ Y₁ R} {A₂ : Matrix X₂ Y₂ R} (hA₁ : A₁.TU) (hA₂ : A₂.TU) :
     (Matrix.fromBlocks A₁ 0 0 A₂).TU := by
   intro k f g hf hg
-  sorry
+  rw [Matrix.TU_iff] at hA₁ hA₂
+  obtain ⟨ι₁, ι₂, eιk, f₁, f₂, hff⟩ := todo f
+  obtain ⟨γ₁, γ₂, eγk, g₁, g₂, hgg⟩ := todo g
+  have hι : Fintype (ι₁ ⊕ ι₂) := Fintype.ofEquiv _ eιk
+  have hι₁ : Fintype ι₁ := hι.sumLeft
+  have hι₂ : Fintype ι₂ := hι.sumRight
+  have hγ : Fintype (γ₁ ⊕ γ₂) := Fintype.ofEquiv _ eγk
+  have hγ₁ : Fintype γ₁ := hγ.sumLeft
+  have hγ₂ : Fintype γ₂ := hγ.sumRight
+  clear hι hγ
+  if hιγ : Fintype.card ι₁ = Fintype.card γ₁ ∧ Fintype.card ι₂ = Fintype.card γ₂ then
+    obtain ⟨hιγ₁, hιγ₂⟩ := hιγ
+    let eι₁ : Fin (Fintype.card ι₁) ≃ ι₁ := (Fintype.equivFin ι₁).symm
+    let eι₂ : Fin (Fintype.card ι₂) ≃ ι₂ := (Fintype.equivFin ι₂).symm
+    let eγ₁ : Fin (Fintype.card ι₁) ≃ γ₁ := (hιγ₁ ▸ Fintype.equivFin γ₁).symm
+    let eγ₂ : Fin (Fintype.card ι₂) ≃ γ₂ := (hιγ₂ ▸ Fintype.equivFin γ₂).symm
+    rw
+      [show
+        ((Matrix.fromBlocks A₁ 0 0 A₂).submatrix f g).det =
+        (A₁.submatrix (f₁ ∘ eι₁) (g₁ ∘ eγ₁)).det * (A₂.submatrix (f₂ ∘ eι₂) (g₂ ∘ eγ₂)).det
+      by
+        rw [←Matrix.det_fromBlocks_zero₂₁ (B := 0), hff, hgg]
+        sorry]
+    apply easy_mul
+    · apply hA₁
+    · apply hA₂
+  else
+    have hιγ' : Fintype.card ι₁ ≠ Fintype.card γ₁ ∧ Fintype.card ι₂ ≠ Fintype.card γ₂
+    · rw [not_and_or] at hιγ
+      have hkι : k = Fintype.card (ι₁ ⊕ ι₂) := Fintype.card_fin k ▸ Fintype.card_congr eιk
+      have hkγ : k = Fintype.card (γ₁ ⊕ γ₂) := Fintype.card_fin k ▸ Fintype.card_congr eγk
+      rw [Fintype.card_sum] at hkι hkγ
+      cases hιγ <;> omega
+    left
+    -- here we have a singular submatrix
+    sorry
