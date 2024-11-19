@@ -211,12 +211,13 @@ lemma Matrix.fromBlocks_submatrix_apply {β ι γ : Type*} (f : ι → X₁ ⊕ 
     := by
   aesop
 
+-- This is probably not the way to go:
 lemma Matrix.fromBlocks_TU {A₁ : Matrix X₁ Y₁ R} {A₂ : Matrix X₂ Y₂ R} (hA₁ : A₁.TU) (hA₂ : A₂.TU) :
     (Matrix.fromBlocks A₁ 0 0 A₂).TU := by
   intro k f g hf hg
   rw [Matrix.TU_iff] at hA₁ hA₂
-  obtain ⟨ι₁, ι₂, eιk, f₁, f₂, hff⟩ := todo f
-  obtain ⟨γ₁, γ₂, eγk, g₁, g₂, hgg⟩ := todo g
+  obtain ⟨ι₁, ι₂, eιk, f₁, f₂, hfff⟩ := todo f
+  obtain ⟨γ₁, γ₂, eγk, g₁, g₂, hggg⟩ := todo g
   have hι : Fintype (ι₁ ⊕ ι₂) := Fintype.ofEquiv _ eιk
   have hι₁ : Fintype ι₁ := hι.sumLeft
   have hι₂ : Fintype ι₂ := hι.sumRight
@@ -235,7 +236,7 @@ lemma Matrix.fromBlocks_TU {A₁ : Matrix X₁ Y₁ R} {A₂ : Matrix X₂ Y₂ 
         ((Matrix.fromBlocks A₁ 0 0 A₂).submatrix f g).det =
         (A₁.submatrix (f₁ ∘ eι₁) (g₁ ∘ eγ₁)).det * (A₂.submatrix (f₂ ∘ eι₂) (g₂ ∘ eγ₂)).det
       by
-        rw [←Matrix.det_fromBlocks_zero₂₁ _ 0, hff, hgg]
+        rw [←Matrix.det_fromBlocks_zero₂₁ _ 0, hfff, hggg]
         sorry]
     apply zom_mul_zom
     · apply hA₁
@@ -249,4 +250,14 @@ lemma Matrix.fromBlocks_TU {A₁ : Matrix X₁ Y₁ R} {A₂ : Matrix X₂ Y₂ 
       cases hιγ <;> omega
     left
     -- here we have a singular submatrix
+    rw [hfff, hggg]
+    simp [Matrix.submatrix, Matrix.fromBlocks]
     sorry
+
+lemma Matrix.fromBlocks_TU_ {A₁ : Matrix X₁ Y₁ R} {A₂ : Matrix X₂ Y₂ R} (hA₁ : A₁.TU) (hA₂ : A₂.TU) :
+    (Matrix.fromBlocks A₁ 0 0 A₂).TU := by
+  intro k f g hf hg
+  rw [Matrix.TU_iff] at hA₁ hA₂
+  rw [f.toSumElimComp, g.toSumElimComp]
+  dsimp only [Matrix.submatrix, Matrix.fromBlocks]
+  sorry
