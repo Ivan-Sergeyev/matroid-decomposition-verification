@@ -212,12 +212,12 @@ lemma Matrix.fromBlocks_submatrix_apply {β ι γ : Type*} (f : ι → X₁ ⊕ 
   aesop
 
 -- This is probably not the way to go:
-lemma Matrix.fromBlocks_TU {A₁ : Matrix X₁ Y₁ R} {A₂ : Matrix X₂ Y₂ R} (hA₁ : A₁.TU) (hA₂ : A₂.TU) :
+lemma Matrix.old_fromBlocks_TU {A₁ : Matrix X₁ Y₁ R} {A₂ : Matrix X₂ Y₂ R} (hA₁ : A₁.TU) (hA₂ : A₂.TU) :
     (Matrix.fromBlocks A₁ 0 0 A₂).TU := by
   intro k f g hf hg
   rw [Matrix.TU_iff] at hA₁ hA₂
-  obtain ⟨ι₁, ι₂, eιk, f₁, f₂, hfff⟩ := todo f
-  obtain ⟨γ₁, γ₂, eγk, g₁, g₂, hggg⟩ := todo g
+  obtain ⟨ι₁, ι₂, eιk, f₁, f₂, hfff⟩ := old_attempt f
+  obtain ⟨γ₁, γ₂, eγk, g₁, g₂, hggg⟩ := old_attempt g
   have hι : Fintype (ι₁ ⊕ ι₂) := Fintype.ofEquiv _ eιk
   have hι₁ : Fintype ι₁ := hι.sumLeft
   have hι₂ : Fintype ι₂ := hι.sumRight
@@ -254,8 +254,8 @@ lemma Matrix.fromBlocks_TU {A₁ : Matrix X₁ Y₁ R} {A₂ : Matrix X₂ Y₂ 
     simp [Matrix.submatrix, Matrix.fromBlocks]
     sorry
 
-set_option maxHeartbeats 666666
-lemma Matrix.fromBlocks_TU_ {A₁ : Matrix X₁ Y₁ R} {A₂ : Matrix X₂ Y₂ R} (hA₁ : A₁.TU) (hA₂ : A₂.TU) :
+set_option maxHeartbeats 666666 in
+lemma Matrix.fromBlocks_TU {A₁ : Matrix X₁ Y₁ R} {A₂ : Matrix X₂ Y₂ R} (hA₁ : A₁.TU) (hA₂ : A₂.TU) :
     (Matrix.fromBlocks A₁ 0 0 A₂).TU := by
   intro k f g hf hg
   rw [Matrix.TU_iff] at hA₁ hA₂
@@ -278,7 +278,7 @@ lemma Matrix.fromBlocks_TU_ {A₁ : Matrix X₁ Y₁ R} {A₂ : Matrix X₂ Y₂
           | Sum.inr b₂ => Sum.inr ⟨⟨j, b₂⟩, hgj⟩
         ))
       )).det = 0
-   ∨
+    ∨
     (Matrix.of (fun i : Fin k => fun j : Fin k =>
       Matrix.of (Sum.elim (fun x₁ => Sum.elim (A₁ x₁) 0) (fun x₂ => Sum.elim 0 (A₂ x₂)))
         (Sum.elim
@@ -296,7 +296,7 @@ lemma Matrix.fromBlocks_TU_ {A₁ : Matrix X₁ Y₁ R} {A₂ : Matrix X₂ Y₂
           | Sum.inr b₂ => Sum.inr ⟨⟨j, b₂⟩, hgj⟩
         ))
       )).det = 1
-   ∨
+    ∨
     (Matrix.of (fun i : Fin k => fun j : Fin k =>
       Matrix.of (Sum.elim (fun x₁ => Sum.elim (A₁ x₁) 0) (fun x₂ => Sum.elim 0 (A₂ x₂)))
         (Sum.elim
@@ -314,6 +314,14 @@ lemma Matrix.fromBlocks_TU_ {A₁ : Matrix X₁ Y₁ R} {A₂ : Matrix X₂ Y₂
           | Sum.inr b₂ => Sum.inr ⟨⟨j, b₂⟩, hgj⟩
         ))
       )).det = -1
+  let A₁' :=
+    A₁.submatrix
+      ((·.val.snd) : { x₁ : Fin k × X₁ // f x₁.fst = Sum.inl x₁.snd } → X₁)
+      ((·.val.snd) : { y₁ : Fin k × Y₁ // g y₁.fst = Sum.inl y₁.snd } → Y₁)
+  let A₂' :=
+    A₂.submatrix
+      ((·.val.snd) : { x₂ : Fin k × X₂ // f x₂.fst = Sum.inr x₂.snd } → X₂)
+      ((·.val.snd) : { y₂ : Fin k × Y₂ // g y₂.fst = Sum.inr y₂.snd } → Y₂)
   have hAfg :
     Matrix.of (fun i : Fin k => fun j : Fin k =>
       Matrix.of (Sum.elim (fun x₁ => Sum.elim (A₁ x₁) 0) (fun x₂ => Sum.elim 0 (A₂ x₂)))
@@ -334,50 +342,6 @@ lemma Matrix.fromBlocks_TU_ {A₁ : Matrix X₁ Y₁ R} {A₂ : Matrix X₂ Y₂
       ) =
     Matrix.of
       (fun i : Fin k => fun j : Fin k =>
-        (Sum.elim
-          (fun x => Sum.elim (A₁ x.val.snd ∘ ((·.val.snd) : { y₁ : Fin k × Y₁ // g y₁.fst = Sum.inl y₁.snd } → Y₁)) 0)
-          (fun x => Sum.elim 0 (A₂ x.val.snd ∘ ((·.val.snd) : { y₂ : Fin k × Y₂ // g y₂.fst = Sum.inr y₂.snd } → Y₂)))
-        : { x₁ : Fin k × X₁ // f x₁.fst = Sum.inl x₁.snd } ⊕ { x₂ : Fin k × X₂ // f x₂.fst = Sum.inr x₂.snd } →
-          { y₁ : Fin k × Y₁ // g y₁.fst = Sum.inl y₁.snd } ⊕ { y₂ : Fin k × Y₂ // g y₂.fst = Sum.inr y₂.snd } →
-            R)
-        (match hfa : f i with
-          | Sum.inl b₁ => Sum.inl ⟨⟨i, b₁⟩, hfa⟩
-          | Sum.inr b₂ => Sum.inr ⟨⟨i, b₂⟩, hfa⟩
-        )
-        (match hgj : g j with
-          | Sum.inl b₁ => Sum.inl ⟨⟨j, b₁⟩, hgj⟩
-          | Sum.inr b₂ => Sum.inr ⟨⟨j, b₂⟩, hgj⟩
-        )
-      )
-  · aesop
-  let A₁' :=
-    A₁.submatrix
-      ((·.val.snd) : { x₁ : Fin k × X₁ // f x₁.fst = Sum.inl x₁.snd } → X₁)
-      ((·.val.snd) : { y₁ : Fin k × Y₁ // g y₁.fst = Sum.inl y₁.snd } → Y₁)
-  let A₂' :=
-    A₂.submatrix
-      ((·.val.snd) : { x₁ : Fin k × X₂ // f x₁.fst = Sum.inr x₁.snd } → X₂)
-      ((·.val.snd) : { y₂ : Fin k × Y₂ // g y₂.fst = Sum.inr y₂.snd } → Y₂)
-  have hAfg' :
-    Matrix.of
-      (fun i : Fin k => fun j : Fin k =>
-        (Sum.elim
-          (fun x => Sum.elim (A₁ x.val.snd ∘ ((·.val.snd) : { y₁ : Fin k × Y₁ // g y₁.fst = Sum.inl y₁.snd } → Y₁)) 0)
-          (fun x => Sum.elim 0 (A₂ x.val.snd ∘ ((·.val.snd) : { y₂ : Fin k × Y₂ // g y₂.fst = Sum.inr y₂.snd } → Y₂)))
-        : { x₁ : Fin k × X₁ // f x₁.fst = Sum.inl x₁.snd } ⊕ { x₂ : Fin k × X₂ // f x₂.fst = Sum.inr x₂.snd } →
-          { y₁ : Fin k × Y₁ // g y₁.fst = Sum.inl y₁.snd } ⊕ { y₂ : Fin k × Y₂ // g y₂.fst = Sum.inr y₂.snd } →
-            R)
-        (match hfa : f i with
-          | Sum.inl b₁ => Sum.inl ⟨⟨i, b₁⟩, hfa⟩
-          | Sum.inr b₂ => Sum.inr ⟨⟨i, b₂⟩, hfa⟩
-        )
-        (match hgj : g j with
-          | Sum.inl b₁ => Sum.inl ⟨⟨j, b₁⟩, hgj⟩
-          | Sum.inr b₂ => Sum.inr ⟨⟨j, b₂⟩, hgj⟩
-        )
-      ) =
-    Matrix.of
-      (fun i : Fin k => fun j : Fin k =>
         (Matrix.fromBlocks A₁' 0 0 A₂')
         (match hfa : f i with
           | Sum.inl b₁ => Sum.inl ⟨⟨i, b₁⟩, hfa⟩
@@ -389,5 +353,31 @@ lemma Matrix.fromBlocks_TU_ {A₁ : Matrix X₁ Y₁ R} {A₂ : Matrix X₂ Y₂
         )
       )
   · aesop
+  have hAfg' :
+    Matrix.of
+      (fun i : Fin k => fun j : Fin k =>
+        (Matrix.fromBlocks A₁' 0 0 A₂')
+        (match hfa : f i with
+          | Sum.inl b₁ => Sum.inl ⟨⟨i, b₁⟩, hfa⟩
+          | Sum.inr b₂ => Sum.inr ⟨⟨i, b₂⟩, hfa⟩
+        )
+        (match hgj : g j with
+          | Sum.inl b₁ => Sum.inl ⟨⟨j, b₁⟩, hgj⟩
+          | Sum.inr b₂ => Sum.inr ⟨⟨j, b₂⟩, hgj⟩
+        )
+      ) =
+    Matrix.of -- TODO
+      (fun i : Fin k => fun j : Fin k =>
+        (Matrix.fromBlocks A₁' 0 0 A₂')
+        (match hfa : f i with
+          | Sum.inl b₁ => Sum.inl ⟨⟨i, b₁⟩, hfa⟩
+          | Sum.inr b₂ => Sum.inr ⟨⟨i, b₂⟩, hfa⟩
+        )
+        (match hgj : g j with
+          | Sum.inl b₁ => Sum.inl ⟨⟨j, b₁⟩, hgj⟩
+          | Sum.inr b₂ => Sum.inr ⟨⟨j, b₂⟩, hgj⟩
+        )
+      )
+  · rfl -- TODO
   rw [hAfg, hAfg']
   sorry
