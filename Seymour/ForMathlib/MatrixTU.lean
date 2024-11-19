@@ -260,4 +260,66 @@ lemma Matrix.fromBlocks_TU_ {A₁ : Matrix X₁ Y₁ R} {A₂ : Matrix X₂ Y₂
   rw [Matrix.TU_iff] at hA₁ hA₂
   rw [f.toSumElimComp, g.toSumElimComp]
   dsimp only [Matrix.submatrix, Matrix.fromBlocks]
+  show
+    (Matrix.of (fun i : Fin k => fun j : Fin k =>
+      Matrix.of (Sum.elim (fun x₁ => Sum.elim (A₁ x₁) 0) (fun x₂ => Sum.elim 0 (A₂ x₂)))
+        (Sum.elim
+          (Sum.inl ∘ ((·.val.snd) : { x₁ : Fin k × X₁ // f x₁.fst = Sum.inl x₁.snd } → X₁))
+          (Sum.inr ∘ ((·.val.snd) : { x₂ : Fin k × X₂ // f x₂.fst = Sum.inr x₂.snd } → X₂))
+        (match hfa : f i with
+          | Sum.inl b₁ => Sum.inl (Subtype.mk (i, b₁) hfa)
+          | Sum.inr b₂ => Sum.inr (Subtype.mk (i, b₂) hfa)
+        ))
+        (Sum.elim
+          (Sum.inl ∘ ((·.val.snd) : { y₁ : Fin k × Y₁ // g y₁.fst = Sum.inl y₁.snd } → Y₁))
+          (Sum.inr ∘ ((·.val.snd) : { y₂ : Fin k × Y₂ // g y₂.fst = Sum.inr y₂.snd } → Y₂))
+        (match hfa : g j with
+          | Sum.inl b₁ => Sum.inl (Subtype.mk (j, b₁) hfa)
+          | Sum.inr b₂ => Sum.inr (Subtype.mk (j, b₂) hfa)
+        ))
+      )).det = 0
+      ∨
+        _
+      ∨
+        _
+  have bla :
+    Matrix.of (fun i : Fin k => fun j : Fin k =>
+      Matrix.of (Sum.elim (fun x₁ => Sum.elim (A₁ x₁) 0) (fun x₂ => Sum.elim 0 (A₂ x₂)))
+        (Sum.elim
+          (Sum.inl ∘ ((·.val.snd) : { x₁ : Fin k × X₁ // f x₁.fst = Sum.inl x₁.snd } → X₁))
+          (Sum.inr ∘ ((·.val.snd) : { x₂ : Fin k × X₂ // f x₂.fst = Sum.inr x₂.snd } → X₂))
+        (match hfa : f i with
+          | Sum.inl b₁ => Sum.inl (Subtype.mk (i, b₁) hfa)
+          | Sum.inr b₂ => Sum.inr (Subtype.mk (i, b₂) hfa)
+        ))
+        (Sum.elim
+          (Sum.inl ∘ ((·.val.snd) : { y₁ : Fin k × Y₁ // g y₁.fst = Sum.inl y₁.snd } → Y₁))
+          (Sum.inr ∘ ((·.val.snd) : { y₂ : Fin k × Y₂ // g y₂.fst = Sum.inr y₂.snd } → Y₂))
+        (match hfa : g j with
+          | Sum.inl b₁ => Sum.inl (Subtype.mk (j, b₁) hfa)
+          | Sum.inr b₂ => Sum.inr (Subtype.mk (j, b₂) hfa)
+        ))
+      ) =
+    Matrix.of (fun i : Fin k => fun j : Fin k =>
+        (Sum.elim
+          (fun x₁ => Sum.elim (A₁ x₁ : Y₁ → R) (0 : Y₂ → R))
+          (fun x₂ => Sum.elim (0 : Y₁ → R) (A₂ x₂ : Y₂ → R))
+        )
+        (Sum.elim
+          (Sum.inl ∘ ((·.val.snd) : { x₁ : Fin k × X₁ // f x₁.fst = Sum.inl x₁.snd } → X₁))
+          (Sum.inr ∘ ((·.val.snd) : { x₂ : Fin k × X₂ // f x₂.fst = Sum.inr x₂.snd } → X₂))
+        (match hfa : f i with
+          | Sum.inl b₁ => Sum.inl (Subtype.mk (i, b₁) hfa)
+          | Sum.inr b₂ => Sum.inr (Subtype.mk (i, b₂) hfa)
+        ))
+        (Sum.elim
+          (Sum.inl ∘ ((·.val.snd) : { y₁ : Fin k × Y₁ // g y₁.fst = Sum.inl y₁.snd } → Y₁))
+          (Sum.inr ∘ ((·.val.snd) : { y₂ : Fin k × Y₂ // g y₂.fst = Sum.inr y₂.snd } → Y₂))
+        (match hfa : g j with
+          | Sum.inl b₁ => Sum.inl (Subtype.mk (j, b₁) hfa)
+          | Sum.inr b₂ => Sum.inr (Subtype.mk (j, b₂) hfa)
+        ))
+      )
+  · simp
+  rw [bla]
   sorry
