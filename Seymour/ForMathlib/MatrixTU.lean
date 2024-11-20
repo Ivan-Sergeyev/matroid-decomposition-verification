@@ -1,9 +1,11 @@
 import Mathlib.Data.Matrix.ColumnRowPartitioned
 import Seymour.ForMathlib.Basic
 
-variable {X Y R : Type*} [CommRing R]
+attribute [-simp] Fintype.card_ofIsEmpty Fintype.card_ofSubsingleton -- major performance issue
 
 open scoped Matrix
+
+variable {X Y R : Type*} [CommRing R]
 
 /-- Is the matrix `A` totally unimodular? -/
 def Matrix.TU (A : Matrix X Y R) : Prop :=
@@ -193,7 +195,6 @@ lemma Matrix.TU_adjoin_id_right_iff [DecidableEq X] [DecidableEq Y] (A : Matrix 
   convert Matrix.TU_adjoin_id_left_iff A
   aesop
 
-omit X Y
 variable {X₁ X₂ Y₁ Y₂ : Type*}
 
 lemma Matrix.fromBlocks_submatrix_apply {β ι γ : Type*} (f : ι → X₁ ⊕ X₂) (g : γ → Y₁ ⊕ Y₂)
@@ -211,177 +212,105 @@ lemma Matrix.fromBlocks_submatrix_apply {β ι γ : Type*} (f : ι → X₁ ⊕ 
     := by
   aesop
 
--- This is probably not the way to go:
-lemma Matrix.old_fromBlocks_TU {A₁ : Matrix X₁ Y₁ R} {A₂ : Matrix X₂ Y₂ R} (hA₁ : A₁.TU) (hA₂ : A₂.TU) :
+omit R
+variable {R : Type*} [LinearOrderedCommRing R]
+
+lemma abs_eq_one (r : R) : |r| = 1 ↔ r = 1 ∨ r = -1 := by
+  rw [←abs_one, abs_eq_abs, abs_one]
+
+lemma Matrix.submatrix_det_abs [Fintype X] [DecidableEq X] [Fintype Y] [DecidableEq Y]
+    (A : Matrix X X R) (e₁ : Y ≃ X) (e₂ : Y ≃ X) :
+    |(A.submatrix e₁ e₂).det| = |A.det| := by
+  sorry
+
+lemma Matrix.fromBlocks_TU
+    [Fintype X₁] [DecidableEq X₁] [Fintype Y₁] [DecidableEq Y₁] [Fintype X₂] [DecidableEq X₂] [Fintype Y₂] [DecidableEq Y₂]
+    {A₁ : Matrix X₁ Y₁ R} {A₂ : Matrix X₂ Y₂ R}
+    (hA₁ : A₁.TU) (hA₂ : A₂.TU) :
     (Matrix.fromBlocks A₁ 0 0 A₂).TU := by
   intro k f g hf hg
   rw [Matrix.TU_iff] at hA₁ hA₂
-  obtain ⟨ι₁, ι₂, eιk, f₁, f₂, hfff⟩ := old_attempt f
-  obtain ⟨γ₁, γ₂, eγk, g₁, g₂, hggg⟩ := old_attempt g
-  have hι : Fintype (ι₁ ⊕ ι₂) := Fintype.ofEquiv _ eιk
-  have hι₁ : Fintype ι₁ := hι.sumLeft
-  have hι₂ : Fintype ι₂ := hι.sumRight
-  have hγ : Fintype (γ₁ ⊕ γ₂) := Fintype.ofEquiv _ eγk
-  have hγ₁ : Fintype γ₁ := hγ.sumLeft
-  have hγ₂ : Fintype γ₂ := hγ.sumRight
-  clear hι hγ
-  if hιγ : Fintype.card ι₁ = Fintype.card γ₁ ∧ Fintype.card ι₂ = Fintype.card γ₂ then
-    obtain ⟨hιγ₁, hιγ₂⟩ := hιγ
-    let eι₁ : Fin (Fintype.card ι₁) ≃ ι₁ := (Fintype.equivFin ι₁).symm
-    let eι₂ : Fin (Fintype.card ι₂) ≃ ι₂ := (Fintype.equivFin ι₂).symm
-    let eγ₁ : Fin (Fintype.card ι₁) ≃ γ₁ := (hιγ₁ ▸ Fintype.equivFin γ₁).symm
-    let eγ₂ : Fin (Fintype.card ι₂) ≃ γ₂ := (hιγ₂ ▸ Fintype.equivFin γ₂).symm
-    rw
-      [show
-        ((Matrix.fromBlocks A₁ 0 0 A₂).submatrix f g).det =
-        (A₁.submatrix (f₁ ∘ eι₁) (g₁ ∘ eγ₁)).det * (A₂.submatrix (f₂ ∘ eι₂) (g₂ ∘ eγ₂)).det
-      by
-        rw [←Matrix.det_fromBlocks_zero₂₁ _ 0, hfff, hggg]
-        sorry]
+  rw [f.eq_comp_myEquiv, g.eq_comp_myEquiv, ←Matrix.submatrix_submatrix]
+  have hAfg :
+    (Matrix.fromBlocks A₁ 0 0 A₂).submatrix
+      (Sum.elim (Sum.inl ∘ (·.val.snd)) (Sum.inr ∘ (·.val.snd)))
+      (Sum.elim (Sum.inl ∘ (·.val.snd)) (Sum.inr ∘ (·.val.snd)))
+    =
+    Matrix.fromBlocks
+      (A₁.submatrix
+        ((·.val.snd) : { x₁ : Fin k × X₁ // f x₁.fst = Sum.inl x₁.snd } → X₁)
+        ((·.val.snd) : { y₁ : Fin k × Y₁ // g y₁.fst = Sum.inl y₁.snd } → Y₁)
+      ) 0 0
+      (A₂.submatrix
+        ((·.val.snd) : { x₂ : Fin k × X₂ // f x₂.fst = Sum.inr x₂.snd } → X₂)
+        ((·.val.snd) : { y₂ : Fin k × Y₂ // g y₂.fst = Sum.inr y₂.snd } → Y₂)
+      )
+  · ext i j
+    cases i <;> cases j <;> simp
+  rw [hAfg]
+  clear hAfg
+  if hxy : Fintype.card { x₁ : Fin k × X₁ // f x₁.fst = Sum.inl x₁.snd } = Fintype.card { y₁ : Fin k × Y₁ // g y₁.fst = Sum.inl y₁.snd }
+         ∧ Fintype.card { x₂ : Fin k × X₂ // f x₂.fst = Sum.inr x₂.snd } = Fintype.card { y₂ : Fin k × Y₂ // g y₂.fst = Sum.inr y₂.snd }
+  then
+    obtain ⟨cardi₁, cardi₂⟩ := hxy
+    let eX₁ : Fin (Fintype.card { x₁ : Fin k × X₁ // f x₁.fst = Sum.inl x₁.snd }) ≃ { x₁ : Fin k × X₁ // f x₁.fst = Sum.inl x₁.snd } :=
+      (Fintype.equivFin { x₁ : Fin k × X₁ // f x₁.fst = Sum.inl x₁.snd }).symm
+    let eX₂ : Fin (Fintype.card { x₂ : Fin k × X₂ // f x₂.fst = Sum.inr x₂.snd }) ≃ { x₂ : Fin k × X₂ // f x₂.fst = Sum.inr x₂.snd } :=
+      (Fintype.equivFin { x₂ : Fin k × X₂ // f x₂.fst = Sum.inr x₂.snd }).symm
+    let eY₁ : Fin (Fintype.card { x₁ : Fin k × X₁ // f x₁.fst = Sum.inl x₁.snd }) ≃ { y₁ : Fin k × Y₁ // g y₁.fst = Sum.inl y₁.snd } :=
+      (cardi₁ ▸ Fintype.equivFin { y₁ : Fin k × Y₁ // g y₁.fst = Sum.inl y₁.snd }).symm
+    let eY₂ : Fin (Fintype.card { x₂ : Fin k × X₂ // f x₂.fst = Sum.inr x₂.snd }) ≃ { y₂ : Fin k × Y₂ // g y₂.fst = Sum.inr y₂.snd } :=
+      (cardi₂ ▸ Fintype.equivFin { y₂ : Fin k × Y₂ // g y₂.fst = Sum.inr y₂.snd }).symm
+    have hAfg' :
+      (Matrix.fromBlocks
+        (A₁.submatrix
+          ((·.val.snd) : { x₁ : Fin k × X₁ // f x₁.fst = Sum.inl x₁.snd } → X₁)
+          ((·.val.snd) : { y₁ : Fin k × Y₁ // g y₁.fst = Sum.inl y₁.snd } → Y₁)
+        ) 0 0
+        (A₂.submatrix
+          ((·.val.snd) : { x₂ : Fin k × X₂ // f x₂.fst = Sum.inr x₂.snd } → X₂)
+          ((·.val.snd) : { y₂ : Fin k × Y₂ // g y₂.fst = Sum.inr y₂.snd } → Y₂)
+        )).submatrix
+          f.myEquiv
+          g.myEquiv
+      =
+      (Matrix.fromBlocks
+        (A₁.submatrix
+          (((·.val.snd) : { x₁ : Fin k × X₁ // f x₁.fst = Sum.inl x₁.snd } → X₁) ∘ eX₁)
+          (((·.val.snd) : { y₁ : Fin k × Y₁ // g y₁.fst = Sum.inl y₁.snd } → Y₁) ∘ eY₁)
+        ) 0 0
+        (A₂.submatrix
+          (((·.val.snd) : { x₂ : Fin k × X₂ // f x₂.fst = Sum.inr x₂.snd } → X₂) ∘ eX₂)
+          (((·.val.snd) : { y₂ : Fin k × Y₂ // g y₂.fst = Sum.inr y₂.snd } → Y₂) ∘ eY₂)
+        )).submatrix
+          (f.myEquiv.trans (Equiv.sumCongr eX₁.symm eX₂.symm))
+          (g.myEquiv.trans (Equiv.sumCongr eY₁.symm eY₂.symm))
+    · ext
+      simp only [Function.myEquiv, Equiv.coe_fn_mk, Equiv.coe_trans, Equiv.sumCongr_apply, Function.comp_apply,
+        Matrix.submatrix, Matrix.fromBlocks, Matrix.of_apply]
+      split
+      · split
+        · simp
+        · rfl
+      · split
+        · rfl
+        · simp
+    rw [hAfg', ←abs_eq_zero, ←abs_eq_one, Matrix.submatrix_det_abs, Matrix.det_fromBlocks_zero₁₂, abs_eq_zero, abs_eq_one]
     apply zom_mul_zom
     · apply hA₁
     · apply hA₂
   else
-    have hιγ' : Fintype.card ι₁ ≠ Fintype.card γ₁ ∧ Fintype.card ι₂ ≠ Fintype.card γ₂
-    · rw [not_and_or] at hιγ
-      have hkι : k = Fintype.card (ι₁ ⊕ ι₂) := Fintype.card_fin k ▸ Fintype.card_congr eιk
-      have hkγ : k = Fintype.card (γ₁ ⊕ γ₂) := Fintype.card_fin k ▸ Fintype.card_congr eγk
-      rw [Fintype.card_sum] at hkι hkγ
-      cases hιγ <;> omega
+    obtain ⟨cardine₁, cardine₂⟩ :
+        Fintype.card { x₁ : Fin k × X₁ // f x₁.fst = Sum.inl x₁.snd } ≠
+        Fintype.card { y₁ : Fin k × Y₁ // g y₁.fst = Sum.inl y₁.snd } ∧
+        Fintype.card { x₂ : Fin k × X₂ // f x₂.fst = Sum.inr x₂.snd } ≠
+        Fintype.card { y₂ : Fin k × Y₂ // g y₂.fst = Sum.inr y₂.snd }
+    · rw [not_and_or] at hxy
+      have hk₁ := Fintype.card_fin k ▸ Fintype.card_congr f.myEquiv
+      have hk₂ := Fintype.card_fin k ▸ Fintype.card_congr g.myEquiv
+      rw [Fintype.card_sum] at hk₁ hk₂
+      cases hxy <;> omega
+    clear hxy
     left
     -- here we have a singular submatrix
-    rw [hfff, hggg]
-    simp [Matrix.submatrix, Matrix.fromBlocks]
     sorry
-
-set_option maxHeartbeats 666666 in
-lemma Matrix.fromBlocks_TU {A₁ : Matrix X₁ Y₁ R} {A₂ : Matrix X₂ Y₂ R} (hA₁ : A₁.TU) (hA₂ : A₂.TU) :
-    (Matrix.fromBlocks A₁ 0 0 A₂).TU := by
-  intro k f g hf hg
-  rw [Matrix.TU_iff] at hA₁ hA₂
-  rw [f.toSumElimComp, g.toSumElimComp]
-  show
-    (Matrix.of (fun i : Fin k => fun j : Fin k =>
-      Matrix.of (Sum.elim (fun x₁ => Sum.elim (A₁ x₁) 0) (fun x₂ => Sum.elim 0 (A₂ x₂)))
-        (Sum.elim
-          (Sum.inl ∘ ((·.val.snd) : { x₁ : Fin k × X₁ // f x₁.fst = Sum.inl x₁.snd } → X₁))
-          (Sum.inr ∘ ((·.val.snd) : { x₂ : Fin k × X₂ // f x₂.fst = Sum.inr x₂.snd } → X₂))
-        (match hfa : f i with
-          | Sum.inl b₁ => Sum.inl ⟨⟨i, b₁⟩, hfa⟩
-          | Sum.inr b₂ => Sum.inr ⟨⟨i, b₂⟩, hfa⟩
-        ))
-        (Sum.elim
-          (Sum.inl ∘ ((·.val.snd) : { y₁ : Fin k × Y₁ // g y₁.fst = Sum.inl y₁.snd } → Y₁))
-          (Sum.inr ∘ ((·.val.snd) : { y₂ : Fin k × Y₂ // g y₂.fst = Sum.inr y₂.snd } → Y₂))
-        (match hgj : g j with
-          | Sum.inl b₁ => Sum.inl ⟨⟨j, b₁⟩, hgj⟩
-          | Sum.inr b₂ => Sum.inr ⟨⟨j, b₂⟩, hgj⟩
-        ))
-      )).det = 0
-    ∨
-    (Matrix.of (fun i : Fin k => fun j : Fin k =>
-      Matrix.of (Sum.elim (fun x₁ => Sum.elim (A₁ x₁) 0) (fun x₂ => Sum.elim 0 (A₂ x₂)))
-        (Sum.elim
-          (Sum.inl ∘ ((·.val.snd) : { x₁ : Fin k × X₁ // f x₁.fst = Sum.inl x₁.snd } → X₁))
-          (Sum.inr ∘ ((·.val.snd) : { x₂ : Fin k × X₂ // f x₂.fst = Sum.inr x₂.snd } → X₂))
-        (match hfa : f i with
-          | Sum.inl b₁ => Sum.inl ⟨⟨i, b₁⟩, hfa⟩
-          | Sum.inr b₂ => Sum.inr ⟨⟨i, b₂⟩, hfa⟩
-        ))
-        (Sum.elim
-          (Sum.inl ∘ ((·.val.snd) : { y₁ : Fin k × Y₁ // g y₁.fst = Sum.inl y₁.snd } → Y₁))
-          (Sum.inr ∘ ((·.val.snd) : { y₂ : Fin k × Y₂ // g y₂.fst = Sum.inr y₂.snd } → Y₂))
-        (match hgj : g j with
-          | Sum.inl b₁ => Sum.inl ⟨⟨j, b₁⟩, hgj⟩
-          | Sum.inr b₂ => Sum.inr ⟨⟨j, b₂⟩, hgj⟩
-        ))
-      )).det = 1
-    ∨
-    (Matrix.of (fun i : Fin k => fun j : Fin k =>
-      Matrix.of (Sum.elim (fun x₁ => Sum.elim (A₁ x₁) 0) (fun x₂ => Sum.elim 0 (A₂ x₂)))
-        (Sum.elim
-          (Sum.inl ∘ ((·.val.snd) : { x₁ : Fin k × X₁ // f x₁.fst = Sum.inl x₁.snd } → X₁))
-          (Sum.inr ∘ ((·.val.snd) : { x₂ : Fin k × X₂ // f x₂.fst = Sum.inr x₂.snd } → X₂))
-        (match hfa : f i with
-          | Sum.inl b₁ => Sum.inl ⟨⟨i, b₁⟩, hfa⟩
-          | Sum.inr b₂ => Sum.inr ⟨⟨i, b₂⟩, hfa⟩
-        ))
-        (Sum.elim
-          (Sum.inl ∘ ((·.val.snd) : { y₁ : Fin k × Y₁ // g y₁.fst = Sum.inl y₁.snd } → Y₁))
-          (Sum.inr ∘ ((·.val.snd) : { y₂ : Fin k × Y₂ // g y₂.fst = Sum.inr y₂.snd } → Y₂))
-        (match hgj : g j with
-          | Sum.inl b₁ => Sum.inl ⟨⟨j, b₁⟩, hgj⟩
-          | Sum.inr b₂ => Sum.inr ⟨⟨j, b₂⟩, hgj⟩
-        ))
-      )).det = -1
-  let A₁' :=
-    A₁.submatrix
-      ((·.val.snd) : { x₁ : Fin k × X₁ // f x₁.fst = Sum.inl x₁.snd } → X₁)
-      ((·.val.snd) : { y₁ : Fin k × Y₁ // g y₁.fst = Sum.inl y₁.snd } → Y₁)
-  let A₂' :=
-    A₂.submatrix
-      ((·.val.snd) : { x₂ : Fin k × X₂ // f x₂.fst = Sum.inr x₂.snd } → X₂)
-      ((·.val.snd) : { y₂ : Fin k × Y₂ // g y₂.fst = Sum.inr y₂.snd } → Y₂)
-  have hAfg :
-    Matrix.of (fun i : Fin k => fun j : Fin k =>
-      Matrix.of (Sum.elim (fun x₁ => Sum.elim (A₁ x₁) 0) (fun x₂ => Sum.elim 0 (A₂ x₂)))
-        (Sum.elim
-          (Sum.inl ∘ ((·.val.snd) : { x₁ : Fin k × X₁ // f x₁.fst = Sum.inl x₁.snd } → X₁))
-          (Sum.inr ∘ ((·.val.snd) : { x₂ : Fin k × X₂ // f x₂.fst = Sum.inr x₂.snd } → X₂))
-        (match hfa : f i with
-          | Sum.inl b₁ => Sum.inl ⟨⟨i, b₁⟩, hfa⟩
-          | Sum.inr b₂ => Sum.inr ⟨⟨i, b₂⟩, hfa⟩
-        ))
-        (Sum.elim
-          (Sum.inl ∘ ((·.val.snd) : { y₁ : Fin k × Y₁ // g y₁.fst = Sum.inl y₁.snd } → Y₁))
-          (Sum.inr ∘ ((·.val.snd) : { y₂ : Fin k × Y₂ // g y₂.fst = Sum.inr y₂.snd } → Y₂))
-        (match hfa : g j with
-          | Sum.inl b₁ => Sum.inl ⟨⟨j, b₁⟩, hfa⟩
-          | Sum.inr b₂ => Sum.inr ⟨⟨j, b₂⟩, hfa⟩
-        ))
-      ) =
-    Matrix.of
-      (fun i : Fin k => fun j : Fin k =>
-        (Matrix.fromBlocks A₁' 0 0 A₂')
-        (match hfa : f i with
-          | Sum.inl b₁ => Sum.inl ⟨⟨i, b₁⟩, hfa⟩
-          | Sum.inr b₂ => Sum.inr ⟨⟨i, b₂⟩, hfa⟩
-        )
-        (match hgj : g j with
-          | Sum.inl b₁ => Sum.inl ⟨⟨j, b₁⟩, hgj⟩
-          | Sum.inr b₂ => Sum.inr ⟨⟨j, b₂⟩, hgj⟩
-        )
-      )
-  · aesop
-  have hAfg' : -- TODO completely change
-    Matrix.of
-      (fun i : Fin k => fun j : Fin k =>
-        (Matrix.fromBlocks
-          (A₁.submatrix
-            ((·.val.snd) : { x₁ : Fin k × X₁ // f x₁.fst = Sum.inl x₁.snd } → X₁)
-            ((·.val.snd) : { y₁ : Fin k × Y₁ // g y₁.fst = Sum.inl y₁.snd } → Y₁)
-          ) 0 0
-          (A₂.submatrix
-            ((·.val.snd) : { x₂ : Fin k × X₂ // f x₂.fst = Sum.inr x₂.snd } → X₂)
-            ((·.val.snd) : { y₂ : Fin k × Y₂ // g y₂.fst = Sum.inr y₂.snd } → Y₂)
-          ))
-        (match hfa : f i with
-          | Sum.inl b₁ => Sum.inl ⟨⟨i, b₁⟩, hfa⟩
-          | Sum.inr b₂ => Sum.inr ⟨⟨i, b₂⟩, hfa⟩
-        )
-        (match hgj : g j with
-          | Sum.inl b₁ => Sum.inl ⟨⟨j, b₁⟩, hgj⟩
-          | Sum.inr b₂ => Sum.inr ⟨⟨j, b₂⟩, hgj⟩
-        )
-      ) =
-    Matrix.of
-      (fun i : Fin k => fun j : Fin k =>
-        (Matrix.fromBlocks A₁ 0 0 A₂) (f i) (g j)
-      )
-  · aesop
-  rw [hAfg, hAfg']
-  show
-    ((fromBlocks A₁ 0 0 A₂).submatrix f g).det = 0 ∨
-    ((fromBlocks A₁ 0 0 A₂).submatrix f g).det = 1 ∨
-    ((fromBlocks A₁ 0 0 A₂).submatrix f g).det = -1
-  sorry

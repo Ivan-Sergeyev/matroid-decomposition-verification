@@ -622,6 +622,9 @@ section main_results
 
 variable {M M₁ M₂ : BinaryMatroid α}
 
+variable [Fintype M₁.X] [Fintype M₁.Y] [Fintype M₂.X] [Fintype M₂.Y]
+-- `Finite` does not work here without calling `Set.Finite.fintype` inside the proofs.
+
 /-- Any 1-sum of regular matroids is a regular matroid. -/
 theorem BinaryMatroid.Is1sum.isRegular (hM : M.Is1sumOf M₁ M₂) (hM₁ : M₁.IsRegular) (hM₂ : M₂.IsRegular) :
     M.IsRegular := by
@@ -656,6 +659,8 @@ theorem BinaryMatroid.Is1sum.isRegular (hM : M.Is1sumOf M₁ M₂) (hM₁ : M₁
       | inr j₂ =>
         specialize hBB₂ i₂ j₂
         simp_all [B']
+
+set_option linter.unusedSectionVars false -- In actual proofs, finiteness will be needed.
 
 /-- Any 2-sum of regular matroids is a regular matroid. -/
 theorem BinaryMatroid.Is2sum.isRegular (hM : M.Is2sumOf M₁ M₂) (hM₁ : M₁.IsRegular) (hM₂ : M₂.IsRegular) :
