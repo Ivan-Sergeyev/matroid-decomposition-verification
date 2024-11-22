@@ -187,12 +187,10 @@ lemma Matrix.TU_adjoin_rowUnit_iff (A : Matrix X Y R) (j' : Y) [DecidableEq Y] :
     (Matrix.fromRows A (Matrix.row Unit (fun j : Y => if j = j' then 1 else 0))).TU ↔ A.TU := by
   rw [Matrix.TU_adjoin_rowUnit_aux, Matrix.TU_adjoin_row0s_iff]
 
+-- Bhavik Mehta proved: https://github.com/leanprover-community/mathlib4/pull/19076
 lemma Matrix.TU_adjoin_id_below_iff [DecidableEq X] [DecidableEq Y] (A : Matrix X Y R) :
     (Matrix.fromRows A (1 : Matrix Y Y R)).TU ↔ A.TU := by
-  rw [Matrix.TU_iff, Matrix.TU_iff]
-  constructor <;> intro hA k f g
-  · exact hA k (Sum.inl ∘ f) g
-  · sorry -- TODO inductively apply `Matrix.TU_adjoin_rowUnit_iff`
+  sorry
 
 lemma Matrix.TU_adjoin_id_above_iff [DecidableEq X] [DecidableEq Y] (A : Matrix X Y R) :
     (Matrix.fromRows (1 : Matrix Y Y R) A).TU ↔ A.TU := by
