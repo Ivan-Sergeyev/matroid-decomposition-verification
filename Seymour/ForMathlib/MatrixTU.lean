@@ -43,6 +43,20 @@ lemma Matrix.TU_iff (A : Matrix X Y R) : A.TU ↔
   · intro _ _ _ _ _
     apply hA
 
+lemma Matrix.TU_iff_fintype (A : Matrix X Y R) : A.TU ↔
+    ∀ (ι : Type) [Fintype ι] [DecidableEq ι], ∀ f : ι → X, ∀ g : ι → Y,
+      (A.submatrix f g).det = 0 ∨
+      (A.submatrix f g).det = 1 ∨
+      (A.submatrix f g).det = -1
+    := by
+  rw [Matrix.TU_iff]
+  constructor
+  · intro hA ι _ _ f g
+    specialize hA (Fintype.card ι) (f ∘ (Fintype.equivFin ι).symm) (g ∘ (Fintype.equivFin ι).symm)
+    rwa [←Matrix.submatrix_submatrix, Matrix.det_submatrix_equiv_self] at hA
+  · intro hA k
+    exact hA (Fin k)
+
 lemma Matrix.TU.apply {A : Matrix X Y R} (hA : A.TU) (i : X) (j : Y) :
     A i j = 0 ∨ A i j = 1 ∨ A i j = -1 := by
   rw [Matrix.TU_iff] at hA
@@ -219,9 +233,15 @@ lemma abs_eq_one (r : R) : |r| = 1 ↔ r = 1 ∨ r = -1 := by
   rw [←abs_one, abs_eq_abs, abs_one]
 
 lemma Matrix.submatrix_det_abs [Fintype X] [DecidableEq X] [Fintype Y] [DecidableEq Y]
-    (A : Matrix X X R) (e₁ : Y ≃ X) (e₂ : Y ≃ X) :
+    (A : Matrix X X R) (e₁ e₂ : Y ≃ X) :
     |(A.submatrix e₁ e₂).det| = |A.det| := by
-  sorry
+  have hee : e₂ = e₁.trans (e₁.symm.trans e₂)
+  · ext
+    simp
+  have hAee : A.submatrix e₁ (e₁.trans (e₁.symm.trans e₂)) = (A.submatrix id (e₁.symm.trans e₂)).submatrix e₁ e₁
+  · rfl
+  rw [hee, hAee, Matrix.det_submatrix_equiv_self, Matrix.det_permute']
+  cases' Int.units_eq_one_or (Equiv.Perm.sign (e₁.symm.trans e₂)) with he he <;> rw [he] <;> simp
 
 lemma Matrix.fromBlocks_TU
     [Fintype X₁] [DecidableEq X₁] [Fintype Y₁] [DecidableEq Y₁] [Fintype X₂] [DecidableEq X₂] [Fintype Y₂] [DecidableEq Y₂]
