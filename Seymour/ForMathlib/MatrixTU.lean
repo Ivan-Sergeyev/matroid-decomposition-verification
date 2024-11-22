@@ -43,8 +43,8 @@ lemma Matrix.TU_iff (A : Matrix X Y R) : A.TU ↔
   · intro _ _ _ _ _
     apply hA
 
-lemma Matrix.TU_iff_fintype (A : Matrix X Y R) : A.TU ↔
-    ∀ (ι : Type) [Fintype ι] [DecidableEq ι], ∀ f : ι → X, ∀ g : ι → Y,
+lemma Matrix.TU_iff_fntp.{u} (A : Matrix X Y R) : A.TU ↔
+    ∀ (ι : Type u) [Fintype ι] [DecidableEq ι], ∀ f : ι → X, ∀ g : ι → Y,
       (A.submatrix f g).det = 0 ∨
       (A.submatrix f g).det = 1 ∨
       (A.submatrix f g).det = -1
@@ -54,8 +54,10 @@ lemma Matrix.TU_iff_fintype (A : Matrix X Y R) : A.TU ↔
   · intro hA ι _ _ f g
     specialize hA (Fintype.card ι) (f ∘ (Fintype.equivFin ι).symm) (g ∘ (Fintype.equivFin ι).symm)
     rwa [←Matrix.submatrix_submatrix, Matrix.det_submatrix_equiv_self] at hA
-  · intro hA k
-    exact hA (Fin k)
+  · intro hA k f g
+    specialize hA (ULift (Fin k)) (f ∘ Equiv.ulift) (g ∘ Equiv.ulift)
+    rw [←Matrix.submatrix_submatrix] at hA
+    convert hA <;> rw [Matrix.det_submatrix_equiv_self]
 
 lemma Matrix.TU.apply {A : Matrix X Y R} (hA : A.TU) (i : X) (j : Y) :
     A i j = 0 ∨ A i j = 1 ∨ A i j = -1 := by
