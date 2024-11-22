@@ -137,56 +137,6 @@ lemma Matrix.TU_adjoin_row0s_iff (A : Matrix X Y R) {X' : Type*} :
         apply hf₀
       apply hA
 
-lemma Matrix.TU_adjoin_rowUnit_aux (A : Matrix X Y R) (j' : Y) [DecidableEq Y] :
-    (Matrix.fromRows A (Matrix.row Unit (fun j : Y => if j = j' then 1 else 0))).TU ↔
-    (Matrix.fromRows A (Matrix.row Unit 0)).TU := by
-  rw [Matrix.TU_iff, Matrix.TU_iff]
-  constructor <;> intro hA k f g
-  · if used_row : ∃ i, ∃ u, f i = Sum.inr u then
-      obtain ⟨i, u, hiu⟩ := used_row -- here `u = ()`
-      left
-      apply Matrix.det_eq_zero_of_row_eq_zero i
-      intro
-      simp_all
-    else
-      obtain ⟨f₀, hf₀⟩ : ∃ f₀ : Fin k → X, f = Sum.inl ∘ f₀
-      · have hi (i : Fin k) : ∃ x, f i = Sum.inl x :=
-          match hfi : f i with
-          | .inl x => ⟨x, rfl⟩
-          | .inr x => (used_row ⟨i, x, hfi⟩).elim
-        choose f₀ hf₀ using hi
-        use f₀
-        ext
-        apply hf₀
-      specialize hA k f g
-      rwa [hf₀] at hA ⊢
-  · if used_row : ∃ i, ∃ u, f i = Sum.inr u then
-      obtain ⟨i, u, hiu⟩ := used_row -- here `u = ()`
-      if hits_one : ∃ j, g j = j' then
-        -- TODO Laplacian expansion
-        sorry
-      else -- copypaste all below
-        left
-        apply Matrix.det_eq_zero_of_row_eq_zero i
-        intro
-        simp_all
-    else
-      obtain ⟨f₀, hf₀⟩ : ∃ f₀ : Fin k → X, f = Sum.inl ∘ f₀
-      · have hi (i : Fin k) : ∃ x, f i = Sum.inl x :=
-          match hfi : f i with
-          | .inl x => ⟨x, rfl⟩
-          | .inr x => (used_row ⟨i, x, hfi⟩).elim
-        choose f₀ hf₀ using hi
-        use f₀
-        ext
-        apply hf₀
-      specialize hA k f g
-      rwa [hf₀] at hA ⊢
-
-lemma Matrix.TU_adjoin_rowUnit_iff (A : Matrix X Y R) (j' : Y) [DecidableEq Y] :
-    (Matrix.fromRows A (Matrix.row Unit (fun j : Y => if j = j' then 1 else 0))).TU ↔ A.TU := by
-  rw [Matrix.TU_adjoin_rowUnit_aux, Matrix.TU_adjoin_row0s_iff]
-
 -- Bhavik Mehta proved: https://github.com/leanprover-community/mathlib4/pull/19076
 lemma Matrix.TU_adjoin_id_below_iff [DecidableEq X] [DecidableEq Y] (A : Matrix X Y R) :
     (Matrix.fromRows A (1 : Matrix Y Y R)).TU ↔ A.TU := by
@@ -228,9 +178,6 @@ lemma Matrix.fromBlocks_submatrix_apply {β ι γ : Type*} (f : ι → X₁ ⊕ 
 
 omit R
 variable {R : Type*} [LinearOrderedCommRing R]
-
-lemma abs_eq_one (r : R) : |r| = 1 ↔ r = 1 ∨ r = -1 := by
-  rw [←abs_one, abs_eq_abs, abs_one]
 
 lemma Matrix.submatrix_det_abs [Fintype X] [DecidableEq X] [Fintype Y] [DecidableEq Y]
     (A : Matrix X X R) (e₁ e₂ : Y ≃ X) :

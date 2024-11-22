@@ -1,5 +1,6 @@
 import Mathlib.Tactic
 
+
 @[simp]
 def Function.myEquiv {α β₁ β₂ : Type*} (f : α → β₁ ⊕ β₂) :
     α ≃ { x₁ : α × β₁ // f x₁.fst = Sum.inl x₁.snd } ⊕ { x₂ : α × β₂ // f x₂.fst = Sum.inr x₂.snd } where
@@ -23,7 +24,13 @@ lemma Function.eq_comp_myEquiv {α β₁ β₂ : Type*} (f : α → β₁ ⊕ β
     f = Sum.elim (Sum.inl ∘ (·.val.snd)) (Sum.inr ∘ (·.val.snd)) ∘ myEquiv f := by
   aesop
 
-lemma zom_mul_zom {R : Type*} [Ring R] {x y : R}
+
+variable {R : Type*}
+
+lemma zom_mul_zom [Ring R] {x y : R}
     (hx : x = 0 ∨ x = 1 ∨ x = -1) (hy : y = 0 ∨ y = 1 ∨ y = -1) :
     x*y = 0 ∨ x*y = 1 ∨ x*y = -1 := by
   aesop
+
+lemma abs_eq_one [LinearOrderedCommRing R] (r : R) : |r| = 1 ↔ r = 1 ∨ r = -1 := by
+  rw [←abs_one, abs_eq_abs, abs_one]
