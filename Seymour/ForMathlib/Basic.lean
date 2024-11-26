@@ -27,6 +27,22 @@ lemma Function.eq_comp_myEquiv {α β₁ β₂ : Type*} (f : α → β₁ ⊕ β
 
 variable {R : Type*}
 
+lemma in_set_range_signType_cast_iff_abs_self [LinearOrderedRing R] (r : R) :
+    r ∈ Set.range SignType.cast ↔ |r| ∈ Set.range SignType.cast := by
+  sorry
+
+-- TODO remove after bumping mathlib
+lemma Matrix.submatrix_det_abs {X Y : Type*} [DecidableEq X] [DecidableEq Y] [Fintype X] [Fintype Y] [LinearOrderedCommRing R]
+    (A : Matrix X X R) (e₁ e₂ : Y ≃ X) :
+    |(A.submatrix e₁ e₂).det| = |A.det| := by
+  have hee : e₂ = e₁.trans (e₁.symm.trans e₂)
+  · ext
+    simp
+  have hAee : A.submatrix e₁ (e₁.trans (e₁.symm.trans e₂)) = (A.submatrix id (e₁.symm.trans e₂)).submatrix e₁ e₁
+  · rfl
+  rw [hee, hAee, Matrix.det_submatrix_equiv_self, Matrix.det_permute']
+  cases' Int.units_eq_one_or (Equiv.Perm.sign (e₁.symm.trans e₂)) with he he <;> rw [he] <;> simp
+
 -- TODO rephrase for `Set.range SignType.cast`
 lemma zom_mul_zom [Ring R] {x y : R}
     (hx : x = 0 ∨ x = 1 ∨ x = -1) (hy : y = 0 ∨ y = 1 ∨ y = -1) :

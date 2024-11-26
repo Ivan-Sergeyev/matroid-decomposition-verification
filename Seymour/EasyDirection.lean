@@ -564,18 +564,6 @@ end API_for_matroid_sums
 
 section lemmas_for_1sum
 
--- TODO remove after bumping mathlib
-lemma Matrix.submatrix_det_abs {X Y : Set α} [Fintype X] [Fintype Y]
-    (A : Matrix X X ℤ) (e₁ e₂ : Y ≃ X) :
-    |(A.submatrix e₁ e₂).det| = |A.det| := by
-  have hee : e₂ = e₁.trans (e₁.symm.trans e₂)
-  · ext
-    simp
-  have hAee : A.submatrix e₁ (e₁.trans (e₁.symm.trans e₂)) = (A.submatrix id (e₁.symm.trans e₂)).submatrix e₁ e₁
-  · rfl
-  rw [hee, hAee, Matrix.det_submatrix_equiv_self, Matrix.det_permute']
-  cases' Int.units_eq_one_or (Equiv.Perm.sign (e₁.symm.trans e₂)) with he he <;> rw [he] <;> simp
-
 -- TODO move somewhere else
 def Fintype.set_equiv_toFinset_self {S : Set α} (hS : Fintype S.Elem) :
     S ≃ S.toFinset := by

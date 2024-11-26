@@ -50,6 +50,18 @@ lemma isTotallyUnimodular_iff (A : Matrix m n R) : A.IsTotallyUnimodular ↔
   · intro _ _ _ _ _
     apply hA
 
+lemma IsTotallyUnimodular.apply_finset {R : Type*} [LinearOrderedCommRing R] [DecidableEq m] [DecidableEq n]
+    {A : Matrix m n R} (hA : A.IsTotallyUnimodular) {M : Finset m} {N : Finset n} (hMN : M.card = N.card) :
+    (A.submatrix Subtype.val (Subtype.val ∘ Finset.equivOfCardEq hMN) : Matrix M M R).det ∈ Set.range SignType.cast := by
+  rw [isTotallyUnimodular_iff] at hA
+  let eM : Fin M.card ≃ M := M.equivFin.symm
+  specialize hA M.card (Subtype.val ∘ eM) (Subtype.val ∘ eM.trans (Finset.equivOfCardEq hMN))
+  rw [in_set_range_signType_cast_iff_abs_self] at hA ⊢
+  show |(A.submatrix (Subtype.val ∘ Equiv.refl _) (Subtype.val ∘ ⇑(Finset.equivOfCardEq hMN))).det| ∈ Set.range SignType.cast
+  rw [← Matrix.submatrix_submatrix] at hA ⊢
+  -- rewrite with `Matrix.submatrix_det_abs`
+  sorry
+
 lemma isTotallyUnimodular_iff_fintype.{w} (A : Matrix m n R) : A.IsTotallyUnimodular ↔
     ∀ (ι : Type w) [Fintype ι] [DecidableEq ι], ∀ f : ι → m, ∀ g : ι → n,
       (A.submatrix f g).det ∈ Set.range SignType.cast := by
