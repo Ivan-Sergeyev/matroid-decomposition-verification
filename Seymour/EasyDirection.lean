@@ -4,6 +4,8 @@ import Seymour.Mathlib.Sets
 
 open scoped Matrix
 
+attribute [-simp] Fintype.card_ofIsEmpty Fintype.card_ofSubsingleton
+
 
 section custom_notation
 
@@ -128,9 +130,35 @@ section sums_matrix_level
 variable {X₁ Y₁ : Set α} {X₂ Y₂ : Set α} {β : Type*} [CommRing β]
 
 /-- Matrix-level 1-sum for matroids defined by their standard representation matrices. -/
-abbrev Matrix.oneSumComposition (A₁ : Matrix X₁ Y₁ β) (A₂ : Matrix X₂ Y₂ β) :
-    Matrix (X₁ ⊕ X₂) (Y₁ ⊕ Y₂) β :=
-  Matrix.fromBlocks A₁ 0 0 A₂
+abbrev Matrix.oneSumComposition
+    [∀ a, Decidable (a ∈ X₁)] [∀ a, Decidable (a ∈ Y₁)] [∀ a, Decidable (a ∈ X₂)] [∀ a, Decidable (a ∈ Y₂)]
+    (A₁ : Matrix X₁ Y₁ β) (A₂ : Matrix X₂ Y₂ β) :
+    Matrix (X₁ ∪ X₂).Elem (Y₁ ∪ Y₂).Elem β :=
+  Matrix.of (fun x y =>
+    if hxy : x.val ∈ X₁ ∧ y.val ∈ Y₁ then
+      A₁ ⟨x.val, hxy.left⟩ ⟨y.val, hxy.right⟩
+    else if hxy : x.val ∈ X₂ ∧ y.val ∈ Y₂ then
+      A₂ ⟨x.val, hxy.left⟩ ⟨y.val, hxy.right⟩
+    else
+      0
+    )
+/-
+  Matrix.of (fun x y =>
+    if hx : x.val ∈ X₁ then
+      if hy : y.val ∈ Y₁ then
+        A₁ ⟨x.val, hx⟩ ⟨y.val, hy⟩
+      else
+        0
+    else
+      if hx' : x.val ∈ X₂ then
+        if hy : y.val ∈ Y₂ then
+          A₂ ⟨x.val, hx'⟩ ⟨y.val, hy⟩
+        else
+          0
+      else
+        False.elim (by have := x.property; aesop)
+    )
+-/
 
 /-- Matrix-level 2-sum for matroids defined by their standard representation matrices; does not check legitimacy. -/
 abbrev Matrix.twoSumComposition (A₁ : Matrix X₁ Y₁ β) (x : Y₁ → β) (A₂ : Matrix X₂ Y₂ β) (y : X₂ → β) :
@@ -202,7 +230,7 @@ def BinaryMatroid.oneSum (hXY : M₁.X ⫗ M₂.Y) (hYX : M₁.Y ⫗ M₂.X) :
       inferInstance,
       inferInstance,
       by simp only [Set.disjoint_union_left, Set.disjoint_union_right]; exact ⟨⟨M₁.hXY, hYX.symm⟩, ⟨hXY, M₂.hXY⟩⟩,
-      (Matrix.oneSumComposition M₁.B M₂.B).toMatrixUnionUnion
+      (Matrix.oneSumComposition M₁.B M₂.B)
     ⟩,
     M₁.X ⫗ M₂.X ∧ M₁.Y ⫗ M₂.Y
   ⟩
@@ -353,8 +381,18 @@ lemma BinaryMatroid.Is1sumOf.Y_eq (hM : M.Is1sumOf M₁ M₂) :
   obtain ⟨_, _, rfl, -⟩ := hM
   rfl
 
+lemma BinaryMatroid.Is1sumOf.disjoXX (hM : M.Is1sumOf M₁ M₂) :
+    M₁.X ⫗ M₂.X := by
+  obtain ⟨_, _, -, hXX, -⟩ := hM
+  exact hXX
+
+lemma BinaryMatroid.Is1sumOf.disjoYY (hM : M.Is1sumOf M₁ M₂) :
+    M₁.Y ⫗ M₂.Y := by
+  obtain ⟨_, _, -, -, hYY⟩ := hM
+  exact hYY
+
 lemma BinaryMatroid.Is1sumOf.B_eq (hM : M.Is1sumOf M₁ M₂) :
-    M.B = hM.X_eq ▸ hM.Y_eq ▸ (Matrix.oneSumComposition M₁.B M₂.B).toMatrixUnionUnion := by
+    M.B = hM.X_eq ▸ hM.Y_eq ▸ (Matrix.oneSumComposition M₁.B M₂.B) := by
   obtain ⟨_, _, rfl, -⟩ := hM
   rfl
 
@@ -524,6 +562,104 @@ M₂.B ⟨x₃, x₃inX₂⟩ ⟨y₃, y₃inY₂⟩ = 1
 end API_for_matroid_sums
 
 
+section lemmas_for_1sum
+
+-- TODO remove after bumping mathlib
+lemma Matrix.submatrix_det_abs {X Y : Set α} [Fintype X] [Fintype Y]
+    (A : Matrix X X ℤ) (e₁ e₂ : Y ≃ X) :
+    |(A.submatrix e₁ e₂).det| = |A.det| := by
+  have hee : e₂ = e₁.trans (e₁.symm.trans e₂)
+  · ext
+    simp
+  have hAee : A.submatrix e₁ (e₁.trans (e₁.symm.trans e₂)) = (A.submatrix id (e₁.symm.trans e₂)).submatrix e₁ e₁
+  · rfl
+  rw [hee, hAee, Matrix.det_submatrix_equiv_self, Matrix.det_permute']
+  cases' Int.units_eq_one_or (Equiv.Perm.sign (e₁.symm.trans e₂)) with he he <;> rw [he] <;> simp
+
+-- TODO move somewhere else
+def Fintype.set_equiv_toFinset_self {S : Set α} (hS : Fintype S.Elem) :
+    S ≃ S.toFinset := by
+  simp only [Set.mem_toFinset]
+  exact Equiv.refl S.Elem
+
+lemma Matrix_from_set_blocks_isTotallyUnimodular {X₁ Y₁ X₂ Y₂ : Set α} [Fintype X₁] [Fintype Y₁] [Fintype X₂] [Fintype Y₂]
+    [∀ a, Decidable (a ∈ X₁)] [∀ a, Decidable (a ∈ Y₁)] [∀ a, Decidable (a ∈ X₂)] [∀ a, Decidable (a ∈ Y₂)]
+    (hXX : X₁ ⫗ X₂) (hXX : Y₁ ⫗ Y₂)
+    {A₁ : Matrix X₁ Y₁ ℤ} {A₂ : Matrix X₂ Y₂ ℤ} (hA₁ : A₁.IsTotallyUnimodular) (hA₂ : A₂.IsTotallyUnimodular) :
+    (Matrix.oneSumComposition A₁ A₂).IsTotallyUnimodular := by
+
+  unfold Matrix.oneSumComposition
+  intro k f g hf hg
+
+  -- look at index sets for rows and cols of submatrix
+  let X₁' := (Subtype.val '' Set.range f) ∩ X₁
+  let X₂' := (Subtype.val '' Set.range f) ∩ X₂
+  let Y₁' := (Subtype.val '' Set.range g) ∩ Y₁
+  let Y₂' := (Subtype.val '' Set.range g) ∩ Y₂
+
+  -- show that they are finite
+  have hf' : Set.Finite (Subtype.val '' Set.range f) := Set.Finite.image Subtype.val (Set.finite_range f)
+  have hfX₁ : Set.Finite X₁' := Set.Finite.inter_of_left hf' X₁
+  have hfX₂ : Set.Finite X₂' := Set.Finite.inter_of_left hf' X₂
+  have hg' : Set.Finite (Subtype.val '' Set.range g) := Set.Finite.image Subtype.val (Set.finite_range g)
+  have hgY₁ : Set.Finite Y₁' := Set.Finite.inter_of_left hg' Y₁
+  have hgY₂ : Set.Finite Y₂' := Set.Finite.inter_of_left hg' Y₂
+
+  if hfg : X₁'.toFinset.card = Y₁'.toFinset.card ∧ X₂'.toFinset.card = Y₂'.toFinset.card
+  then -- square case
+
+    -- witness of fintypeness (for stability)
+    have fntpX₁' : Fintype X₁'.Elem := Set.fintypeInterOfLeft _ X₁
+    have fntpX₂' : Fintype X₂'.Elem := Set.fintypeInterOfLeft _ X₂
+    have fntpY₁' : Fintype Y₁'.Elem := Set.fintypeInterOfLeft _ Y₁
+    have fntpY₂' : Fintype Y₂'.Elem := Set.fintypeInterOfLeft _ Y₂
+    -- -- outdated witness for all of the above (in case something breaks):
+    -- classical
+    -- apply Set.fintypeInterOfRight
+
+    -- construct equivalences with the canonical type on given number of elements
+    let eX₁' : X₁'.Elem ≃ Fin X₁'.toFinset.card := fntpX₁'.set_equiv_toFinset_self.trans X₁'.toFinset.equivFin
+    let eX₂' : X₂'.Elem ≃ Fin X₂'.toFinset.card := fntpX₂'.set_equiv_toFinset_self.trans X₂'.toFinset.equivFin
+    -- by transitivity `X₁'.Elem ≃ Y₁'.Elem` and `X₂'.Elem ≃ Y₂'.Elem`
+    let eY₁' : Y₁'.Elem ≃ Fin X₁'.toFinset.card := (fntpY₁'.set_equiv_toFinset_self.trans Y₁'.toFinset.equivFin).trans (by
+      have := hfg.1
+      simp_all only [Set.toFinset_inter, X₁', Y₁']
+      rfl)
+    let eY₂' : Y₂'.Elem ≃ Fin X₂'.toFinset.card := (fntpY₂'.set_equiv_toFinset_self.trans Y₂'.toFinset.equivFin).trans (by
+      have := hfg.2
+      simp_all only [Set.toFinset_inter, X₂', Y₂']
+      rfl)
+
+    -- invoke TUness of `A₁`
+    rw [Matrix.isTotallyUnimodular_iff] at hA₁
+    specialize hA₁ X₁'.toFinset.card
+      ((fun x => ⟨x.val, Set.mem_of_mem_inter_right x.property⟩) ∘ eX₁'.symm) -- instead of `f`
+      ((fun y => ⟨y.val, Set.mem_of_mem_inter_right y.property⟩) ∘ eY₁'.symm) -- instead of `g`
+
+    -- invoke TUness of `A₂`
+    rw [Matrix.isTotallyUnimodular_iff] at hA₂
+    specialize hA₂ X₂'.toFinset.card
+      ((fun x => ⟨x.val, Set.mem_of_mem_inter_right x.property⟩) ∘ eX₂'.symm) -- instead of `f`
+      ((fun y => ⟨y.val, Set.mem_of_mem_inter_right y.property⟩) ∘ eY₂'.symm) -- instead of `g`
+
+    -- map these to blocks of our submatrix
+    -- since top right and bottom left blocks are 0, overall det is a product of dets, hence also ±1 or 0
+
+    sorry
+
+  else -- non-square case
+
+    -- - look at top left block
+    -- - either # rows > # cols or vice versa, wlog the former
+    -- - then top left block has incomplete row rank
+    -- - thus the top sub-submatrix defined by these rows has incomplete row rank
+    -- - thus the whole submatrix has incomplete row rank
+    -- - thus det is 0
+    sorry
+
+end lemmas_for_1sum
+
+
 section lemmas_for_2sum
 
 lemma Matrix_twoSumComposition_TU {X₁ Y₁ : Set α} {X₂ Y₂ : Set α} {A₁ : Matrix X₁ Y₁ ℤ} {A₂ : Matrix X₂ Y₂ ℤ}
@@ -646,20 +782,32 @@ theorem BinaryMatroid.Is1sum.isRegular (hM : M.Is1sumOf M₁ M₂) (hM₁ : M₁
   obtain ⟨B₂, hB₂, hBB₂⟩ := hM₂
   let B' := Matrix.oneSumComposition B₁ B₂
   have hB' : B'.IsTotallyUnimodular
-  · sorry/-
-    apply Matrix.fromBlocks_TU
+  · apply Matrix_from_set_blocks_isTotallyUnimodular hM.disjoXX hM.disjoYY
     · rwa [Matrix.one_fromColumns_isTotallyUnimodular_iff] at hB₁
     · rwa [Matrix.one_fromColumns_isTotallyUnimodular_iff] at hB₂
+  have hMB :
+    M.B =
+      Matrix.reindex (Equiv.setCongr hM.X_eq.symm) (Equiv.setCongr hM.Y_eq.symm) (Matrix.oneSumComposition M₁.B M₂.B)
+  · sorry
+    /-simp [hM.B_eq]
+    ext i j
+    rw [hM.X_eq] at i
+    rw [hM.Y_eq] at j
+    if hi : i.val ∈ M₁.X then
+      if hj : j.val ∈ M₁.Y then
+        aesop
+      else
+        sorry
+    else
+      sorry
     -/
-  have hMB : M.B = (Matrix.oneSumComposition M₁.B M₂.B).toMatrixElemElem hM.X_eq hM.Y_eq
-  · rewrite [hM.B_eq]
-    rfl
-  use B'.toMatrixElemElem hM.X_eq hM.Y_eq
+  use Matrix.reindex (Equiv.setCongr hM.X_eq.symm) (Equiv.setCongr hM.Y_eq.symm) B'
   constructor
-  · rw [Matrix.one_fromColumns_isTotallyUnimodular_iff]
-    exact hB'.toMatrixElemElem hM.X_eq hM.Y_eq
+  · rw [Matrix.one_fromColumns_isTotallyUnimodular_iff, Matrix.reindex_isTotallyUnimodular]
+    exact hB'
   · intro i j
     simp only [hMB, Matrix.oneSumComposition, Matrix.toMatrixElemElem_eq]
+    sorry/-
     cases hi : (hM.X_eq ▸ i).toSum with
     | inl i₁ =>
       cases hj : (hM.Y_eq ▸ j).toSum with
@@ -675,6 +823,7 @@ theorem BinaryMatroid.Is1sum.isRegular (hM : M.Is1sumOf M₁ M₂) (hM₁ : M₁
       | inr j₂ =>
         specialize hBB₂ i₂ j₂
         simp_all [B']
+    -/
 
 set_option linter.unusedSectionVars false -- In actual proofs, finiteness will be needed.
 

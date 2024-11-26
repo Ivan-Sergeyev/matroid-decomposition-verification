@@ -27,6 +27,7 @@ lemma Function.eq_comp_myEquiv {α β₁ β₂ : Type*} (f : α → β₁ ⊕ β
 
 variable {R : Type*}
 
+-- TODO rephrase for `Set.range SignType.cast`
 lemma zom_mul_zom [Ring R] {x y : R}
     (hx : x = 0 ∨ x = 1 ∨ x = -1) (hy : y = 0 ∨ y = 1 ∨ y = -1) :
     x*y = 0 ∨ x*y = 1 ∨ x*y = -1 := by
