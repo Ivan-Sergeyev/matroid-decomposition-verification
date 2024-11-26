@@ -34,3 +34,7 @@ lemma zom_mul_zom [Ring R] {x y : R}
 
 lemma abs_eq_one [LinearOrderedCommRing R] (r : R) : |r| = 1 ↔ r = 1 ∨ r = -1 := by
   rw [←abs_one, abs_eq_abs, abs_one]
+
+lemma neg_one_pow_mem_signType_range [Ring R] (n : ℕ) {a : R} (ha : a ∈ Set.range SignType.cast) :
+    (-1 : R) ^ n * a ∈ Set.range SignType.cast :=
+  mul_mem (s := MonoidHom.mrange SignType.castHom.toMonoidHom) (pow_mem (by use -1; rfl) n) ha

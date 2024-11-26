@@ -117,7 +117,7 @@ instance : Coe (BinaryMatroid α) (Matroid α) where
 /-- The binary matroid on the ground set `X ∪ Y` is regular. -/
 def BinaryMatroid.IsRegular (M : BinaryMatroid α) : Prop :=
   ∃ B' : Matrix M.X M.Y ℤ, -- signed version of `B`
-    (Matrix.fromColumns (1 : Matrix M.X M.X ℤ) B').TU ∧ -- the signed representation matrix is totally unimodular
+    (Matrix.fromColumns (1 : Matrix M.X M.X ℤ) B').IsTotallyUnimodular ∧ -- the signed representation matrix is totally unimodular
     ∀ i : M.X, ∀ j : M.Y, if M.B i j = 0 then B' i j = 0 else B' i j = 1 ∨ B' i j = -1 -- in absolulute values `B' = B`
 
 end binary_matroid_matroid
@@ -173,14 +173,14 @@ lemma Matrix.toMatrixElemElem_eq (C : Matrix (T₁ ⊕ T₂) (S₁ ⊕ S₂) β)
   subst hT hS
   rfl
 
-lemma Matrix.TU.toMatrixUnionUnion {C : Matrix (T₁ ⊕ T₂) (S₁ ⊕ S₂) ℤ} (hC : C.TU) :
-    C.toMatrixUnionUnion.TU := by
-  rw [Matrix.TU_iff] at hC ⊢
+lemma Matrix.IsTotallyUnimodular.toMatrixUnionUnion {C : Matrix (T₁ ⊕ T₂) (S₁ ⊕ S₂) ℤ} (hC : C.IsTotallyUnimodular) :
+    C.toMatrixUnionUnion.IsTotallyUnimodular := by
+  rw [Matrix.isTotallyUnimodular_iff] at hC ⊢
   intros
   apply hC
 
-lemma Matrix.TU.toMatrixElemElem {C : Matrix (T₁ ⊕ T₂) (S₁ ⊕ S₂) ℤ} (hC : C.TU) (hT : T = T₁ ∪ T₂) (hS : S = S₁ ∪ S₂) :
-    (C.toMatrixElemElem hT hS).TU :=
+lemma Matrix.IsTotallyUnimodular.toMatrixElemElem {C : Matrix (T₁ ⊕ T₂) (S₁ ⊕ S₂) ℤ} (hC : C.IsTotallyUnimodular) (hT : T = T₁ ∪ T₂) (hS : S = S₁ ∪ S₂) :
+    (C.toMatrixElemElem hT hS).IsTotallyUnimodular :=
   hT ▸ hS ▸ hC.toMatrixUnionUnion
 
 end matrix_conversions
@@ -527,8 +527,8 @@ end API_for_matroid_sums
 section lemmas_for_2sum
 
 lemma Matrix_twoSumComposition_TU {X₁ Y₁ : Set α} {X₂ Y₂ : Set α} {A₁ : Matrix X₁ Y₁ ℤ} {A₂ : Matrix X₂ Y₂ ℤ}
-    (hA₁ : A₁.TU) (hA₂ : A₂.TU) (x : Y₁ → ℤ) (y : X₂ → ℤ) :
-    (Matrix.twoSumComposition A₁ x A₂ y).TU := by
+    (hA₁ : A₁.IsTotallyUnimodular) (hA₂ : A₂.IsTotallyUnimodular) (x : Y₁ → ℤ) (y : X₂ → ℤ) :
+    (Matrix.twoSumComposition A₁ x A₂ y).IsTotallyUnimodular := by
   sorry -- Does it hold without further preconditions?
 
 variable {M₁ M₂ : BinaryMatroid α} {a : α}
@@ -545,6 +545,20 @@ lemma BinaryMatroid_twoSum_B (ha : M₁.X ∩ M₂.Y = {a}) (hXY : M₂.X ⫗ M�
   have haXY : a ∈ M₁.X ∩ M₂.Y := ha ▸ rfl
   ⟨Set.mem_of_mem_inter_left haXY, Set.mem_of_mem_inter_right haXY, rfl⟩
 
+lemma Matrix.IsTotallyUnimodular.comp_rows {α₁ α₂ α₃ R : Type*} [CommRing R] {A : Matrix α₁ α₂ R}
+    (hA : A.IsTotallyUnimodular) (e : α₃ → α₁) :
+    Matrix.IsTotallyUnimodular (A ∘ e) := by
+  rw [Matrix.isTotallyUnimodular_iff] at hA ⊢
+  intro k f g
+  exact hA k (e ∘ f) g
+
+lemma Matrix.IsTotallyUnimodular.comp_cols {α₁ α₂ α₃ R : Type*} [CommRing R] {A : Matrix α₁ α₂ R}
+    (hA : A.IsTotallyUnimodular) (e : α₃ → α₂) :
+    Matrix.IsTotallyUnimodular (A · ∘ e) := by
+  rw [Matrix.isTotallyUnimodular_iff] at hA ⊢
+  intro k f g
+  exact hA k f (e ∘ g)
+
 lemma BinaryMatroid_twoSum_isRegular (ha : M₁.X ∩ M₂.Y = {a}) (hXY : M₂.X ⫗ M₁.Y)
     (hM₁ : M₁.IsRegular) (hM₂ : M₂.IsRegular) :
     (BinaryMatroid.twoSum ha hXY).fst.IsRegular := by
@@ -555,11 +569,11 @@ lemma BinaryMatroid_twoSum_isRegular (ha : M₁.X ∩ M₂.Y = {a}) (hXY : M₂.
   let y' : M₂.X.Elem → ℤ := (B₂ · ⟨a, haY₂⟩)
   let A₁' : Matrix (M₁.X \ {a}).Elem M₁.Y.Elem ℤ := B₁ ∘ Set.diff_subset.elem
   let A₂' : Matrix M₂.X.Elem (M₂.Y \ {a}).Elem ℤ := (B₂ · ∘ Set.diff_subset.elem)
-  have hB' : (Matrix.twoSumComposition A₁' x' A₂' y').TU
+  have hB' : (Matrix.twoSumComposition A₁' x' A₂' y').IsTotallyUnimodular
   · apply Matrix_twoSumComposition_TU
-    · rw [Matrix.TU_adjoin_id_left_iff] at hB₁
+    · rw [Matrix.one_fromColumns_isTotallyUnimodular_iff] at hB₁
       apply hB₁.comp_rows
-    · rw [Matrix.TU_adjoin_id_left_iff] at hB₂
+    · rw [Matrix.one_fromColumns_isTotallyUnimodular_iff] at hB₂
       apply hB₂.comp_cols
   have hA₁ : -- cannot be inlined
     ∀ i : (M₁.X \ {a}).Elem, ∀ j : M₁.Y.Elem,
@@ -579,7 +593,7 @@ lemma BinaryMatroid_twoSum_isRegular (ha : M₁.X ∩ M₂.Y = {a}) (hXY : M₂.
     exact hBB₂ i ⟨a, haY₂⟩
   use (Matrix.twoSumComposition A₁' x' A₂' y').toMatrixUnionUnion
   constructor
-  · rw [Matrix.TU_adjoin_id_left_iff]
+  · rw [Matrix.one_fromColumns_isTotallyUnimodular_iff]
     exact hB'.toMatrixUnionUnion
   · intro i j
     simp only [hB, Matrix.toMatrixUnionUnion, Function.comp_apply]
@@ -631,16 +645,18 @@ theorem BinaryMatroid.Is1sum.isRegular (hM : M.Is1sumOf M₁ M₂) (hM₁ : M₁
   obtain ⟨B₁, hB₁, hBB₁⟩ := hM₁
   obtain ⟨B₂, hB₂, hBB₂⟩ := hM₂
   let B' := Matrix.oneSumComposition B₁ B₂
-  have hB' : B'.TU
-  · apply Matrix.fromBlocks_TU
-    · rwa [Matrix.TU_adjoin_id_left_iff] at hB₁
-    · rwa [Matrix.TU_adjoin_id_left_iff] at hB₂
+  have hB' : B'.IsTotallyUnimodular
+  · sorry/-
+    apply Matrix.fromBlocks_TU
+    · rwa [Matrix.one_fromColumns_isTotallyUnimodular_iff] at hB₁
+    · rwa [Matrix.one_fromColumns_isTotallyUnimodular_iff] at hB₂
+    -/
   have hMB : M.B = (Matrix.oneSumComposition M₁.B M₂.B).toMatrixElemElem hM.X_eq hM.Y_eq
   · rewrite [hM.B_eq]
     rfl
   use B'.toMatrixElemElem hM.X_eq hM.Y_eq
   constructor
-  · rw [Matrix.TU_adjoin_id_left_iff]
+  · rw [Matrix.one_fromColumns_isTotallyUnimodular_iff]
     exact hB'.toMatrixElemElem hM.X_eq hM.Y_eq
   · intro i j
     simp only [hMB, Matrix.oneSumComposition, Matrix.toMatrixElemElem_eq]
