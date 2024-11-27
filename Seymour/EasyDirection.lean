@@ -570,68 +570,127 @@ def Fintype.set_equiv_toFinset_self {S : Set α} (hS : Fintype S.Elem) :
   simp only [Set.mem_toFinset]
   exact Equiv.refl S.Elem
 
-lemma Matrix_from_set_blocks_isTotallyUnimodular {X₁ Y₁ X₂ Y₂ : Set α} [Fintype X₁] [Fintype Y₁] [Fintype X₂] [Fintype Y₂]
+abbrev Matrix.oneSumComposition' {X₁ Y₁ X₂ Y₂ : Finset α}
     [∀ a, Decidable (a ∈ X₁)] [∀ a, Decidable (a ∈ Y₁)] [∀ a, Decidable (a ∈ X₂)] [∀ a, Decidable (a ∈ Y₂)]
-    (hXX : X₁ ⫗ X₂) (hXX : Y₁ ⫗ Y₂)
-    {A₁ : Matrix X₁ Y₁ ℤ} {A₂ : Matrix X₂ Y₂ ℤ} (hA₁ : A₁.IsTotallyUnimodular) (hA₂ : A₂.IsTotallyUnimodular) :
-    (Matrix.oneSumComposition A₁ A₂).IsTotallyUnimodular := by
+    (A₁ : Matrix X₁ Y₁ ℤ) (A₂ : Matrix X₂ Y₂ ℤ) :
+    Matrix (X₁ ∪ X₂ : Finset α) (Y₁ ∪ Y₂ : Finset α) ℤ :=
+  Matrix.of (fun x y =>
+    if hxy : x.val ∈ X₁ ∧ y.val ∈ Y₁ then
+      A₁ ⟨x.val, hxy.left⟩ ⟨y.val, hxy.right⟩
+    else if hxy : x.val ∈ X₂ ∧ y.val ∈ Y₂ then
+      A₂ ⟨x.val, hxy.left⟩ ⟨y.val, hxy.right⟩
+    else
+      0
+    )
 
-  unfold Matrix.oneSumComposition
-  intro k f g hf hg
+lemma Matrix.oneSumComposition'_det_mul {X₁ X₂ : Finset α}
+    [∀ a, Decidable (a ∈ X₁)] [∀ a, Decidable (a ∈ X₂)]
+    (A₁ : Matrix X₁ X₁ ℤ) (A₂ : Matrix X₂ X₂ ℤ) :
+    |(A₁.oneSumComposition' A₂).det| = |A₁.det| * |A₂.det| := by
+  sorry
+
+-- same, but for decomposition
+lemma Matrix.square_blocks_det {X₁ Y₁ X₂ Y₂ : Finset α}
+    (A : Matrix (X₁ ∪ X₂ : Finset α) (Y₁ ∪ Y₂ : Finset α) ℤ)
+    (hX₁Y₁ : X₁.card = Y₁.card) (hX₂Y₂ : X₂.card = Y₂.card)
+    (hAX₁Y₂ : ∀ i, ∀ j, ∀ hi : i ∈ X₁, ∀ hj : j ∈ Y₂, A ⟨i, Finset.mem_union_left X₂ hi⟩ ⟨j, Finset.mem_union_right Y₁ hj⟩ = 0)
+    (hAX₂Y₁ : ∀ i, ∀ j, ∀ hi : i ∈ X₂, ∀ hj : j ∈ Y₁, A ⟨i, Finset.mem_union_right X₁ hi⟩ ⟨j, Finset.mem_union_left Y₂ hj⟩ = 0)
+    (hRedundantX₁ : X₁ ⊆ X₁ ∪ X₂) (hRedundantY₁ : Y₁ ⊆ Y₁ ∪ Y₂) (hRedundantX₂ : X₂ ⊆ X₁ ∪ X₂) (hRedundantY₂ : Y₂ ⊆ Y₁ ∪ Y₂)
+    :
+    let e₁ : X₁ ≃ Y₁ := Finset.equivOfCardEq hX₁Y₁
+    let e₂ : X₂ ≃ Y₂ := Finset.equivOfCardEq hX₂Y₂
+    let e : (X₁ ∪ X₂ : Finset α) ≃ (Y₁ ∪ Y₂ : Finset α) := sorry
+    |(Matrix.reindex e (Equiv.refl _) A).det| =
+    |(Matrix.reindex e₁ (Equiv.refl _) (A.submatrix_subset hRedundantX₁ hRedundantY₁)).det| *
+    |(Matrix.reindex e₂ (Equiv.refl _) (A.submatrix_subset hRedundantX₂ hRedundantY₂)).det|
+  := by sorry
+
+-- lemma
+--   :
+--   A.submatrix_subset_square hM' hN' hM'N' = Matrix.reindex sorry sorry A.submatrix_subset hM' hN'
+--   := by sorry
+
+-- lemma
+--   (Matrix.reindex sorry sorry A₁).oneSumComposition' (Matrix.reindex sorry sorry A₂) =
+--   Matrix.reindex sorry sorry (A₁.oneSumComposition' A₂)
+
+--   A₁ = Matrix.reindex refl refl A₁
+
+lemma oneSumComposition_comm_submatrix_subset_square {X₁ Y₁ X₂ Y₂ X' Y' : Finset α}
+    (hXX : X₁ ⫗ X₂) (hXX : Y₁ ⫗ Y₂)
+    (A₁ : Matrix X₁ Y₁ ℤ) (A₂ : Matrix X₂ Y₂ ℤ)
+    (hX' : X' ⊆ X₁ ∪ X₂) (hY' : Y' ⊆ Y₁ ∪ Y₂) (hCard : X'.card = Y'.card) :
+    ∃ eX : (X' ∩ X₁ ∪ X' ∩ X₂ : Finset α) ≃ X',
+    ∃ eY : (Y' ∩ Y₁ ∪ Y' ∩ Y₂ : Finset α) ≃ Y',
+    (A₁.oneSumComposition' A₂).submatrix_subset_square hX' hY' hCard =
+    Matrix.reindex (eX.trans (Finset.equivOfCardEq hCard)) eY
+      (Matrix.oneSumComposition'
+        (A₁.submatrix_subset Finset.inter_subset_right Finset.inter_subset_right)
+        (A₂.submatrix_subset Finset.inter_subset_right Finset.inter_subset_right)
+    )
+    := by
+  use Finset.equivOfCardEq (congrArg Finset.card (by
+    ext a
+    aesop -- TODO refactor
+    exact Finset.mem_union.mp (hX' a_1)))
+  use Finset.equivOfCardEq (congrArg Finset.card (by
+    ext a
+    aesop -- TODO refactor
+    exact Finset.mem_union.mp (hY' a_1)))
+  sorry
+
+/- A submatrix of a 1-sum is a 1-sum of the corresponding submatrices -/
+lemma oneSumComposition_comm_submatrix_subset_square2 {X₁ Y₁ X₂ Y₂ X' Y' : Finset α}
+    (hXX : X₁ ⫗ X₂) (hYY : Y₁ ⫗ Y₂)
+    (A₁ : Matrix X₁ Y₁ ℤ) (A₂ : Matrix X₂ Y₂ ℤ)
+    (hX' : X' ⊆ X₁ ∪ X₂) (hY' : Y' ⊆ Y₁ ∪ Y₂)
+    (hCard₁ : (X₁ ∩ X').card = (Y₁ ∩ Y').card) (hCard₂ : (X₂ ∩ X').card = (Y₂ ∩ Y').card)
+    (hCardRedundant : X'.card = Y'.card) :
+    (A₁.oneSumComposition' A₂).submatrix_subset_square hX' hY' hCardRedundant =
+      Matrix.reindex sorry sorry
+      ((A₁.submatrix_subset_square Finset.inter_subset_left Finset.inter_subset_left hCard₁).oneSumComposition'
+      (A₂.submatrix_subset_square Finset.inter_subset_left Finset.inter_subset_left hCard₂))
+    := by
+  sorry
+
+
+/- A block-diagonal matrix consisting of TU blocks is TU -/
+lemma Matrix_from_set_blocks_isTotallyUnimodular {X₁ Y₁ X₂ Y₂ : Finset α}
+    (hXX : X₁ ⫗ X₂) (hYY : Y₁ ⫗ Y₂)
+    {A₁ : Matrix X₁ Y₁ ℤ} {A₂ : Matrix X₂ Y₂ ℤ} (hA₁ : A₁.IsTotallyUnimodular) (hA₂ : A₂.IsTotallyUnimodular) :
+    (A₁.oneSumComposition' A₂).IsTotallyUnimodular := by
+  -- apply TUness criterion in terms of subsets
+  rw [Matrix.isTotallyUnimodular_iff_subset]
+  intro X' Y' hX' hY' hX'Y'
 
   -- look at index sets for rows and cols of submatrix
-  let X₁' := (Subtype.val '' Set.range f) ∩ X₁
-  let X₂' := (Subtype.val '' Set.range f) ∩ X₂
-  let Y₁' := (Subtype.val '' Set.range g) ∩ Y₁
-  let Y₂' := (Subtype.val '' Set.range g) ∩ Y₂
+  let X₁' := X₁ ∩ X'
+  let X₂' := X₂ ∩ X'
+  let Y₁' := Y₁ ∩ Y'
+  let Y₂' := Y₂ ∩ Y'
+  have hX₁' : X₁' ⊆ X₁ := Finset.inter_subset_left
+  have hX₂' : X₂' ⊆ X₂ := Finset.inter_subset_left
+  have hY₁' : Y₁' ⊆ Y₁ := Finset.inter_subset_left
+  have hY₂' : Y₂' ⊆ Y₂ := Finset.inter_subset_left
 
-  -- show that they are finite
-  have hf' : Set.Finite (Subtype.val '' Set.range f) := Set.Finite.image Subtype.val (Set.finite_range f)
-  have hfX₁ : Set.Finite X₁' := Set.Finite.inter_of_left hf' X₁
-  have hfX₂ : Set.Finite X₂' := Set.Finite.inter_of_left hf' X₂
-  have hg' : Set.Finite (Subtype.val '' Set.range g) := Set.Finite.image Subtype.val (Set.finite_range g)
-  have hgY₁ : Set.Finite Y₁' := Set.Finite.inter_of_left hg' Y₁
-  have hgY₂ : Set.Finite Y₂' := Set.Finite.inter_of_left hg' Y₂
+  -- -- submatrix of block matrix is a block matrix of submatrices
+  -- obtain ⟨hhX, hhY, hrewr⟩ := oneSumComposition_comm_submatrix_subset_square hXX hYY A₁ A₂ hX' hY' hX'Y'
+  -- rw [hrewr]
 
-  if hfg : X₁'.toFinset.card = Y₁'.toFinset.card ∧ X₂'.toFinset.card = Y₂'.toFinset.card
+  if hfg : X₁'.card = Y₁'.card ∧ X₂'.card = Y₂'.card
   then -- square case
+    -- invoke TUness of `A₁` and `A₂`
+    have hA₁' := hA₁.apply_submatrix_subset hX₁' hY₁' hfg.1
+    have hA₂' := hA₂.apply_submatrix_subset hX₂' hY₂' hfg.2
 
-    -- witness of fintypeness (for stability)
-    have fntpX₁' : Fintype X₁'.Elem := Set.fintypeInterOfLeft _ X₁
-    have fntpX₂' : Fintype X₂'.Elem := Set.fintypeInterOfLeft _ X₂
-    have fntpY₁' : Fintype Y₁'.Elem := Set.fintypeInterOfLeft _ Y₁
-    have fntpY₂' : Fintype Y₂'.Elem := Set.fintypeInterOfLeft _ Y₂
-    -- -- outdated witness for all of the above (in case something breaks):
-    -- classical
-    -- apply Set.fintypeInterOfRight
+    -- our submatrix consists of these two blocks
+    have hCardRedundant : (X₁' ∪ X₂').card = (Y₁' ∪ Y₂').card := by sorry
+    have := oneSumComposition_comm_submatrix_subset_square2 hXX hYY A₁ A₂ hX₁' hY₁' hX₂' hY₂' hfg.1 hfg.2 hCardRedundant
+    rw []
 
-    -- construct equivalences with the canonical type on given number of elements
-    let eX₁' : X₁'.Elem ≃ Fin X₁'.toFinset.card := fntpX₁'.set_equiv_toFinset_self.trans X₁'.toFinset.equivFin
-    let eX₂' : X₂'.Elem ≃ Fin X₂'.toFinset.card := fntpX₂'.set_equiv_toFinset_self.trans X₂'.toFinset.equivFin
-    -- by transitivity `X₁'.Elem ≃ Y₁'.Elem` and `X₂'.Elem ≃ Y₂'.Elem`
-    let eY₁' : Y₁'.Elem ≃ Fin X₁'.toFinset.card := (fntpY₁'.set_equiv_toFinset_self.trans Y₁'.toFinset.equivFin).trans (by
-      have := hfg.1
-      simp_all only [Set.toFinset_inter, X₁', Y₁']
-      rfl)
-    let eY₂' : Y₂'.Elem ≃ Fin X₂'.toFinset.card := (fntpY₂'.set_equiv_toFinset_self.trans Y₂'.toFinset.equivFin).trans (by
-      have := hfg.2
-      simp_all only [Set.toFinset_inter, X₂', Y₂']
-      rfl)
 
-    -- invoke TUness of `A₁`
-    rw [Matrix.isTotallyUnimodular_iff] at hA₁
-    specialize hA₁ X₁'.toFinset.card
-      ((fun x => ⟨x.val, Set.mem_of_mem_inter_right x.property⟩) ∘ eX₁'.symm) -- instead of `f`
-      ((fun y => ⟨y.val, Set.mem_of_mem_inter_right y.property⟩) ∘ eY₁'.symm) -- instead of `g`
-
-    -- invoke TUness of `A₂`
-    rw [Matrix.isTotallyUnimodular_iff] at hA₂
-    specialize hA₂ X₂'.toFinset.card
-      ((fun x => ⟨x.val, Set.mem_of_mem_inter_right x.property⟩) ∘ eX₂'.symm) -- instead of `f`
-      ((fun y => ⟨y.val, Set.mem_of_mem_inter_right y.property⟩) ∘ eY₂'.symm) -- instead of `g`
-
-    -- map these to blocks of our submatrix
     -- since top right and bottom left blocks are 0, overall det is a product of dets, hence also ±1 or 0
+    --
 
     sorry
 

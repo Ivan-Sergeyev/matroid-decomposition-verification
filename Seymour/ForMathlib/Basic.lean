@@ -24,6 +24,21 @@ lemma Function.eq_comp_myEquiv {α β₁ β₂ : Type*} (f : α → β₁ ⊕ β
     f = Sum.elim (Sum.inl ∘ (·.val.snd)) (Sum.inr ∘ (·.val.snd)) ∘ myEquiv f := by
   aesop
 
+-- @[simp]
+-- def Function.myEquiv' {α β : Type*} (B₁ B₂ : Set β) (f : α → (B₁ ∪ B₂).Elem) :
+--     α ≃ { x₁ : α × B₁ // f x₁.fst = x₁.snd.val } ⊕ { x₂ : α × B₂ // f x₂.fst = x₂.snd.val } where
+--   toFun a := sorry
+--   invFun x :=
+--     x.casesOn (·.val.fst) (·.val.fst)
+--   left_inv a := by
+--     sorry
+--   right_inv x := by
+--     sorry
+
+-- lemma Function.eq_comp_myEquiv' {α β : Type*} (B₁ B₂ : Set β) (f : α → (B₁ ∪ B₂).Elem) :
+--     f = (by sorry) ∘ myEquiv' f := by
+--   aesop
+
 
 variable {R : Type*}
 

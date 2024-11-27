@@ -81,6 +81,33 @@ lemma IsTotallyUnimodular.apply_finset [DecidableEq m] [DecidableEq n]
   rw [isTotallyUnimodular_iff_fintype] at hA
   exact hA M Subtype.val (Subtype.val ∘ Finset.equivOfCardEq hMN)
 
+abbrev _root_.HasSubset.Subset.elem' {X Y : Finset m} (hXY : X ⊆ Y) (x : X) : Y :=
+  ⟨x.val, hXY x.property⟩
+
+abbrev submatrix_subset {X X' : Finset m} {Y Y' : Finset n}
+    (A : Matrix X Y R) (hX : X' ⊆ X) (hY : Y' ⊆ Y) :
+    (Matrix X' Y' R) :=
+  A.submatrix hX.elem' hY.elem'
+
+noncomputable abbrev submatrix_subset_square {X X' : Finset m} {Y Y' : Finset n}
+    (A : Matrix X Y R) (hX' : X' ⊆ X) (hY' : Y' ⊆ Y) (hX'Y' : X'.card = Y'.card) :
+    (Matrix Y' Y' R) :=
+  Matrix.reindex (Finset.equivOfCardEq hX'Y') (Equiv.refl _) (A.submatrix_subset hX' hY')
+
+lemma IsTotallyUnimodular.apply_submatrix_subset [DecidableEq m] [DecidableEq n]
+    {M M' : Finset m} {N N' : Finset n} {A : Matrix M N R} (hA : A.IsTotallyUnimodular)
+    (hM' : M' ⊆ M) (hN' : N' ⊆ N) (hM'N' : M'.card = N'.card) :
+    (A.submatrix_subset_square hM' hN' hM'N').det ∈ Set.range SignType.cast := by
+  rw [isTotallyUnimodular_iff_fintype] at hA
+  exact hA { x // x ∈ N' } (fun i => hM'.elem' ((Finset.equivOfCardEq hM'N').symm i)) fun j =>
+    hN'.elem' ((Equiv.refl { x // x ∈ N' }).symm j) --todo: golf
+
+lemma isTotallyUnimodular_iff_subset [DecidableEq m] [DecidableEq n]
+    {M : Finset m} {N : Finset n} (A : Matrix M N R) : A.IsTotallyUnimodular ↔
+    ∀ M' : Finset m, ∀ N' : Finset n, ∀ (hM' : M' ⊆ M), ∀ (hN' : N' ⊆ N), ∀ (hM'N' : M'.card = N'.card),
+    (A.submatrix_subset_square hM' hN' hM'N').det ∈ Set.range SignType.cast := by
+  sorry
+
 lemma IsTotallyUnimodular.apply {A : Matrix m n R} (hA : A.IsTotallyUnimodular) (i : m) (j : n) :
     A i j ∈ Set.range SignType.cast := by
   rw [isTotallyUnimodular_iff] at hA
