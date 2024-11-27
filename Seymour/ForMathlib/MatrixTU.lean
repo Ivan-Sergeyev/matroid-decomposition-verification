@@ -50,17 +50,18 @@ lemma isTotallyUnimodular_iff (A : Matrix m n R) : A.IsTotallyUnimodular ↔
   · intro _ _ _ _ _
     apply hA
 
-lemma IsTotallyUnimodular.apply_finset {R : Type*} [LinearOrderedCommRing R] [DecidableEq m] [DecidableEq n]
-    {A : Matrix m n R} (hA : A.IsTotallyUnimodular) {M : Finset m} {N : Finset n} (hMN : M.card = N.card) :
-    (A.submatrix Subtype.val (Subtype.val ∘ Finset.equivOfCardEq hMN) : Matrix M M R).det ∈ Set.range SignType.cast := by
-  rw [isTotallyUnimodular_iff] at hA
-  let eM : Fin M.card ≃ M := M.equivFin.symm
-  specialize hA M.card (Subtype.val ∘ eM) (Subtype.val ∘ eM.trans (Finset.equivOfCardEq hMN))
-  rw [in_set_range_signType_cast_iff_abs_self] at hA ⊢
-  show |(A.submatrix (Subtype.val ∘ Equiv.refl _) (Subtype.val ∘ ⇑(Finset.equivOfCardEq hMN))).det| ∈ Set.range SignType.cast
-  rw [← Matrix.submatrix_submatrix] at hA ⊢
-  -- rewrite with `Matrix.submatrix_det_abs`
-  sorry
+lemma isTotallyUnimodular_iff_fintype_injective.{w} (A : Matrix m n R) : A.IsTotallyUnimodular ↔
+    ∀ (ι : Type w) [Fintype ι] [DecidableEq ι], ∀ f : ι → m, ∀ g : ι → n, f.Injective → g.Injective →
+      (A.submatrix f g).det ∈ Set.range SignType.cast := by
+  constructor
+  · intro hA ι _ _ f g hf hg
+    specialize hA (Fintype.card ι) (f ∘ (Fintype.equivFin ι).symm) (g ∘ (Fintype.equivFin ι).symm)
+      (by rwa [Equiv.injective_comp]) (by rwa [Equiv.injective_comp])
+    rwa [←submatrix_submatrix, det_submatrix_equiv_self] at hA
+  · intro hA k f g hf hg
+    specialize hA (ULift (Fin k)) (f ∘ Equiv.ulift) (g ∘ Equiv.ulift)
+      (by rwa [Equiv.injective_comp]) (by rwa [Equiv.injective_comp])
+    rwa [←submatrix_submatrix, det_submatrix_equiv_self] at hA
 
 lemma isTotallyUnimodular_iff_fintype.{w} (A : Matrix m n R) : A.IsTotallyUnimodular ↔
     ∀ (ι : Type w) [Fintype ι] [DecidableEq ι], ∀ f : ι → m, ∀ g : ι → n,
@@ -73,6 +74,12 @@ lemma isTotallyUnimodular_iff_fintype.{w} (A : Matrix m n R) : A.IsTotallyUnimod
   · intro hA k f g
     specialize hA (ULift (Fin k)) (f ∘ Equiv.ulift) (g ∘ Equiv.ulift)
     rwa [←submatrix_submatrix, det_submatrix_equiv_self] at hA
+
+lemma IsTotallyUnimodular.apply_finset [DecidableEq m] [DecidableEq n]
+    {A : Matrix m n R} (hA : A.IsTotallyUnimodular) {M : Finset m} {N : Finset n} (hMN : M.card = N.card) :
+    (A.submatrix Subtype.val (Subtype.val ∘ Finset.equivOfCardEq hMN) : Matrix M M R).det ∈ Set.range SignType.cast := by
+  rw [isTotallyUnimodular_iff_fintype] at hA
+  exact hA M Subtype.val (Subtype.val ∘ Finset.equivOfCardEq hMN)
 
 lemma IsTotallyUnimodular.apply {A : Matrix m n R} (hA : A.IsTotallyUnimodular) (i : m) (j : n) :
     A i j ∈ Set.range SignType.cast := by

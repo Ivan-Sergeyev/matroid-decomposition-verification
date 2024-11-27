@@ -27,7 +27,7 @@ lemma Function.eq_comp_myEquiv {α β₁ β₂ : Type*} (f : α → β₁ ⊕ β
 
 variable {R : Type*}
 
-lemma in_set_range_signType_cast_iff_abs_self [LinearOrderedRing R] (r : R) :
+lemma in_set_range_sign_iff_abs [LinearOrderedRing R] (r : R) :
     r ∈ Set.range SignType.cast ↔ |r| ∈ Set.range SignType.cast := by
   sorry
 
