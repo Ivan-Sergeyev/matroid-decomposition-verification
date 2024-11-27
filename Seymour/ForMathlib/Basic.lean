@@ -20,24 +20,51 @@ def Function.myEquiv {α β₁ β₂ : Type*} (f : α → β₁ ⊕ β₂) :
     | inl => aesop
     | inr => aesop
 
-lemma Function.eq_comp_myEquiv {α β₁ β₂ : Type*} (f : α → β₁ ⊕ β₂) :
+lemma Function.eq_comp_myEquiv {α β₁ β₂ : Type} (f : α → β₁ ⊕ β₂) :
     f = Sum.elim (Sum.inl ∘ (·.val.snd)) (Sum.inr ∘ (·.val.snd)) ∘ myEquiv f := by
   aesop
 
--- @[simp]
--- def Function.myEquiv' {α β : Type*} (B₁ B₂ : Set β) (f : α → (B₁ ∪ B₂).Elem) :
---     α ≃ { x₁ : α × B₁ // f x₁.fst = x₁.snd.val } ⊕ { x₂ : α × B₂ // f x₂.fst = x₂.snd.val } where
---   toFun a := sorry
---   invFun x :=
---     x.casesOn (·.val.fst) (·.val.fst)
---   left_inv a := by
---     sorry
---   right_inv x := by
---     sorry
-
--- lemma Function.eq_comp_myEquiv' {α β : Type*} (B₁ B₂ : Set β) (f : α → (B₁ ∪ B₂).Elem) :
---     f = (by sorry) ∘ myEquiv' f := by
---   aesop
+@[simp]
+abbrev myEquiv' {α : Type*} [DecidableEq α] (A B₁ B₂ : Finset α) (hB : Disjoint B₁ B₂) (hA : A ⊆ (B₁ ∪ B₂ : Finset α)) :
+    A ≃ ((A ∩ B₁) ∪ (A ∩ B₂) : Finset α) where
+  toFun a := by
+    if ha₁ : a.val ∈ B₁ then
+      use a.val
+      rw [Finset.mem_union]
+      left
+      rw [Finset.mem_inter]
+      constructor
+      · exact a.property
+      · exact ha₁
+    else if ha₂ : a.val ∈ B₂ then
+      use a.val
+      rw [Finset.mem_union]
+      right
+      rw [Finset.mem_inter]
+      constructor
+      · exact a.property
+      · exact ha₂
+    else
+      exfalso
+      specialize hA a.property
+      rw [Finset.mem_union] at hA
+      tauto
+  invFun x := by
+    obtain ⟨a, ha⟩ := x
+    rw [Finset.mem_union] at ha
+    if ha₁ : a ∈ A ∩ B₁ then
+      use a
+      exact Finset.mem_of_mem_filter a ha₁
+    else if ha₂ : a ∈ A ∩ B₂ then
+      use a
+      exact Finset.mem_of_mem_filter a ha₂
+    else
+      exfalso
+      tauto
+  left_inv a := by
+    sorry
+  right_inv x := by
+    sorry
 
 
 variable {R : Type*}

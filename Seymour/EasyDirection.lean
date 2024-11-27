@@ -583,6 +583,18 @@ abbrev Matrix.oneSumComposition' {X₁ Y₁ X₂ Y₂ : Finset α}
       0
     )
 
+def Subtype.finsetToSum {X Y : Finset α} (i : (X ∪ Y : Finset α)) : X ⊕ Y :=
+  if hiX : i.val ∈ X then Sum.inl ⟨i, hiX⟩ else
+  if hiY : i.val ∈ Y then Sum.inr ⟨i, hiY⟩ else
+  sorry -- (i.property.elim hiX hiY).elim
+
+lemma IsTotallyUnimodular_union_iff_sumtype {X₁ Y₁ X₂ Y₂ : Finset α}
+  [∀ a, Decidable (a ∈ X₁)] [∀ a, Decidable (a ∈ Y₁)] [∀ a, Decidable (a ∈ X₂)] [∀ a, Decidable (a ∈ Y₂)]
+  (A : Matrix (X₁ ∪ X₂ : Finset α) (Y₁ ∪ Y₂ : Finset α) ℤ)
+  (B : Matrix (X₁ ⊕ X₂) (Y₁ ⊕ Y₂) ℤ)
+  (hAB : ∀ i : (X₁ ∪ X₂ : Finset α), ∀ j : (Y₁ ∪ Y₂ : Finset α), A i j = B i.finsetToSum j.finsetToSum) :
+  A.IsTotallyUnimodular ↔ B.IsTotallyUnimodular := by sorry
+
 lemma Matrix.oneSumComposition'_det_mul {X₁ X₂ : Finset α}
     [∀ a, Decidable (a ∈ X₁)] [∀ a, Decidable (a ∈ X₂)]
     (A₁ : Matrix X₁ X₁ ℤ) (A₂ : Matrix X₂ X₂ ℤ) :
@@ -653,6 +665,27 @@ lemma oneSumComposition_comm_submatrix_subset_square2 {X₁ Y₁ X₂ Y₂ X' Y'
     := by
   sorry
 
+lemma oneSumComposition_comm_submatrix_subset_square3 {X₁ Y₁ X₂ Y₂ X' Y' : Finset α}
+    (hXX : X₁ ⫗ X₂) (hXX : Y₁ ⫗ Y₂)
+    (A₁ : Matrix X₁ Y₁ ℤ) (A₂ : Matrix X₂ Y₂ ℤ)
+    (hX' : X' ⊆ X₁ ∪ X₂) (hY' : Y' ⊆ Y₁ ∪ Y₂) (hCard : X'.card = Y'.card) :
+    ∃ eX : (X' ∩ X₁ ∪ X' ∩ X₂ : Finset α) = X',
+    ∃ eY : (Y' ∩ Y₁ ∪ Y' ∩ Y₂ : Finset α) ≃ X',
+    (A₁.oneSumComposition' A₂).submatrix_subset_square hX' hY' hCard =
+    Matrix.oneSumComposition'
+      (A₁.submatrix_subset (show X' ∩ X₁ ⊆ X₁ from Finset.inter_subset_right) (show Y' ∩ Y₁ ⊆ Y₁ from Finset.inter_subset_right))
+      (A₂.submatrix_subset (show X' ∩ X₂ ⊆ X₂ from Finset.inter_subset_right) (show Y' ∩ Y₂ ⊆ Y₂ from Finset.inter_subset_right))
+    := by
+  use (by
+    ext a
+    aesop -- TODO refactor
+    exact Finset.mem_union.mp (hX' a_1))
+  use (by
+    ext a
+    aesop -- TODO refactor
+    exact Finset.mem_union.mp (hY' a_1))
+  sorry
+
 
 /- A block-diagonal matrix consisting of TU blocks is TU -/
 lemma Matrix_from_set_blocks_isTotallyUnimodular {X₁ Y₁ X₂ Y₂ : Finset α}
@@ -674,6 +707,8 @@ lemma Matrix_from_set_blocks_isTotallyUnimodular {X₁ Y₁ X₂ Y₂ : Finset �
   have hY₂' : Y₂' ⊆ Y₂ := Finset.inter_subset_left
 
   -- -- submatrix of block matrix is a block matrix of submatrices
+  obtain ⟨a, b, c⟩ := oneSumComposition_comm_submatrix_subset_square3
+  rw [oneSumComposition_comm_submatrix_subset]
   -- obtain ⟨hhX, hhY, hrewr⟩ := oneSumComposition_comm_submatrix_subset_square hXX hYY A₁ A₂ hX' hY' hX'Y'
   -- rw [hrewr]
 
