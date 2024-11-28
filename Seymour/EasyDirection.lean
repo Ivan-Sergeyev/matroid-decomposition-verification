@@ -497,7 +497,7 @@ lemma BinaryMatroid.Is3sumOf.indep (hM : M.Is3sumOf M₁ M₂) :
     hyyy₂ (Set.mem_insert y₁ {y₂, y₃}),
     rfl⟩
 
-lemma BinaryMatroid.Is3sumOf.invertibilityDbar (hM : M.Is3sumOf M₁ M₂) :
+lemma BinaryMatroid.Is3sumOf.invertibilityD_₁ (hM : M.Is3sumOf M₁ M₂) :
     ∃ x₂ x₃ y₁ y₂ : α, ∃ x₂inX₁ : x₂ ∈ M₁.X, ∃ x₃inX₁ : x₃ ∈ M₁.X, ∃ y₂inY₁ : y₂ ∈ M₁.Y, ∃ y₁inY₁ : y₁ ∈ M₁.Y,
       IsUnit (Matrix.of (fun i j => M₁.B (![⟨x₂, x₂inX₁⟩, ⟨x₃, x₃inX₁⟩] i) (![⟨y₂, y₂inY₁⟩, ⟨y₁, y₁inY₁⟩] j))) := by
   obtain ⟨x₁, x₂, x₃, y₁, y₂, y₃, hXX, hYY, _, _, rfl, valid⟩ := hM
@@ -506,8 +506,19 @@ lemma BinaryMatroid.Is3sumOf.invertibilityDbar (hM : M.Is3sumOf M₁ M₂) :
   use hxxx₁ (Set.insert_comm x₁ x₂ {x₃} ▸ Set.mem_insert x₂ {x₁, x₃}), hxxx₁ (by simp)
   have hyyy₁ : {y₁, y₂, y₃} ⊆ M₁.Y := hYY.symm.subset.trans Set.inter_subset_left
   use hyyy₁ (Set.insert_comm y₁ y₂ {y₃} ▸ Set.mem_insert y₂ {y₁, y₃}), hyyy₁ (Set.mem_insert y₁ {y₂, y₃})
-  unfold BinaryMatroid_3sum at valid
-  aesop
+  exact valid.left
+
+lemma BinaryMatroid.Is3sumOf.invertibilityD_₂ (hM : M.Is3sumOf M₁ M₂) :
+    ∃ x₂ x₃ y₁ y₂ : α, ∃ x₂inX₂ : x₂ ∈ M₂.X, ∃ x₃inX₂ : x₃ ∈ M₂.X, ∃ y₂inY₂ : y₂ ∈ M₂.Y, ∃ y₁inY₂ : y₁ ∈ M₂.Y,
+      IsUnit (Matrix.of (fun i j => M₂.B (![⟨x₂, x₂inX₂⟩, ⟨x₃, x₃inX₂⟩] i) (![⟨y₂, y₂inY₂⟩, ⟨y₁, y₁inY₂⟩] j))) := by
+  obtain ⟨x₁, x₂, x₃, y₁, y₂, y₃, hXX, hYY, _, _, rfl, valid⟩ := hM
+  use x₂, x₃, y₁, y₂
+  have hxxx₁ : {x₁, x₂, x₃} ⊆ M₂.X := hXX.symm.subset.trans Set.inter_subset_right
+  use hxxx₁ (Set.insert_comm x₁ x₂ {x₃} ▸ Set.mem_insert x₂ {x₁, x₃}), hxxx₁ (by simp)
+  have hyyy₁ : {y₁, y₂, y₃} ⊆ M₂.Y := hYY.symm.subset.trans Set.inter_subset_right
+  use hyyy₁ (Set.insert_comm y₁ y₂ {y₃} ▸ Set.mem_insert y₂ {y₁, y₃}), hyyy₁ (Set.mem_insert y₁ {y₂, y₃})
+  rw [←valid.right.left]
+  exact valid.left
 
 /- TODO missing API for all of the following parts of the 3-sum definition:
 M₁.B ⟨x₁, x₁inX₁⟩ ⟨y₁, y₁inY₁⟩ = 1
