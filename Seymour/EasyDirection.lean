@@ -231,7 +231,7 @@ def BinaryMatroid_2sum {a : α} (ha : M₁.X ∩ M₂.Y = {a}) (hXY : M₂.X ⫗
   ⟩
 
 /-- BinaryMatroid-level 3-sum of two matroids.
-The second part check legitimacy: some very specific conditions about the standard representation matrices. -/
+The second part check legitimacy (TODO document very specific conditions about the standard representation matrices). -/
 noncomputable def BinaryMatroid_3sum {x₁ x₂ x₃ y₁ y₂ y₃ : α}
     (hXX : M₁.X ∩ M₂.X = {x₁, x₂, x₃}) (hYY : M₁.Y ∩ M₂.Y = {y₁, y₂, y₃}) (hXY : M₁.X ⫗ M₂.Y) (hYX : M₁.Y ⫗ M₂.X) :
     BinaryMatroid α × Prop :=
@@ -253,23 +253,25 @@ noncomputable def BinaryMatroid_3sum {x₁ x₂ x₃ y₁ y₂ y₃ : α}
   have y₁inY₂ : y₁ ∈ M₂.Y := hyyy₂ (Set.mem_insert y₁ {y₂, y₃})
   -- The actual definition starts here:
   let A₁ : Matrix (M₁.X \ {x₁, x₂, x₃}).Elem ((M₁.Y \ {y₁, y₂, y₃}).Elem ⊕ Fin 2) Z2 := -- the top left submatrix
-    (fun i j => M₁.B ⟨i.val, Set.mem_of_mem_diff i.property⟩
+    Matrix.of (fun i j => M₁.B
+        ⟨i.val, Set.mem_of_mem_diff i.property⟩
         (j.casesOn (fun j' => ⟨j'.val, Set.mem_of_mem_diff j'.property⟩) ![⟨y₂, y₂inY₁⟩, ⟨y₁, y₁inY₁⟩]))
   let A₂ : Matrix (Fin 2 ⊕ (M₂.X \ {x₁, x₂, x₃}).Elem) (M₂.Y \ {y₁, y₂, y₃}).Elem Z2 := -- the bottom right submatrix
-    (fun i j => M₂.B (i.casesOn ![⟨x₂, x₂inX₂⟩, ⟨x₃, x₃inX₂⟩] (fun i' => ⟨i'.val, Set.mem_of_mem_diff i'.property⟩))
+    Matrix.of (fun i j => M₂.B
+        (i.casesOn ![⟨x₂, x₂inX₂⟩, ⟨x₃, x₃inX₂⟩] (fun i' => ⟨i'.val, Set.mem_of_mem_diff i'.property⟩))
         ⟨j.val, Set.mem_of_mem_diff j.property⟩)
   let z₁ : (M₁.Y \ {y₁, y₂, y₃}).Elem → Z2 := -- the middle left "row vector"
     (fun j => M₁.B ⟨x₁, x₁inX₁⟩ ⟨j.val, Set.mem_of_mem_diff j.property⟩)
   let z₂ : (M₂.X \ {x₁, x₂, x₃}).Elem → Z2 := -- the bottom middle "column vector"
     (fun i => M₂.B ⟨i.val, Set.mem_of_mem_diff i.property⟩ ⟨y₃, y₃inY₂⟩)
   let D_₁ : Matrix (Fin 2) (Fin 2) Z2 := -- the bottom middle 2x2 submatrix
-    (fun i j => M₁.B (![⟨x₂, x₂inX₁⟩, ⟨x₃, x₃inX₁⟩] i) (![⟨y₂, y₂inY₁⟩, ⟨y₁, y₁inY₁⟩] j))
+    Matrix.of (fun i j => M₁.B (![⟨x₂, x₂inX₁⟩, ⟨x₃, x₃inX₁⟩] i) (![⟨y₂, y₂inY₁⟩, ⟨y₁, y₁inY₁⟩] j))
   let D_₂ : Matrix (Fin 2) (Fin 2) Z2 := -- the middle left 2x2 submatrix
-    (fun i j => M₂.B (![⟨x₂, x₂inX₂⟩, ⟨x₃, x₃inX₂⟩] i) (![⟨y₂, y₂inY₂⟩, ⟨y₁, y₁inY₂⟩] j))
+    Matrix.of (fun i j => M₂.B (![⟨x₂, x₂inX₂⟩, ⟨x₃, x₃inX₂⟩] i) (![⟨y₂, y₂inY₂⟩, ⟨y₁, y₁inY₂⟩] j))
   let D₁ : Matrix (Fin 2) (M₁.Y \ {y₁, y₂, y₃}).Elem Z2 := -- the bottom left submatrix
-    (fun i j => M₁.B (![⟨x₂, x₂inX₁⟩, ⟨x₃, x₃inX₁⟩] i) ⟨j.val, Set.mem_of_mem_diff j.property⟩)
+    Matrix.of (fun i j => M₁.B (![⟨x₂, x₂inX₁⟩, ⟨x₃, x₃inX₁⟩] i) ⟨j.val, Set.mem_of_mem_diff j.property⟩)
   let D₂ : Matrix (M₂.X \ {x₁, x₂, x₃}).Elem (Fin 2) Z2 := -- the bottom left submatrix
-    (fun i j => M₂.B ⟨i.val, Set.mem_of_mem_diff i.property⟩ (![⟨y₂, y₂inY₂⟩, ⟨y₁, y₁inY₂⟩] j))
+    Matrix.of (fun i j => M₂.B ⟨i.val, Set.mem_of_mem_diff i.property⟩ (![⟨y₂, y₂inY₂⟩, ⟨y₁, y₁inY₂⟩] j))
   ⟨
     ⟨
       (M₁.X \ {x₁, x₂, x₃}) ∪ M₂.X,
@@ -444,21 +446,23 @@ lemma BinaryMatroid.Is3sumOf.indep (hM : M.Is3sumOf M₁ M₂) :
     ∃ y₁inY₁ : y₁ ∈ M₁.Y,
     ∃ y₁inY₂ : y₁ ∈ M₂.Y,
       let A₁ : Matrix (M₁.X \ {x₁, x₂, x₃}).Elem ((M₁.Y \ {y₁, y₂, y₃}).Elem ⊕ Fin 2) Z2 := -- the top left submatrix
-        (fun i j => M₁.B ⟨i.val, Set.mem_of_mem_diff i.property⟩
+        Matrix.of (fun i j => M₁.B
+            ⟨i.val, Set.mem_of_mem_diff i.property⟩
             (j.casesOn (fun j' => ⟨j'.val, Set.mem_of_mem_diff j'.property⟩) ![⟨y₂, y₂inY₁⟩, ⟨y₁, y₁inY₁⟩]))
       let A₂ : Matrix (Fin 2 ⊕ (M₂.X \ {x₁, x₂, x₃}).Elem) (M₂.Y \ {y₁, y₂, y₃}).Elem Z2 := -- the bottom right submatrix
-        (fun i j => M₂.B (i.casesOn ![⟨x₂, x₂inX₂⟩, ⟨x₃, x₃inX₂⟩] (fun i' => ⟨i'.val, Set.mem_of_mem_diff i'.property⟩))
+        Matrix.of (fun i j => M₂.B
+            (i.casesOn ![⟨x₂, x₂inX₂⟩, ⟨x₃, x₃inX₂⟩] (fun i' => ⟨i'.val, Set.mem_of_mem_diff i'.property⟩))
             ⟨j.val, Set.mem_of_mem_diff j.property⟩)
       let z₁ : (M₁.Y \ {y₁, y₂, y₃}).Elem → Z2 := -- the middle left "row vector"
         (fun j => M₁.B ⟨x₁, x₁inX₁⟩ ⟨j.val, Set.mem_of_mem_diff j.property⟩)
       let z₂ : (M₂.X \ {x₁, x₂, x₃}).Elem → Z2 := -- the bottom middle "column vector"
         (fun i => M₂.B ⟨i.val, Set.mem_of_mem_diff i.property⟩ ⟨y₃, y₃inY₂⟩)
       let D_₁ : Matrix (Fin 2) (Fin 2) Z2 := -- the bottom middle 2x2 submatrix
-        (fun i j => M₁.B (![⟨x₂, x₂inX₁⟩, ⟨x₃, x₃inX₁⟩] i) (![⟨y₂, y₂inY₁⟩, ⟨y₁, y₁inY₁⟩] j))
+        Matrix.of (fun i j => M₁.B (![⟨x₂, x₂inX₁⟩, ⟨x₃, x₃inX₁⟩] i) (![⟨y₂, y₂inY₁⟩, ⟨y₁, y₁inY₁⟩] j))
       let D₁ : Matrix (Fin 2) (M₁.Y \ {y₁, y₂, y₃}).Elem Z2 := -- the bottom left submatrix
-        (fun i j => M₁.B (![⟨x₂, x₂inX₁⟩, ⟨x₃, x₃inX₁⟩] i) ⟨j.val, Set.mem_of_mem_diff j.property⟩)
+        Matrix.of (fun i j => M₁.B (![⟨x₂, x₂inX₁⟩, ⟨x₃, x₃inX₁⟩] i) ⟨j.val, Set.mem_of_mem_diff j.property⟩)
       let D₂ : Matrix (M₂.X \ {x₁, x₂, x₃}).Elem (Fin 2) Z2 := -- the bottom left submatrix
-        (fun i j => M₂.B ⟨i.val, Set.mem_of_mem_diff i.property⟩ (![⟨y₂, y₂inY₂⟩, ⟨y₁, y₁inY₂⟩] j))
+        Matrix.of (fun i j => M₂.B ⟨i.val, Set.mem_of_mem_diff i.property⟩ (![⟨y₂, y₂inY₂⟩, ⟨y₁, y₁inY₂⟩] j))
       (Matrix.of (
         fun i : ((M₁.X \ {x₁, x₂, x₃}) ∪ M₂.X).Elem =>
         fun j : (M₁.Y ∪ (M₂.Y \ {y₁, y₂, y₃})).Elem =>
@@ -502,10 +506,10 @@ lemma BinaryMatroid.Is3sumOf.invertibilityD_₁ (hM : M.Is3sumOf M₁ M₂) :
       IsUnit (Matrix.of (fun i j => M₁.B (![⟨x₂, x₂inX₁⟩, ⟨x₃, x₃inX₁⟩] i) (![⟨y₂, y₂inY₁⟩, ⟨y₁, y₁inY₁⟩] j))) := by
   obtain ⟨x₁, x₂, x₃, y₁, y₂, y₃, hXX, hYY, _, _, rfl, valid⟩ := hM
   use x₂, x₃, y₁, y₂
-  have hxxx₁ : {x₁, x₂, x₃} ⊆ M₁.X := hXX.symm.subset.trans Set.inter_subset_left
-  use hxxx₁ (Set.insert_comm x₁ x₂ {x₃} ▸ Set.mem_insert x₂ {x₁, x₃}), hxxx₁ (by simp)
-  have hyyy₁ : {y₁, y₂, y₃} ⊆ M₁.Y := hYY.symm.subset.trans Set.inter_subset_left
-  use hyyy₁ (Set.insert_comm y₁ y₂ {y₃} ▸ Set.mem_insert y₂ {y₁, y₃}), hyyy₁ (Set.mem_insert y₁ {y₂, y₃})
+  have hxxx : {x₁, x₂, x₃} ⊆ M₁.X := hXX.symm.subset.trans Set.inter_subset_left
+  use hxxx (Set.insert_comm x₁ x₂ {x₃} ▸ Set.mem_insert x₂ {x₁, x₃}), hxxx (by simp)
+  have hyyy : {y₁, y₂, y₃} ⊆ M₁.Y := hYY.symm.subset.trans Set.inter_subset_left
+  use hyyy (Set.insert_comm y₁ y₂ {y₃} ▸ Set.mem_insert y₂ {y₁, y₃}), hyyy (Set.mem_insert y₁ {y₂, y₃})
   exact valid.left
 
 lemma BinaryMatroid.Is3sumOf.invertibilityD_₂ (hM : M.Is3sumOf M₁ M₂) :
@@ -513,10 +517,10 @@ lemma BinaryMatroid.Is3sumOf.invertibilityD_₂ (hM : M.Is3sumOf M₁ M₂) :
       IsUnit (Matrix.of (fun i j => M₂.B (![⟨x₂, x₂inX₂⟩, ⟨x₃, x₃inX₂⟩] i) (![⟨y₂, y₂inY₂⟩, ⟨y₁, y₁inY₂⟩] j))) := by
   obtain ⟨x₁, x₂, x₃, y₁, y₂, y₃, hXX, hYY, _, _, rfl, valid⟩ := hM
   use x₂, x₃, y₁, y₂
-  have hxxx₁ : {x₁, x₂, x₃} ⊆ M₂.X := hXX.symm.subset.trans Set.inter_subset_right
-  use hxxx₁ (Set.insert_comm x₁ x₂ {x₃} ▸ Set.mem_insert x₂ {x₁, x₃}), hxxx₁ (by simp)
-  have hyyy₁ : {y₁, y₂, y₃} ⊆ M₂.Y := hYY.symm.subset.trans Set.inter_subset_right
-  use hyyy₁ (Set.insert_comm y₁ y₂ {y₃} ▸ Set.mem_insert y₂ {y₁, y₃}), hyyy₁ (Set.mem_insert y₁ {y₂, y₃})
+  have hxxx : {x₁, x₂, x₃} ⊆ M₂.X := hXX.symm.subset.trans Set.inter_subset_right
+  use hxxx (Set.insert_comm x₁ x₂ {x₃} ▸ Set.mem_insert x₂ {x₁, x₃}), hxxx (by simp)
+  have hyyy : {y₁, y₂, y₃} ⊆ M₂.Y := hYY.symm.subset.trans Set.inter_subset_right
+  use hyyy (Set.insert_comm y₁ y₂ {y₃} ▸ Set.mem_insert y₂ {y₁, y₃}), hyyy (Set.mem_insert y₁ {y₂, y₃})
   rw [←valid.right.left]
   exact valid.left
 
