@@ -1,5 +1,7 @@
 import Mathlib.Data.Matroid.Map
-import Seymour.EasyDirection
+import Seymour.Sum1
+import Seymour.Sum2
+import Seymour.Sum3
 
 
 variable {α : Type} [DecidableEq α]
