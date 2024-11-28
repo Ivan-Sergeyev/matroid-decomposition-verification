@@ -208,7 +208,7 @@ def BinaryMatroid.oneSum (hXY : M₁.X ⫗ M₂.Y) (hYX : M₁.Y ⫗ M₂.X) :
   ⟩
 
 /-- BinaryMatroid-level 2-sum of two matroids.
-Second part check legitimacy: the ground sets of `M₁` and `M₂` are disjoint except for element `a` that lies in `M₁.X ∩ M₂.Y`,
+The second part check legitimacy: the ground sets of `M₁` and `M₂` are disjoint except for the element `a ∈ M₁.X ∩ M₂.Y`,
 and the bottom-most row of `M₁` and the left-most column of `M₂` are each nonzero vectors. -/
 def BinaryMatroid.twoSum {a : α} (ha : M₁.X ∩ M₂.Y = {a}) (hXY : M₂.X ⫗ M₁.Y) :
     BinaryMatroid α × Prop :=
@@ -231,7 +231,7 @@ def BinaryMatroid.twoSum {a : α} (ha : M₁.X ∩ M₂.Y = {a}) (hXY : M₂.X �
   ⟩
 
 /-- BinaryMatroid-level 3-sum of two matroids.
-Second part check legitimacy: some very specific conditions about the standard representation matrices. -/
+The second part check legitimacy: some very specific conditions about the standard representation matrices. -/
 noncomputable def BinaryMatroid.threeSum {x₁ x₂ x₃ y₁ y₂ y₃ : α}
     (hXX : M₁.X ∩ M₂.X = {x₁, x₂, x₃}) (hYY : M₁.Y ∩ M₂.Y = {y₁, y₂, y₃}) (hXY : M₁.X ⫗ M₂.Y) (hYX : M₁.Y ⫗ M₂.X) :
     BinaryMatroid α × Prop :=
@@ -529,7 +529,7 @@ section lemmas_for_2sum
 lemma Matrix_twoSumComposition_TU {X₁ Y₁ : Set α} {X₂ Y₂ : Set α} {A₁ : Matrix X₁ Y₁ ℤ} {A₂ : Matrix X₂ Y₂ ℤ}
     (hA₁ : A₁.TU) (hA₂ : A₂.TU) (x : Y₁ → ℤ) (y : X₂ → ℤ) :
     (Matrix.twoSumComposition A₁ x A₂ y).TU := by
-  sorry -- Does it hold without further preconditions?
+  sorry
 
 variable {M₁ M₂ : BinaryMatroid α} {a : α}
 

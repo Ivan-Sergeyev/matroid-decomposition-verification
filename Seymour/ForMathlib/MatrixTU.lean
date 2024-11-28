@@ -279,5 +279,9 @@ lemma Matrix.fromBlocks_TU
       cases hxy <;> omega
     clear hxy
     left
-    -- here we have a singular submatrix
-    sorry
+    if hxy₁ :
+        Fintype.card { x₁ : Fin k × X₁ // f x₁.fst = Sum.inl x₁.snd } <
+        Fintype.card { y₁ : Fin k × Y₁ // g y₁.fst = Sum.inl y₁.snd } then
+      sorry -- the bottom half of our submatrix is singular
+    else
+      sorry -- the top half of our submatrix is singular
