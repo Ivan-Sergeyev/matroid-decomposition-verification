@@ -177,3 +177,13 @@ theorem BinaryMatroid.Is2sumOf.isRegular (hM : M.Is2sumOf M₁ M₂) (hM₁ : M�
     M.IsRegular := by
   obtain ⟨a, ha, hXY, rfl, -⟩ := hM
   exact BinaryMatroid_2sum_isRegular ha hXY hM₁ hM₂
+
+/-- If a regular matroid is a 2-sum, then the left summand of the 2-sum is regular. -/
+lemma BinaryMatroid.Is2sumOf.isRegular_left (hMsum : M.Is2sumOf M₁ M₂) (hMreg : M.IsRegular) :
+    M₁.IsRegular := by
+  sorry
+
+/-- If a regular matroid is a 2-sum, then the right summand of the 2-sum is regular. -/
+lemma BinaryMatroid.Is2sumOf.isRegular_right (hMsum : M.Is2sumOf M₁ M₂) (hMreg : M.IsRegular) :
+    M₂.IsRegular := by
+  sorry

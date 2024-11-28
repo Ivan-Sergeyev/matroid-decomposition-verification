@@ -247,3 +247,14 @@ M₂.B ⟨x₃, x₃inX₂⟩ ⟨y₃, y₃inY₂⟩ = 1
 theorem BinaryMatroid.Is3sumOf.isRegular (hM : M.Is3sumOf M₁ M₂) (hM₁ : M₁.IsRegular) (hM₂ : M₂.IsRegular) :
     M.IsRegular := by
   sorry
+
+
+/-- If a regular matroid is a 3-sum, then the left summand of the 3-sum is regular. -/
+lemma BinaryMatroid.Is3sumOf.isRegular_left (hMsum : M.Is3sumOf M₁ M₂) (hMreg : M.IsRegular) :
+    M₁.IsRegular := by
+  sorry
+
+/-- If a regular matroid is a 3-sum, then the right summand of the 3-sum is regular. -/
+lemma BinaryMatroid.Is3sumOf.isRegular_right (hMsum : M.Is3sumOf M₁ M₂) (hMreg : M.IsRegular) :
+    M₂.IsRegular := by
+  sorry

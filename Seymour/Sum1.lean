@@ -31,6 +31,11 @@ def BinaryMatroid.Is1sumOf (M : BinaryMatroid α) (M₁ M₂ : BinaryMatroid α)
     let M₀ := BinaryMatroid_1sum hXY hYX
     M = M₀.fst ∧ M₀.snd
 
+/-- 1-sum is commutative. -/
+lemma BinaryMatroid.Is1sumOf.comm (hXY : M₁.X ⫗ M₂.Y) (hYX : M₁.Y ⫗ M₂.X) :
+    BinaryMatroid_1sum hXY hYX = BinaryMatroid_1sum hYX.symm hXY.symm := by
+  sorry
+
 variable {M : BinaryMatroid α}
 
 lemma BinaryMatroid.Is1sumOf.X_eq (hM : M.Is1sumOf M₁ M₂) :
@@ -83,3 +88,13 @@ theorem BinaryMatroid.Is1sumOf.isRegular [Fintype M₁.X] [Fintype M₁.Y] [Fint
       | inr j₂ =>
         specialize hBB₂ i₂ j₂
         simp_all [B']
+
+/-- If a regular matroid is a 1-sum, then the left summand of the 1-sum is regular. -/
+lemma BinaryMatroid.Is1sumOf.isRegular_left (hMsum : M.Is1sumOf M₁ M₂) (hMreg : M.IsRegular) :
+    M₁.IsRegular := by
+  sorry
+
+/-- If a regular matroid is a 1-sum, then the right summand of the 1-sum is regular. -/
+lemma BinaryMatroid.Is1sumOf.isRegular_right (hMsum : M.Is1sumOf M₁ M₂) (hMreg : M.IsRegular) :
+    M₂.IsRegular := by
+  sorry

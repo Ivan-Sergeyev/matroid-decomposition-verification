@@ -1,22 +1,9 @@
 \section{Matroid Definitions}
 
-\begin{definition}[(finite) matroid]
-  \label{def:code_finite_matroid}
-  % \uses{}
-  Let $E$ be a finite ground set. Let $\I \subseteq 2^{E}$ be a family of subsets satisfying:
-  \begin{itemize}
-    \item $\emptyset \in \I$ (non-empty)
-    \item if $A \subseteq B \in \I$, then $A \in \I$ (down-closed)
-    \item if $A ,B \in \I$ and $\left| A \right| < \left| B \right|$,
-          then $A + b \in \I$ for some $b \in B \setminus A$ (exchange property)
-  \end{itemize}
-  Then the pair $M = \left(E, \I\right)$ is called a \emph{(finite) matroid}.
-  % Note: Our definition is aligned with Mathlib
-\end{definition}
-
 \begin{definition}[binary matroid]
   \label{def:code_binary_matroid}
-  \uses{def:code_finite_matroid}
+  \lean{BinaryMatroid}
+  \leanok
   Let $B$ be a binary matrix, let $A = \left[ I \mid B \right]$, and let $E$ denote the column index set of $A$.
   Let $\I$ be all index subsets $Z \subseteq E$ such that the columns of $A$ indexed by $Z$ are independent over $\GFtwo$.
   Then $M = \left(E, \I\right)$ is called a \emph{binary matroid} and $B$ is called its \emph{(standard) representation matrix}.
@@ -27,6 +14,8 @@
 \begin{definition}[regular matroid]
   \label{def:code_regular_matroid}
   \uses{def:code_binary_matroid,def:code_tu_matrix}
+  \lean{BinaryMatroid.IsRegular}
+  \leanok
   Let $M$ be a binary matroid generated from a standard representation matrix $B$. Suppose $B$ has a TU signing, i.e., there exists a real matrix $A$ such that:
   \begin{itemize}
     \item $A$ is a signed version of $B$, i.e., $\left| A \right| = B$,

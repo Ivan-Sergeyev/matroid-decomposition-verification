@@ -72,7 +72,7 @@ lemma BinaryMatroid.indep_eq (M : BinaryMatroid α) : M.toMatroid.Indep = M.B.In
 
 instance : Coe (BinaryMatroid α) (Matroid α) where coe := BinaryMatroid.toMatroid
 
-/-- The binary matroid on the ground set `X ∪ Y` is regular. -/
+/-- The binary matroid is regular. -/
 def BinaryMatroid.IsRegular (M : BinaryMatroid α) : Prop :=
   ∃ B' : Matrix M.X M.Y ℤ, -- signed version of `B`
     (Matrix.fromColumns (1 : Matrix M.X M.X ℤ) B').TU ∧ -- the signed representation matrix is totally unimodular

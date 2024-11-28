@@ -1,0 +1,46 @@
+\begin{definition}[$3$-sum of matrices]
+  \label{def:code_3_sum_of_matrices}
+  % \uses{}
+  \lean{Matrix_3sumComposition}
+  \leanok
+  \todo[inline]{add}
+\end{definition}
+
+\begin{definition}[matroid $3$-sum]
+  \label{def:code_3_sum_of_binary}
+  \uses{def:code_binary_matroid,def:code_3_sum_of_matrices}
+  \lean{BinaryMatroid.Is3sumOf}
+  \leanok
+  \todo[inline]{add}
+\end{definition}
+
+% todo: same as for 1-separations and 1-sums
+% \begin{lemma}[$3$-separations and $3$-sums]
+%   \label{lem:code_3_sep_3_sum}
+%   \uses{def:code_3_sum_of_binary,def:code_k_conn,def:code_k_sep}
+%   \todo[inline]{add}
+% \end{lemma}
+
+\begin{lemma}[$3$-sum of regular matroids is regular]
+  \label{lem:code_3_sum_of_regular}
+  \uses{def:code_3_sum_of_binary,def:code_regular_matroid}
+  \lean{BinaryMatroid.Is3sumOf.isRegular}
+  \leanok
+  \todo[inline]{add}
+\end{lemma}
+
+\begin{lemma}[left summand of regular $3$-sum is regular]
+  \label{lem:code_3_sum_regular_left}
+  \uses{def:code_3_sum_of_binary,def:code_regular_matroid}
+  \lean{BinaryMatroid.Is3sumOf.isRegular_left}
+  \leanok
+  \todo[inline]{add}
+\end{lemma}
+
+\begin{lemma}[right summand of regular $3$-sum is regular]
+  \label{lem:code_3_sum_regular_right}
+  \uses{def:code_3_sum_of_binary,def:code_regular_matroid}
+  \lean{BinaryMatroid.Is3sumOf.isRegular_right}
+  \leanok
+  \todo[inline]{add}
+\end{lemma}
