@@ -16,8 +16,7 @@ attribute [instance] BinaryMatroid.decmemX
 attribute [instance] BinaryMatroid.decmemY
 
 
-variable {α : Type*} {X Y : Set α}
-variable [∀ a, Decidable (a ∈ X)] [∀ a, Decidable (a ∈ Y)] [DecidableEq α]
+variable {α : Type*} [DecidableEq α] {X Y : Set α} [∀ a, Decidable (a ∈ X)] [∀ a, Decidable (a ∈ Y)]
 -- Note that `variable [DecidablePred X.Mem] [DecidablePred Y.Mem]` does not work.
 
 /-- Given matrix `B`, is the set of columns `S` in the (standard) representation [`1` | `B`] `Z2`-independent? -/

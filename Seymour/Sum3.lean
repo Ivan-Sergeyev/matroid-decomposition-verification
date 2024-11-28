@@ -109,6 +109,8 @@ def BinaryMatroid.Is3sumOf (M : BinaryMatroid α) (M₁ M₂ : BinaryMatroid α)
 
 variable {M : BinaryMatroid α}
 
+-- API for access to individual fields and assumptions in the definition of 2-sum
+
 lemma BinaryMatroid.Is3sumOf.X_eq (hM : M.Is3sumOf M₁ M₂) :
     M.X = M₁.X ∪ M₂.X := by
   obtain ⟨_, _, _, _, _, _, hXX, _, _, _, rfl, -⟩ := hM

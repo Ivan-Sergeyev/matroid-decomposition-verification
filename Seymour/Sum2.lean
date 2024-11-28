@@ -42,6 +42,8 @@ def BinaryMatroid.Is2sumOf (M : BinaryMatroid α) (M₁ M₂ : BinaryMatroid α)
 
 variable {M : BinaryMatroid α}
 
+-- API for access to individual fields and assumptions in the definition of 2-sum
+
 lemma BinaryMatroid.Is2sumOf.disjoXX (hM : M.Is2sumOf M₁ M₂) :
     M₁.X ⫗ M₂.X := by
   obtain ⟨a, -, -, -, ⟨hXX, -⟩, -⟩ := hM

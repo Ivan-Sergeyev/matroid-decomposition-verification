@@ -46,7 +46,7 @@ lemma BinaryMatroid_1sum.equiv_direct_sum (hXY : M₁.X ⫗ M₂.Y) (hYX : M₁.
 
 variable {M : BinaryMatroid α}
 
--- API for access to individual fields in definition of 1-sum
+-- API for access to individual fields in the definition of 1-sum
 
 lemma BinaryMatroid.Is1sumOf.X_eq (hM : M.Is1sumOf M₁ M₂) :
     M.X = M₁.X ∪ M₂.X := by

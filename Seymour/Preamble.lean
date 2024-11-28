@@ -14,9 +14,11 @@ infix:61 " ⫗ " => Disjoint
 
 variable {α : Type*}
 
+/-- Given `X ⊆ Y` cast an element of `X` as an element of `Y`. -/
 def HasSubset.Subset.elem {X Y : Set α} (hXY : X ⊆ Y) (x : X.Elem) : Y.Elem :=
   ⟨x.val, hXY x.property⟩
 
+/-- Cast element of `X ∪ Y` as `X.Elem ⊕ Y.Elem`. -/
 def Subtype.toSum {X Y : Set α} [∀ a, Decidable (a ∈ X)] [∀ a, Decidable (a ∈ Y)] (i : (X ∪ Y).Elem) : X.Elem ⊕ Y.Elem :=
   if hiX : i.val ∈ X then Sum.inl ⟨i, hiX⟩ else
   if hiY : i.val ∈ Y then Sum.inr ⟨i, hiY⟩ else
@@ -28,12 +30,14 @@ variable {T₁ T₂ S₁ S₂ : Set α} {β : Type*}
   [∀ a, Decidable (a ∈ S₁)]
   [∀ a, Decidable (a ∈ S₂)]
 
+/-- Cast a block matrix as a matrix over set unions. -/
 def Matrix.toMatrixUnionUnion (C : Matrix (T₁.Elem ⊕ T₂.Elem) (S₁.Elem ⊕ S₂.Elem) β) :
     Matrix (T₁ ∪ T₂).Elem (S₁ ∪ S₂).Elem β :=
   ((C ∘ Subtype.toSum) · ∘ Subtype.toSum)
 
 variable {T S : Set α}
 
+/-- Cast a block matrix as a matrix over set unions named as single indexing sets. -/
 def Matrix.toMatrixElemElem (C : Matrix (T₁ ⊕ T₂) (S₁ ⊕ S₂) β) (hT : T = T₁ ∪ T₂) (hS : S = S₁ ∪ S₂) :
     Matrix T S β :=
   hT ▸ hS ▸ C.toMatrixUnionUnion
