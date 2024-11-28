@@ -1,4 +1,5 @@
 import Seymour.BinaryMatroid
+import Mathlib.Data.Matroid.Sum
 
 
 variable {α : Type*}
@@ -32,11 +33,20 @@ def BinaryMatroid.Is1sumOf (M : BinaryMatroid α) (M₁ M₂ : BinaryMatroid α)
     M = M₀.fst ∧ M₀.snd
 
 /-- 1-sum is commutative. -/
-lemma BinaryMatroid.Is1sumOf.comm (hXY : M₁.X ⫗ M₂.Y) (hYX : M₁.Y ⫗ M₂.X) :
+lemma BinaryMatroid_1sum_comm (hXY : M₁.X ⫗ M₂.Y) (hYX : M₁.Y ⫗ M₂.X) :
     BinaryMatroid_1sum hXY hYX = BinaryMatroid_1sum hYX.symm hXY.symm := by
   sorry
 
+/-- 1-sum is the same as direct sum. -/
+lemma BinaryMatroid_1sum.equiv_direct_sum (hXY : M₁.X ⫗ M₂.Y) (hYX : M₁.Y ⫗ M₂.X) (valid : (BinaryMatroid_1sum hXY hYX).snd) :
+    (BinaryMatroid_1sum hXY hYX).fst.toMatroid = Matroid.disjointSum M₁.toMatroid M₂.toMatroid (by
+      simp [Set.disjoint_union_left, Set.disjoint_union_right]
+      exact ⟨⟨valid.left, hYX⟩, ⟨hXY, valid.right⟩⟩) := by
+  sorry
+
 variable {M : BinaryMatroid α}
+
+-- API for access to individual fields in definition of 1-sum
 
 lemma BinaryMatroid.Is1sumOf.X_eq (hM : M.Is1sumOf M₁ M₂) :
     M.X = M₁.X ∪ M₂.X := by

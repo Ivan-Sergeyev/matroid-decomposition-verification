@@ -68,6 +68,9 @@ def Matrix.toMatroid (B : Matrix X Y Z2) : Matroid α := B.toIndepMatroid.matroi
 def BinaryMatroid.toMatroid (M : BinaryMatroid α) := M.B.toMatroid
 
 @[simp]
+lemma BinaryMatroid.E_eq (M : BinaryMatroid α) : M.toMatroid.E = M.X ∪ M.Y := rfl
+
+@[simp]
 lemma BinaryMatroid.indep_eq (M : BinaryMatroid α) : M.toMatroid.Indep = M.B.IndepCols := rfl
 
 instance : Coe (BinaryMatroid α) (Matroid α) where coe := BinaryMatroid.toMatroid

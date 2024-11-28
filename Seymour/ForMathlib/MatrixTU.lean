@@ -190,6 +190,7 @@ lemma Matrix.submatrix_det_abs [Fintype X] [DecidableEq X] [Fintype Y] [Decidabl
   rw [hee, hAee, Matrix.det_submatrix_equiv_self, Matrix.det_permute']
   cases' Int.units_eq_one_or (Equiv.Perm.sign (e₁.symm.trans e₂)) with he he <;> rw [he] <;> simp
 
+/-- A matrix composed of TU blocks on the diagonal is TU. -/
 lemma Matrix.fromBlocks_TU
     [Fintype X₁] [DecidableEq X₁] [Fintype Y₁] [DecidableEq Y₁] [Fintype X₂] [DecidableEq X₂] [Fintype Y₂] [DecidableEq Y₂]
     {A₁ : Matrix X₁ Y₁ R} {A₂ : Matrix X₂ Y₂ R}
@@ -198,6 +199,7 @@ lemma Matrix.fromBlocks_TU
   intro k f g hf hg
   rw [Matrix.TU_iff] at hA₁ hA₂
   rw [f.eq_comp_myEquiv, g.eq_comp_myEquiv, ←Matrix.submatrix_submatrix]
+  -- submatrix of a block matrix is a block matrix of submatrices
   have hAfg :
     (Matrix.fromBlocks A₁ 0 0 A₂).submatrix
       (Sum.elim (Sum.inl ∘ (·.val.snd)) (Sum.inr ∘ (·.val.snd)))
@@ -216,10 +218,12 @@ lemma Matrix.fromBlocks_TU
     cases i <;> cases j <;> simp
   rw [hAfg]
   clear hAfg
+  -- look at sizes of submatrices in blocks
   if hxy : Fintype.card { x₁ : Fin k × X₁ // f x₁.fst = Sum.inl x₁.snd } = Fintype.card { y₁ : Fin k × Y₁ // g y₁.fst = Sum.inl y₁.snd }
          ∧ Fintype.card { x₂ : Fin k × X₂ // f x₂.fst = Sum.inr x₂.snd } = Fintype.card { y₂ : Fin k × Y₂ // g y₂.fst = Sum.inr y₂.snd }
-  then
+  then -- square case
     obtain ⟨cardi₁, cardi₂⟩ := hxy
+    -- equivalences between canonical indexing types of given cardinality and current indexing types (domains of parts of indexing functions)
     let eX₁ : Fin (Fintype.card { x₁ : Fin k × X₁ // f x₁.fst = Sum.inl x₁.snd }) ≃ { x₁ : Fin k × X₁ // f x₁.fst = Sum.inl x₁.snd } :=
       (Fintype.equivFin { x₁ : Fin k × X₁ // f x₁.fst = Sum.inl x₁.snd }).symm
     let eX₂ : Fin (Fintype.card { x₂ : Fin k × X₂ // f x₂.fst = Sum.inr x₂.snd }) ≃ { x₂ : Fin k × X₂ // f x₂.fst = Sum.inr x₂.snd } :=
@@ -228,6 +232,8 @@ lemma Matrix.fromBlocks_TU
       (cardi₁ ▸ Fintype.equivFin { y₁ : Fin k × Y₁ // g y₁.fst = Sum.inl y₁.snd }).symm
     let eY₂ : Fin (Fintype.card { x₂ : Fin k × X₂ // f x₂.fst = Sum.inr x₂.snd }) ≃ { y₂ : Fin k × Y₂ // g y₂.fst = Sum.inr y₂.snd } :=
       (cardi₂ ▸ Fintype.equivFin { y₂ : Fin k × Y₂ // g y₂.fst = Sum.inr y₂.snd }).symm
+    -- relating submatrices in blocks to submatrices of `A₁` and `A₂`
+    -- (this is done via a mapping of the form `f ∘ h = (f ∘ g) ∘ (g⁻¹ ∘ h)` where `g⁻¹ ∘ h` is bijective)
     have hAfg' :
       (Matrix.fromBlocks
         (A₁.submatrix
@@ -262,11 +268,15 @@ lemma Matrix.fromBlocks_TU
       · split
         · rfl
         · simp
+    -- absolute value of determinant was preserved by previous mappings,
+    -- and we now express it as a product of determinants of submatrices in blocks
     rw [hAfg', ←abs_eq_zero, ←abs_eq_one, Matrix.submatrix_det_abs, Matrix.det_fromBlocks_zero₁₂, abs_eq_zero, abs_eq_one]
+    -- determinants of submatrices in blocks are `0` or `±1` by TUness of `A₁` and `A₂`
     apply zom_mul_zom
     · apply hA₁
     · apply hA₂
-  else
+  else -- non-square case
+    -- both submatrices in blocks are non-square
     obtain ⟨cardine₁, cardine₂⟩ :
         Fintype.card { x₁ : Fin k × X₁ // f x₁.fst = Sum.inl x₁.snd } ≠
         Fintype.card { y₁ : Fin k × Y₁ // g y₁.fst = Sum.inl y₁.snd } ∧
@@ -278,6 +288,7 @@ lemma Matrix.fromBlocks_TU
       rw [Fintype.card_sum] at hk₁ hk₂
       cases hxy <;> omega
     clear hxy
+    -- goal: prove that `det` = `0`
     left
     if hxy₁ :
         Fintype.card { x₁ : Fin k × X₁ // f x₁.fst = Sum.inl x₁.snd } <
