@@ -12,7 +12,7 @@ BinaryMatroid
 BinaryMatroid.IsRegular
 Matrix_1sumComposition
 BinaryMatroid.Is1sumOf
-BinaryMatroid.Is1sumOf.comm
+BinaryMatroid_1sum_comm
 BinaryMatroid.Is1sumOf.isRegular
 BinaryMatroid.Is1sumOf.isRegular_left
 BinaryMatroid.Is1sumOf.isRegular_right
