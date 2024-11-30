@@ -4,7 +4,8 @@ The goal of this project is to formally verify Seymour's decomposition theorem i
 
 ## Blueprint
 
-You can find the blueprint on the [GitHub Pages site](https://ivan-sergeyev.github.io/seymour/)
+- You can find the blueprint on the [GitHub Pages site](https://ivan-sergeyev.github.io/seymour/)
+- Quick link to the [dependency graph](https://ivan-sergeyev.github.io/seymour/blueprint/dep_graph_document.html)
 
 ## References
 
