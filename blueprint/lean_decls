@@ -18,6 +18,7 @@ BinaryMatroid.Is1sumOf.isRegular_left
 BinaryMatroid.Is1sumOf.isRegular_right
 Matrix_2sumComposition
 BinaryMatroid.Is2sumOf
+BinaryMatroid_2sum_isRegular
 BinaryMatroid.Is2sumOf.isRegular
 BinaryMatroid.Is2sumOf.isRegular_left
 BinaryMatroid.Is2sumOf.isRegular_right

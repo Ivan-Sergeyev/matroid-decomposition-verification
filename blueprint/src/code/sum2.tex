@@ -58,19 +58,18 @@
 %   Check by definition. Connectedness of representation matrices is equivalent to connectedness of corresponding matroids.
 % \end{proof}
 
-\begin{lemma}[$2$-sum of regular matroids is regular]
-  \label{lem:code_2_sum_of_regular}
-  \uses{def:code_2_sum_of_binary,def:code_regular_matroid}
-  \lean{BinaryMatroid.Is2sumOf.isRegular}
+\begin{lemma}[$2$-sum of TU matrices is a TU matrix]
+  \label{lem:code_2_sum_of_TU}
+  \uses{def:code_2_sum_of_binary,def:code_tu_matrix}
+  \lean{BinaryMatroid_2sum_isRegular}
   \leanok
-  Let $M_{1}$ and $M_{2}$ be regular matroids. Then $M = M_{1} \oplus_{2} M_{2}$ is a regular matroid.
+  Let $B_{1}$ and $B_{2}$ be TU matrices. Then $B = B_{1} \oplus_{2} B_{2}$ is a TU matrix.
 \end{lemma}
 
 \begin{proof}[Proof sketch]
-  \uses{def:code_2_sum_of_binary,def:code_regular_matroid,lem:code_tu_add_ok_rows,cor:code_tu_add_ok_cols}
+  \uses{def:code_2_sum_of_matrices,def:code_tu_matrix,lem:code_tu_add_ok_rows,cor:code_tu_add_ok_cols}
   % \leanok
 
-  Let $B$, $B_{1}$, and $B_{2}$ be the representation matrices of $M$, $M_{1}$, and $M_{2}$, respectively.
   Let $B_{1}'$ and $B_{2}'$ be TU signings of $B_{1}$ and $B_{2}$, respectively.
   In particular, let $A_{1}'$, $x'$, $A_{2}'$, and $y'$ be the signed versions of $A_{1}$, $x$, $A_{2}$, and $y$, respectively.
   Let $B'$ be the signing of $B$ where the blocks of $A_{1}$ and $A_{2}$ are signed as $A_{1}'$ and $A_{2}'$, respectively, and the block of $D$ is signed as $D' = y' \cdot x'$ (outer product).
@@ -96,6 +95,21 @@
     \item .
     \todo[inline]{complete proof, see last paragraph of Lemma 11.2.1 in Truemper} % lem:code_pivot_tu
   \end{itemize}
+\end{proof}
+
+\begin{lemma}[$2$-sum of regular matroids is a regular matroid]
+  \label{lem:code_2_sum_of_regular}
+  \uses{def:code_2_sum_of_binary,def:code_regular_matroid}
+  \lean{BinaryMatroid.Is2sumOf.isRegular}
+  \leanok
+  Let $M_{1}$ and $M_{2}$ be regular matroids. Then $M = M_{1} \oplus_{2} M_{2}$ is a regular matroid.
+\end{lemma}
+
+\begin{proof}[Proof sketch]
+  \uses{def:code_2_sum_of_binary,def:code_regular_matroid,lem:code_2_sum_of_TU}
+  \leanok
+  Let $B$, $B_{1}$, and $B_{2}$ be the representation matrices of $M$, $M_{1}$, and $M_{2}$, respectively.
+  Apply Lemma~\ref{lem:code_2_sum_of_TU}.
 \end{proof}
 
 \begin{lemma}[left summand of regular $2$-sum is regular]
