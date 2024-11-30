@@ -2,7 +2,6 @@ import Mathlib.Data.Matroid.IndepAxioms
 import Seymour.Basic
 
 
-
 /-- Data describing a binary matroid on the ground set `X ∪ Y` where `X` and `Y` are bundled. -/
 structure BinaryMatroid (α : Type*) [DecidableEq α] where
   X : Set α
