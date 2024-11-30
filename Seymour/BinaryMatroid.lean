@@ -1,6 +1,6 @@
 import Mathlib.Data.Matroid.IndepAxioms
+import Seymour.Basic
 
-import Seymour.Preamble
 
 
 /-- Data describing a binary matroid on the ground set `X ∪ Y` where `X` and `Y` are bundled. -/
