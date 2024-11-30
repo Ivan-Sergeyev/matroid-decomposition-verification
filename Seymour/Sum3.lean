@@ -17,7 +17,7 @@ noncomputable abbrev Matrix_3sumComposition {β : Type*} [CommRing β] {X₁ Y�
 variable [DecidableEq α] {M₁ M₂ : BinaryMatroid α}
 
 /-- BinaryMatroid-level 3-sum of two matroids.
-The second part check legitimacy (TODO document very specific conditions about the standard representation matrices). -/
+The second part checks legitimacy (TODO document very specific conditions about the standard representation matrices). -/
 noncomputable def BinaryMatroid_3sum {x₁ x₂ x₃ y₁ y₂ y₃ : α}
     (hXX : M₁.X ∩ M₂.X = {x₁, x₂, x₃}) (hYY : M₁.Y ∩ M₂.Y = {y₁, y₂, y₃}) (hXY : M₁.X ⫗ M₂.Y) (hYX : M₁.Y ⫗ M₂.X) :
     BinaryMatroid α × Prop :=

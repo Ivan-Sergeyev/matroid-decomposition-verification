@@ -42,7 +42,11 @@ lemma BinaryMatroid_1sum.equiv_direct_sum (hXY : M₁.X ⫗ M₂.Y) (hYX : M₁.
     (BinaryMatroid_1sum hXY hYX).fst.toMatroid = Matroid.disjointSum M₁.toMatroid M₂.toMatroid (by
       simp [Set.disjoint_union_left, Set.disjoint_union_right]
       exact ⟨⟨valid.left, hYX⟩, ⟨hXY, valid.right⟩⟩) := by
-  sorry
+  ext
+  · unfold BinaryMatroid_1sum
+    aesop
+  · sorry -- this should hopefully not be necessary to prove
+  · sorry -- TODO
 
 variable {M : BinaryMatroid α}
 
@@ -102,9 +106,44 @@ theorem BinaryMatroid.Is1sumOf.isRegular [Fintype M₁.X] [Fintype M₁.Y] [Fint
 /-- If a regular matroid is a 1-sum, then the left summand of the 1-sum is regular. -/
 lemma BinaryMatroid.Is1sumOf.isRegular_left (hMsum : M.Is1sumOf M₁ M₂) (hMreg : M.IsRegular) :
     M₁.IsRegular := by
-  sorry
+  obtain ⟨B', hB', hBB'⟩ := hMreg
+  use (B'.fromMatrixElemElem hMsum.X_eq hMsum.Y_eq).submatrix Sum.inl Sum.inl
+  constructor
+  · rw [Matrix.TU_adjoin_id_left_iff] at hB' ⊢
+    apply Matrix.TU.submatrix
+    apply Matrix.TU.fromMatrixElemElem
+    exact hB'
+  · intro i j
+    specialize hBB'
+      ⟨i.val, hMsum.X_eq ▸ Set.mem_union_left M₂.X i.property⟩
+      ⟨j.val, hMsum.Y_eq ▸ Set.mem_union_left M₂.Y j.property⟩
+    rw [hMsum.B_eq] at hBB'
+    if h0 : M₁.B i j = 0 then
+      simp [h0]
+      have :
+        (hMsum.X_eq ▸ hMsum.Y_eq ▸ (Matrix_1sumComposition M₁.B M₂.B).toMatrixUnionUnion)
+          ⟨i.val, hMsum.X_eq ▸ Set.mem_union_left M₂.X i.property⟩
+          ⟨j.val, hMsum.Y_eq ▸ Set.mem_union_left M₂.Y j.property⟩
+        = 0
+      · sorry
+      simp [this] at hBB'
+      sorry
+    else
+      sorry
 
 /-- If a regular matroid is a 1-sum, then the right summand of the 1-sum is regular. -/
 lemma BinaryMatroid.Is1sumOf.isRegular_right (hMsum : M.Is1sumOf M₁ M₂) (hMreg : M.IsRegular) :
     M₂.IsRegular := by
-  sorry
+  obtain ⟨B', hB', hBB'⟩ := hMreg
+  use (B'.fromMatrixElemElem hMsum.X_eq hMsum.Y_eq).submatrix Sum.inr Sum.inr
+  constructor
+  · rw [Matrix.TU_adjoin_id_left_iff] at hB' ⊢
+    apply Matrix.TU.submatrix
+    apply Matrix.TU.fromMatrixElemElem
+    exact hB'
+  · intro i j
+    if h0 : M₂.B i j = 0 then
+      simp [h0]
+      sorry
+    else
+      sorry

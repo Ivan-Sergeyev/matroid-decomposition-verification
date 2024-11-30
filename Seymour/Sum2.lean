@@ -12,7 +12,7 @@ abbrev Matrix_2sumComposition {β : Type*} [CommRing β] {X₁ Y₁ : Set α} {X
 variable [DecidableEq α] {M₁ M₂ : BinaryMatroid α}
 
 /-- BinaryMatroid-level 2-sum of two matroids.
-The second part check legitimacy: the ground sets of `M₁` and `M₂` are disjoint except for the element `a ∈ M₁.X ∩ M₂.Y`,
+The second part checks legitimacy: the ground sets of `M₁` and `M₂` are disjoint except for the element `a ∈ M₁.X ∩ M₂.Y`,
 and the bottom-most row of `M₁` and the left-most column of `M₂` are each nonzero vectors. -/
 def BinaryMatroid_2sum {a : α} (ha : M₁.X ∩ M₂.Y = {a}) (hXY : M₂.X ⫗ M₁.Y) :
     BinaryMatroid α × Prop :=

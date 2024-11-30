@@ -64,7 +64,7 @@ lemma Matrix.TU.apply {A : Matrix X Y R} (hA : A.TU) (i : X) (j : Y) :
   rw [Matrix.TU_iff] at hA
   convert hA 1 (fun _ => i) (fun _ => j) <;> simp
 
-lemma Matrix.TU.submatrix {A : Matrix X Y R} (hA : A.TU) (k : ℕ) (f : Fin k → X) (g : Fin k → Y) :
+lemma Matrix.TU.submatrix {A : Matrix X Y R} (hA : A.TU) {X' Y' : Type*} (f : X' → X) (g : Y' → Y) :
     (A.submatrix f g).TU := by
   intro _ _ _ _ _
   rw [Matrix.submatrix_submatrix]
