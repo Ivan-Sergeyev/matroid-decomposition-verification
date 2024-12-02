@@ -4,7 +4,12 @@ import Mathlib.Tactic
 variable {α : Type*} {X Y : Set α}
 
 lemma Disjoint.ni_of_in (hXY : Disjoint X Y) {a : α} (ha : a ∈ X) : a ∉ Y := by
-  sorry
+  intro haY
+  rw [Set.disjoint_iff_forall_ne] at hXY
+  apply hXY at ha
+  apply ha at haY
+  apply haY
+  simp
 
 lemma disjoint_of_singleton_intersection_left_wo {a : α} (hXY : X ∩ Y = {a}) : Disjoint (X \ {a}) Y := by
   rw [Set.disjoint_iff_forall_ne]
