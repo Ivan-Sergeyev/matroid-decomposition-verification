@@ -1,5 +1,5 @@
 \begin{definition}[$1$-sum of matrices]
-  \label{def:code_1_sum_of_matrices}
+  \label{Matrix_1sumComposition}
   % \uses{}
   \lean{Matrix_1sumComposition}
   \leanok
@@ -17,12 +17,12 @@
 \end{definition}
 
 \begin{definition}[matroid $1$-sum]
-  \label{def:code_1_sum_of_binary}
-  \uses{def:code_binary_matroid,def:code_1_sum_of_matrices}
+  \label{BinaryMatroid.Is1sumOf}
+  \uses{def:BinaryMatroid,Matrix_1sumComposition}
   \lean{BinaryMatroid.Is1sumOf}
   \leanok
   Let $M$ be a binary matroid with a representation matrix $B$.
-  Suppose that $B$ can be partitioned as in Definition~\ref{def:code_1_sum_of_matrices} with non-zero blocks $B_{1}$ and $B_{2}$.
+  Suppose that $B$ can be partitioned as in Definition~\ref{Matrix_1sumComposition} with non-zero blocks $B_{1}$ and $B_{2}$.
   Then the binary matroids $M_{1}$ and $M_{2}$ represented by $B_{1}$ and $B_{2}$, respectively, are the two \emph{components} of a \emph{$1$-sum decomposition} of $M$.
 
   Conversely, a \emph{$1$-sum composition} with \emph{components} $M_{1}$ and $M_{2}$ is the matroid $M$ defined by the corresponding representation matrix $B$.
@@ -33,8 +33,8 @@
 % todo: $1$-sum of matroids is the same as direct sum
 
 \begin{lemma}[$1$-sum is commutative]
-  \label{lem:code_1_sum_comm}
-  \uses{def:code_1_sum_of_binary}
+  \label{BinaryMatroid_1sum_comm}
+  \uses{BinaryMatroid.Is1sumOf}
   \lean{BinaryMatroid_1sum_comm}
   \leanok
   \todo[inline]{add}
@@ -43,13 +43,13 @@
 % % todo: nice to have, but not vital; can be done when working on formalizing k-separations for hard direction
 % \begin{lemma}[$1$-separations and $1$-sums]
 %   \label{lem:code_1_sep_yields_1_sum}
-%   \uses{def:code_1_sum_of_binary,def:code_k_sep}
+%   \uses{BinaryMatroid.Is1sumOf,def:code_k_sep}
 %   Let $M$ be a binary matroid that is $1$-separable.
 %   Then $M$ can be decomposed as a $1$-sum with components given by the $1$-separation.
 % \end{lemma}
 
 % \begin{proof}[Proof sketch]
-%   \uses{def:code_1_sum_of_binary,def:code_k_sep}
+%   \uses{BinaryMatroid.Is1sumOf,def:code_k_sep}
 %   Check by definition.
 % \end{proof}
 
@@ -57,18 +57,18 @@
 % todo: lemma 8.2.2.b: 1-sum composition of graphic (planar) is graphic (planar)
 
 \begin{lemma}[$1$-sum of regular matroids is regular]
-  \label{lem:code_1_sum_of_regular}
+  \label{BinaryMatroid.Is1sumOf.isRegular}
   \lean{BinaryMatroid.Is1sumOf.isRegular}
   \leanok
-  \uses{def:code_1_sum_of_binary,def:code_regular_matroid}
+  \uses{BinaryMatroid.Is1sumOf,def:BinaryMatroid.IsRegular}
   Let $M_{1}$ and $M_{2}$ be regular matroids. Then $M = M_{1} \oplus_{1} M_{2}$ is a regular matroid.
 
   Conversely, if a regular matroid $M$ can be decomposed as a $1$-sum $M = M_{1} \oplus_{1} M_{2}$, then $M_{1}$ and $M_{2}$ are both regular.
 \end{lemma}
 
 \begin{proof}[Proof sketch]
-  \uses{def:code_1_sum_of_binary,def:code_regular_matroid,lem:code_diagonal_with_tu_blocks}
-  % \leanok
+  \uses{BinaryMatroid.Is1sumOf,def:BinaryMatroid.IsRegular,lem:code_diagonal_with_tu_blocks}
+  \leanok
   \todo[inline]{extract into lemmas about TU matrices}
   Let $B$, $B_{1}$, and $B_{2}$ be the representation matrices of $M$, $M_{1}$, and $M_{2}$, respectively.
   \begin{itemize}
@@ -78,16 +78,16 @@
 \end{proof}
 
 \begin{lemma}[left summand of regular $1$-sum is regular]
-  \label{lem:code_1_sum_regular_left}
-  \uses{def:code_1_sum_of_binary,def:code_regular_matroid}
+  \label{BinaryMatroid.Is1sumOf.isRegular_left}
+  \uses{BinaryMatroid.Is1sumOf,def:BinaryMatroid.IsRegular}
   \lean{BinaryMatroid.Is1sumOf.isRegular_left}
   \leanok
   \todo[inline]{add}
 \end{lemma}
 
 \begin{lemma}[right summand of regular $1$-sum is regular]
-  \label{lem:code_1_sum_regular_right}
-  \uses{def:code_1_sum_of_binary,def:code_regular_matroid}
+  \label{BinaryMatroid.Is1sumOf.isRegular_right}
+  \uses{BinaryMatroid.Is1sumOf,def:BinaryMatroid.IsRegular}
   \lean{BinaryMatroid.Is1sumOf.isRegular_right}
   \leanok
   \todo[inline]{add}

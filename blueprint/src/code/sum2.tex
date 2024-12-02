@@ -1,5 +1,5 @@
 \begin{definition}[$2$-sum of matrices]
-  \label{def:code_2_sum_of_matrices}
+  \label{Matrix_2sumComposition}
   % \uses{}
   \lean{Matrix_2sumComposition}
   \leanok
@@ -30,12 +30,12 @@
 \end{definition}
 
 \begin{definition}[matroid $2$-sum]
-  \label{def:code_2_sum_of_binary}
-  \uses{def:code_binary_matroid,def:code_2_sum_of_matrices}
+  \label{BinaryMatroid.Is2sumOf}
+  \uses{def:BinaryMatroid,Matrix_2sumComposition}
   \lean{BinaryMatroid.Is2sumOf}
   \leanok
   Let $M$ be a binary matroid with a representation matrix $B$.
-  Suppose $B$, $B_{1}$, and $B_{2}$ satisfy the assumptions of Definition~\ref{def:code_2_sum_of_matrices}.
+  Suppose $B$, $B_{1}$, and $B_{2}$ satisfy the assumptions of Definition~\ref{Matrix_2sumComposition}.
   Then the binary matroids $M_{1}$ and $M_{2}$ represented by $B_{1}$ and $B_{2}$, respectively, are the two \emph{components} of a \emph{$2$-sum decomposition} of $M$.
 
   Conversely, a \emph{$2$-sum composition} with \emph{components} $M_{1}$ and $M_{2}$ is the matroid $M$ defined by the corresponding representation matrix $B$.
@@ -46,7 +46,7 @@
 % todo: same as 1-separations and 1-sums
 % \begin{lemma}[$2$-separations and $2$-sums of connected binary matroids]
 %   \label{lem:code_2_sep_2_sum}
-%   \uses{def:code_2_sum_of_binary,def:code_k_sep,def:code_k_conn}
+%   \uses{BinaryMatroid.Is2sumOf,def:code_k_sep,def:code_k_conn}
 %   Let $M$ be a binary matroid that is $2$-separable.
 %   Then $M$ can be decomposed as a $2$-sum with connected components given by the $2$-separation.
 
@@ -54,20 +54,20 @@
 % \end{lemma}
 
 % \begin{proof}[Proof sketch]
-%   \uses{def:code_2_sum_of_binary,def:code_k_sep,def:code_k_conn}
+%   \uses{BinaryMatroid.Is2sumOf,def:code_k_sep,def:code_k_conn}
 %   Check by definition. Connectedness of representation matrices is equivalent to connectedness of corresponding matroids.
 % \end{proof}
 
 \begin{lemma}[$2$-sum of TU matrices is a TU matrix]
-  \label{lem:code_2_sum_of_TU}
-  \uses{def:code_2_sum_of_matrices,def:code_tu_matrix}
+  \label{BinaryMatroid.Is2sumOf}
+  \uses{Matrix_2sumComposition,def:code_tu_matrix}
   \lean{BinaryMatroid_2sum_isRegular}
   \leanok
   Let $B_{1}$ and $B_{2}$ be TU matrices. Then $B = B_{1} \oplus_{2} B_{2}$ is a TU matrix.
 \end{lemma}
 
 \begin{proof}[Proof sketch]
-  \uses{def:code_2_sum_of_matrices,def:code_tu_matrix,lem:code_tu_add_ok_rows,cor:code_tu_add_ok_cols,lem:code_mvm_pivot,lem:code_mvm_props}
+  \uses{Matrix_2sumComposition,def:code_tu_matrix,lem:code_tu_add_ok_rows,cor:code_tu_add_ok_cols,lem:code_mvm_pivot,lem:code_mvm_props}
   % \leanok
 
   Let $B_{1}'$ and $B_{2}'$ be TU signings of $B_{1}$ and $B_{2}$, respectively.
@@ -98,31 +98,31 @@
 \end{proof}
 
 \begin{lemma}[$2$-sum of regular matroids is a regular matroid]
-  \label{lem:code_2_sum_of_regular}
-  \uses{def:code_2_sum_of_binary,def:code_regular_matroid}
+  \label{BinaryMatroid.Is2sumOf.isRegular}
+  \uses{BinaryMatroid.Is2sumOf,def:BinaryMatroid.IsRegular}
   \lean{BinaryMatroid.Is2sumOf.isRegular}
   \leanok
   Let $M_{1}$ and $M_{2}$ be regular matroids. Then $M = M_{1} \oplus_{2} M_{2}$ is a regular matroid.
 \end{lemma}
 
 \begin{proof}[Proof sketch]
-  \uses{def:code_2_sum_of_binary,def:code_regular_matroid,lem:code_2_sum_of_TU}
+  \uses{BinaryMatroid.Is2sumOf,def:BinaryMatroid.IsRegular,lem:code_2_sum_of_TU}
   \leanok
   Let $B$, $B_{1}$, and $B_{2}$ be the representation matrices of $M$, $M_{1}$, and $M_{2}$, respectively.
   Apply Lemma~\ref{lem:code_2_sum_of_TU}.
 \end{proof}
 
 \begin{lemma}[left summand of regular $2$-sum is regular]
-  \label{lem:code_2_sum_regular_left}
-  \uses{def:code_2_sum_of_binary,def:code_regular_matroid}
+  \label{BinaryMatroid.Is2sumOf.isRegular_left}
+  \uses{BinaryMatroid.Is2sumOf,def:BinaryMatroid.IsRegular}
   \lean{BinaryMatroid.Is2sumOf.isRegular_left}
   \leanok
   \todo[inline]{add}
 \end{lemma}
 
 \begin{lemma}[right summand of regular $2$-sum is regular]
-  \label{lem:code_2_sum_regular_right}
-  \uses{def:code_2_sum_of_binary,def:code_regular_matroid}
+  \label{BinaryMatroid.Is2sumOf.isRegular_right}
+  \uses{BinaryMatroid.Is2sumOf,def:BinaryMatroid.IsRegular}
   \lean{BinaryMatroid.Is2sumOf.isRegular_right}
   \leanok
   \todo[inline]{add}

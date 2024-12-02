@@ -1,7 +1,7 @@
 \section{Matroid Definitions}
 
 \begin{definition}[binary matroid]
-  \label{def:code_binary_matroid}
+  \label{def:BinaryMatroid}
   \lean{BinaryMatroid}
   \leanok
   Let $B$ be a binary matrix, let $A = \left[ I \mid B \right]$, and let $E$ denote the column index set of $A$.
@@ -12,8 +12,8 @@
 \end{definition}
 
 \begin{definition}[regular matroid]
-  \label{def:code_regular_matroid}
-  \uses{def:code_binary_matroid,def:code_tu_matrix}
+  \label{def:BinaryMatroid.IsRegular}
+  \uses{def:BinaryMatroid,def:code_tu_matrix}
   \lean{BinaryMatroid.IsRegular}
   \leanok
   Let $M$ be a binary matroid generated from a standard representation matrix $B$. Suppose $B$ has a TU signing, i.e., there exists a real matrix $A$ such that:
