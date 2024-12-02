@@ -42,11 +42,11 @@ lemma BinaryMatroid_1sum.equiv_direct_sum (hXY : M₁.X ⫗ M₂.Y) (hYX : M₁.
     (BinaryMatroid_1sum hXY hYX).fst.toMatroid = Matroid.disjointSum M₁.toMatroid M₂.toMatroid (by
       simp [Set.disjoint_union_left, Set.disjoint_union_right]
       exact ⟨⟨valid.left, hYX⟩, ⟨hXY, valid.right⟩⟩) := by
-  ext
+  apply Matroid.eq_of_indep_iff_indep_forall -- after bumping Mathlib, this line can become `ext`
   · unfold BinaryMatroid_1sum
     aesop
-  · sorry -- this should hopefully not be necessary to prove
-  · sorry -- TODO
+  · intro I hI
+    sorry -- TODO
 
 variable {M : BinaryMatroid α}
 
@@ -127,6 +127,7 @@ lemma BinaryMatroid.Is1sumOf.isRegular_left (hMsum : M.Is1sumOf M₁ M₂) (hMre
         = 0
       · sorry
       simp [this] at hBB'
+      --simpa [Matrix.fromMatrixElemElem] using hBB'
       sorry
     else
       sorry
