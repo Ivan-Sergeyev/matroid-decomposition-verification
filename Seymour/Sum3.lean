@@ -3,7 +3,7 @@ import Seymour.BinaryMatroid
 
 variable {α : Type*}
 
-/-- Matrix-level 3-sum for matroids defined by their standard representation matrices; does not check legitimacy. -/
+/-- `Matrix`-level 3-sum for matroids defined by their standard representation matrices; does not check legitimacy. -/
 noncomputable abbrev Matrix_3sumComposition {β : Type*} [CommRing β] {X₁ Y₁ : Set α} {X₂ Y₂ : Set α}
     (A₁ : Matrix X₁ (Y₁ ⊕ Fin 2) β) (A₂ : Matrix (Fin 2 ⊕ X₂) Y₂ β)
     (z₁ : Y₁ → β) (z₂ : X₂ → β) (D : Matrix (Fin 2) (Fin 2) β) (D₁ : Matrix (Fin 2) Y₁ β) (D₂ : Matrix X₂ (Fin 2) β) :
@@ -16,8 +16,8 @@ noncomputable abbrev Matrix_3sumComposition {β : Type*} [CommRing β] {X₁ Y�
 
 variable [DecidableEq α] {M₁ M₂ : BinaryMatroid α}
 
-/-- BinaryMatroid-level 3-sum of two matroids.
-The second part checks legitimacy (TODO document very specific conditions about the standard representation matrices). -/
+/-- `BinaryMatroid`-level 3-sum of two matroids.
+The second part checks legitimacy (invertibility of a certain 2x2 submatrix and specific 1s and 0s on concrete positions). -/
 noncomputable def BinaryMatroid_3sum {x₁ x₂ x₃ y₁ y₂ y₃ : α}
     (hXX : M₁.X ∩ M₂.X = {x₁, x₂, x₃}) (hYY : M₁.Y ∩ M₂.Y = {y₁, y₂, y₃}) (hXY : M₁.X ⫗ M₂.Y) (hYX : M₁.Y ⫗ M₂.X) :
     BinaryMatroid α × Prop :=
@@ -100,7 +100,7 @@ noncomputable def BinaryMatroid_3sum {x₁ x₂ x₃ y₁ y₂ y₃ : α}
     ∧ (∀ y : α, ∀ hy : y ∈ M₂.Y, y ≠ y₂ ∧ y ≠ y₁ → M₂.B ⟨x₁, x₁inX₂⟩ ⟨y, hy⟩ = 0) -- the rest of the topmost row is `0`s
   ⟩
 
-/-- Matroid `M` is a result of 3-summing `M₁` and `M₂` in some way. -/
+/-- Binary matroid `M` is a result of 3-summing `M₁` and `M₂` in some way. -/
 def BinaryMatroid.Is3sumOf (M : BinaryMatroid α) (M₁ M₂ : BinaryMatroid α) : Prop :=
   ∃ x₁ x₂ x₃ y₁ y₂ y₃ : α,
     ∃ hXX : M₁.X ∩ M₂.X = {x₁, x₂, x₃}, ∃ hYY : M₁.Y ∩ M₂.Y = {y₁, y₂, y₃}, ∃ hXY : M₁.X ⫗ M₂.Y, ∃ hYX : M₁.Y ⫗ M₂.X,
@@ -245,8 +245,10 @@ M₂.B ⟨x₃, x₃inX₂⟩ ⟨y₃, y₃inY₂⟩ = 1
 (∀ y : α, ∀ hy : y ∈ M₂.Y, y ≠ y₂ ∧ y ≠ y₁ → M₂.B ⟨x₁, x₁inX₂⟩ ⟨y, hy⟩ = 0)
 -/
 
-/-- Any 3-sum of regular matroids is a regular matroid. -/
-theorem BinaryMatroid.Is3sumOf.isRegular (hM : M.Is3sumOf M₁ M₂) (hM₁ : M₁.IsRegular) (hM₂ : M₂.IsRegular) :
+/-- Any 3-sum of regular matroids is a regular matroid.
+This is the last of the three parts of the easy direction of the Seymour's theorem. -/
+theorem BinaryMatroid.Is3sumOf.isRegular [Fintype M₁.X] [Fintype M₁.Y] [Fintype M₂.X] [Fintype M₂.Y]
+    (hM : M.Is3sumOf M₁ M₂) (hM₁ : M₁.IsRegular) (hM₂ : M₂.IsRegular) :
     M.IsRegular := by
   sorry
 

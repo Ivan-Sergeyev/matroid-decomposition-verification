@@ -11,6 +11,7 @@ structure BinaryMatroid (α : Type*) [DecidableEq α] where
   hXY : X ⫗ Y
   B : Matrix X Y Z2
 
+-- Automatically infer decidability when `BinaryMatroid` is present.
 attribute [instance] BinaryMatroid.decmemX
 attribute [instance] BinaryMatroid.decmemY
 
@@ -66,16 +67,17 @@ def Matrix.toMatroid (B : Matrix X Y Z2) : Matroid α := B.toIndepMatroid.matroi
 /-- Convert `BinaryMatroid` to `Matroid`. -/
 def BinaryMatroid.toMatroid (M : BinaryMatroid α) : Matroid α := M.B.toMatroid
 
-@[simp]
+@[simp] -- API
 lemma BinaryMatroid.E_eq (M : BinaryMatroid α) : M.toMatroid.E = M.X ∪ M.Y := rfl
 
-@[simp]
+@[simp] -- API
 lemma BinaryMatroid.indep_eq (M : BinaryMatroid α) : M.toMatroid.Indep = M.B.IndepCols := rfl
 
+/-- Registered conversion from `BinaryMatroid` to `Matroid`. -/
 instance : Coe (BinaryMatroid α) (Matroid α) where coe := BinaryMatroid.toMatroid
 
 
-/-- The binary matroid is regular. -/
+/-- The binary matroid is regular iff it has a totally unimodular signing. -/
 def BinaryMatroid.IsRegular (M : BinaryMatroid α) : Prop :=
   ∃ B' : Matrix M.X M.Y ℤ, -- signed version of `B`
     (Matrix.fromColumns (1 : Matrix M.X M.X ℤ) B').TU ∧ -- the signed representation matrix is totally unimodular

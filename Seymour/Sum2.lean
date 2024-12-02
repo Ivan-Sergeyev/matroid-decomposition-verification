@@ -3,7 +3,7 @@ import Seymour.BinaryMatroid
 
 variable {α : Type*}
 
-/-- Matrix-level 2-sum for matroids defined by their standard representation matrices; does not check legitimacy. -/
+/-- `Matrix`-level 2-sum for matroids defined by their standard representation matrices; does not check legitimacy. -/
 abbrev Matrix_2sumComposition {β : Type*} [CommRing β] {X₁ Y₁ : Set α} {X₂ Y₂ : Set α}
     (A₁ : Matrix X₁ Y₁ β) (x : Y₁ → β) (A₂ : Matrix X₂ Y₂ β) (y : X₂ → β) :
     Matrix (X₁ ⊕ X₂) (Y₁ ⊕ Y₂) β :=
@@ -11,7 +11,7 @@ abbrev Matrix_2sumComposition {β : Type*} [CommRing β] {X₁ Y₁ : Set α} {X
 
 variable [DecidableEq α] {M₁ M₂ : BinaryMatroid α}
 
-/-- BinaryMatroid-level 2-sum of two matroids.
+/-- `BinaryMatroid`-level 2-sum of two matroids.
 The second part checks legitimacy: the ground sets of `M₁` and `M₂` are disjoint except for the element `a ∈ M₁.X ∩ M₂.Y`,
 and the bottom-most row of `M₁` and the left-most column of `M₂` are each nonzero vectors. -/
 def BinaryMatroid_2sum {a : α} (ha : M₁.X ∩ M₂.Y = {a}) (hXY : M₂.X ⫗ M₁.Y) :
@@ -34,7 +34,7 @@ def BinaryMatroid_2sum {a : α} (ha : M₁.X ∩ M₂.Y = {a}) (hXY : M₂.X ⫗
     (M₁.X ⫗ M₂.X ∧ M₁.Y ⫗ M₂.Y) ∧ (x ≠ 0 ∧ y ≠ 0)
   ⟩
 
-/-- Matroid `M` is a result of 2-summing `M₁` and `M₂` in some way. -/
+/-- Binary matroid `M` is a result of 2-summing `M₁` and `M₂` in some way. -/
 def BinaryMatroid.Is2sumOf (M : BinaryMatroid α) (M₁ M₂ : BinaryMatroid α) : Prop :=
   ∃ a : α, ∃ ha : M₁.X ∩ M₂.Y = {a}, ∃ hXY : M₂.X ⫗ M₁.Y,
     let M₀ := BinaryMatroid_2sum ha hXY
@@ -174,8 +174,10 @@ lemma BinaryMatroid_2sum_isRegular {a : α} (ha : M₁.X ∩ M₂.Y = {a}) (hXY 
         specialize hA₂ i₂ j₂
         simp_all [x', y', A₁', A₂']
 
-/-- Any 2-sum of regular matroids is a regular matroid. -/
-theorem BinaryMatroid.Is2sumOf.isRegular (hM : M.Is2sumOf M₁ M₂) (hM₁ : M₁.IsRegular) (hM₂ : M₂.IsRegular) :
+/-- Any 2-sum of regular matroids is a regular matroid.
+This is the middle of the three parts of the easy direction of the Seymour's theorem. -/
+theorem BinaryMatroid.Is2sumOf.isRegular [Fintype M₁.X] [Fintype M₁.Y] [Fintype M₂.X] [Fintype M₂.Y]
+    (hM : M.Is2sumOf M₁ M₂) (hM₁ : M₁.IsRegular) (hM₂ : M₂.IsRegular) :
     M.IsRegular := by
   obtain ⟨a, ha, hXY, rfl, -⟩ := hM
   exact BinaryMatroid_2sum_isRegular ha hXY hM₁ hM₂

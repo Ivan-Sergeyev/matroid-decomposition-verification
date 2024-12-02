@@ -5,7 +5,7 @@ import Mathlib.Data.Matroid.Sum
 
 variable {α : Type*}
 
-/-- Matrix-level 1-sum for matroids defined by their standard representation matrices. -/
+/-- `Matrix`-level 1-sum for matroids defined by their standard representation matrices. -/
 abbrev Matrix_1sumComposition {β : Type*} [CommRing β] {X₁ Y₁ : Set α} {X₂ Y₂ : Set α}
     (A₁ : Matrix X₁ Y₁ β) (A₂ : Matrix X₂ Y₂ β) :
     Matrix (X₁ ⊕ X₂) (Y₁ ⊕ Y₂) β :=
@@ -13,7 +13,7 @@ abbrev Matrix_1sumComposition {β : Type*} [CommRing β] {X₁ Y₁ : Set α} {X
 
 variable [DecidableEq α] {M₁ M₂ : BinaryMatroid α}
 
-/-- BinaryMatroid-level 1-sum of two matroids. It checks that everything is disjoint (returned as `.snd` of the output). -/
+/-- `BinaryMatroid`-level 1-sum of two matroids. It checks that everything is disjoint (returned as `.snd` of the output). -/
 def BinaryMatroid_1sum (hXY : M₁.X ⫗ M₂.Y) (hYX : M₁.Y ⫗ M₂.X) :
     BinaryMatroid α × Prop :=
   ⟨
@@ -28,7 +28,7 @@ def BinaryMatroid_1sum (hXY : M₁.X ⫗ M₂.Y) (hYX : M₁.Y ⫗ M₂.X) :
     M₁.X ⫗ M₂.X ∧ M₁.Y ⫗ M₂.Y
   ⟩
 
-/-- Matroid `M` is a result of 1-summing `M₁` and `M₂` (should be equivalent to direct sums). -/
+/-- Binary matroid `M` is a result of 1-summing `M₁` and `M₂` (should be equivalent to disjoint sums). -/
 def BinaryMatroid.Is1sumOf (M : BinaryMatroid α) (M₁ M₂ : BinaryMatroid α) : Prop :=
   ∃ hXY : M₁.X ⫗ M₂.Y, ∃ hYX : M₁.Y ⫗ M₂.X,
     let M₀ := BinaryMatroid_1sum hXY hYX
@@ -72,13 +72,14 @@ lemma BinaryMatroid.Is1sumOf.B_eq (hM : M.Is1sumOf M₁ M₂) :
   obtain ⟨_, _, rfl, -⟩ := hM
   rfl
 
-/-- Any 1-sum of regular matroids is a regular matroid. -/
+/-- Any 1-sum of regular matroids is a regular matroid.
+This is the first of the three parts of the easy direction of the Seymour's theorem. -/
 theorem BinaryMatroid.Is1sumOf.isRegular [Fintype M₁.X] [Fintype M₁.Y] [Fintype M₂.X] [Fintype M₂.Y]
     (hM : M.Is1sumOf M₁ M₂) (hM₁ : M₁.IsRegular) (hM₂ : M₂.IsRegular) :
     M.IsRegular := by
   obtain ⟨B₁, hB₁, hBB₁⟩ := hM₁
   obtain ⟨B₂, hB₂, hBB₂⟩ := hM₂
-  let B' := Matrix_1sumComposition B₁ B₂
+  let B' := Matrix_1sumComposition B₁ B₂ -- the signing is obtained using the same function
   have hB' : B'.TU
   · apply Matrix.fromBlocks_TU
     · rwa [Matrix.TU_adjoin_id_left_iff] at hB₁
@@ -91,17 +92,17 @@ theorem BinaryMatroid.Is1sumOf.isRegular [Fintype M₁.X] [Fintype M₁.Y] [Fint
   · rw [Matrix.TU_adjoin_id_left_iff]
     exact hB'.toMatrixElemElem hM.X_eq hM.Y_eq
   · intro i j
-    simp only [hMB, Matrix_1sumComposition, Matrix.toMatrixElemElem_eq]
-    cases hi : (hM.X_eq ▸ i).toSum with
+    simp only [hMB, Matrix_1sumComposition, Matrix.toMatrixElemElem_apply]
+    cases (hM.X_eq ▸ i).toSum with
     | inl i₁ =>
-      cases hj : (hM.Y_eq ▸ j).toSum with
+      cases (hM.Y_eq ▸ j).toSum with
       | inl j₁ =>
         specialize hBB₁ i₁ j₁
         simp_all [B']
       | inr j₂ =>
         simp_all [B']
     | inr i₂ =>
-      cases hj : (hM.Y_eq ▸ j).toSum with
+      cases (hM.Y_eq ▸ j).toSum with
       | inl j₁ =>
         simp_all [B']
       | inr j₂ =>
