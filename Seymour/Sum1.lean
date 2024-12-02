@@ -1,11 +1,13 @@
 import Seymour.BinaryMatroid
+import Seymour.ForMathlib.Matroid
 import Mathlib.Data.Matroid.Sum
 
 
 variable {α : Type*}
 
 /-- Matrix-level 1-sum for matroids defined by their standard representation matrices. -/
-abbrev Matrix_1sumComposition {β : Type*} [CommRing β] {X₁ Y₁ : Set α} {X₂ Y₂ : Set α} (A₁ : Matrix X₁ Y₁ β) (A₂ : Matrix X₂ Y₂ β) :
+abbrev Matrix_1sumComposition {β : Type*} [CommRing β] {X₁ Y₁ : Set α} {X₂ Y₂ : Set α}
+    (A₁ : Matrix X₁ Y₁ β) (A₂ : Matrix X₂ Y₂ β) :
     Matrix (X₁ ⊕ X₂) (Y₁ ⊕ Y₂) β :=
   Matrix.fromBlocks A₁ 0 0 A₂
 
@@ -32,13 +34,8 @@ def BinaryMatroid.Is1sumOf (M : BinaryMatroid α) (M₁ M₂ : BinaryMatroid α)
     let M₀ := BinaryMatroid_1sum hXY hYX
     M = M₀.fst ∧ M₀.snd
 
-/-- 1-sum is commutative. -/
-lemma BinaryMatroid_1sum_comm (hXY : M₁.X ⫗ M₂.Y) (hYX : M₁.Y ⫗ M₂.X) :
-    BinaryMatroid_1sum hXY hYX = BinaryMatroid_1sum hYX.symm hXY.symm := by
-  sorry
-
-/-- 1-sum is the same as direct sum. -/
-lemma BinaryMatroid_1sum.equiv_direct_sum (hXY : M₁.X ⫗ M₂.Y) (hYX : M₁.Y ⫗ M₂.X) (valid : (BinaryMatroid_1sum hXY hYX).snd) :
+/-- Matroid constructed from a valid 1-sum of binary matroids is the same as disjoint sum of matroids constructed from them. -/
+lemma BinaryMatroid_1sum_as_disjoint_sum {hXY : M₁.X ⫗ M₂.Y} {hYX : M₁.Y ⫗ M₂.X} (valid : (BinaryMatroid_1sum hXY hYX).snd) :
     (BinaryMatroid_1sum hXY hYX).fst.toMatroid = Matroid.disjointSum M₁.toMatroid M₂.toMatroid (by
       simp [Set.disjoint_union_left, Set.disjoint_union_right]
       exact ⟨⟨valid.left, hYX⟩, ⟨hXY, valid.right⟩⟩) := by
@@ -47,6 +44,14 @@ lemma BinaryMatroid_1sum.equiv_direct_sum (hXY : M₁.X ⫗ M₂.Y) (hYX : M₁.
     aesop
   · intro I hI
     sorry -- TODO
+
+/-- A valid 1-sum of binary matroids is commutative. -/
+lemma BinaryMatroid_1sum_comm {hXY : M₁.X ⫗ M₂.Y} {hYX : M₁.Y ⫗ M₂.X} (valid : (BinaryMatroid_1sum hXY hYX).snd) :
+    (BinaryMatroid_1sum hXY hYX).fst.toMatroid = (BinaryMatroid_1sum hYX.symm hXY.symm).fst.toMatroid := by
+  rw [BinaryMatroid_1sum_as_disjoint_sum valid, BinaryMatroid_1sum_as_disjoint_sum, Matroid.disjointSum_comm]
+  constructor
+  · exact valid.left.symm
+  · exact valid.right.symm
 
 variable {M : BinaryMatroid α}
 
