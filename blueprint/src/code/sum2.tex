@@ -59,7 +59,7 @@
 % \end{proof}
 
 \begin{lemma}[$2$-sum of TU matrices is a TU matrix]
-  \label{BinaryMatroid.Is2sumOf}
+  \label{Matrix_2sumComposition_TU}
   \uses{Matrix_2sumComposition,def:code_tu_matrix}
   \lean{BinaryMatroid_2sum_isRegular}
   \leanok
@@ -106,10 +106,10 @@
 \end{theorem}
 
 \begin{proof}[Proof sketch]
-  \uses{BinaryMatroid.Is2sumOf,BinaryMatroid.IsRegular,lem:code_2_sum_of_TU}
+  \uses{BinaryMatroid.Is2sumOf,BinaryMatroid.IsRegular,Matrix_2sumComposition_TU}
   \leanok
   Let $B$, $B_{1}$, and $B_{2}$ be the representation matrices of $M$, $M_{1}$, and $M_{2}$, respectively.
-  Apply Lemma~\ref{lem:code_2_sum_of_TU}.
+  Apply Lemma~\ref{Matrix_2sumComposition_TU}.
 \end{proof}
 
 \begin{lemma}[left summand of regular $2$-sum is regular]
