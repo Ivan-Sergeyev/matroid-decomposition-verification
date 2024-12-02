@@ -250,7 +250,6 @@ theorem BinaryMatroid.Is3sumOf.isRegular (hM : M.Is3sumOf M₁ M₂) (hM₁ : M�
     M.IsRegular := by
   sorry
 
-
 /-- If a regular matroid is a 3-sum, then the left summand of the 3-sum is regular. -/
 lemma BinaryMatroid.Is3sumOf.isRegular_left (hMsum : M.Is3sumOf M₁ M₂) (hMreg : M.IsRegular) :
     M₁.IsRegular := by

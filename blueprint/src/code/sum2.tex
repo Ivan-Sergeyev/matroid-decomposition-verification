@@ -31,7 +31,7 @@
 
 \begin{definition}[matroid $2$-sum]
   \label{BinaryMatroid.Is2sumOf}
-  \uses{def:BinaryMatroid,Matrix_2sumComposition}
+  \uses{BinaryMatroid,Matrix_2sumComposition}
   \lean{BinaryMatroid.Is2sumOf}
   \leanok
   Let $M$ be a binary matroid with a representation matrix $B$.
@@ -97,16 +97,16 @@
   \end{itemize}
 \end{proof}
 
-\begin{lemma}[$2$-sum of regular matroids is a regular matroid]
+\begin{theorem}[$2$-sum of regular matroids is a regular matroid]
   \label{BinaryMatroid.Is2sumOf.isRegular}
-  \uses{BinaryMatroid.Is2sumOf,def:BinaryMatroid.IsRegular}
+  \uses{BinaryMatroid.Is2sumOf,BinaryMatroid.IsRegular}
   \lean{BinaryMatroid.Is2sumOf.isRegular}
   \leanok
   Let $M_{1}$ and $M_{2}$ be regular matroids. Then $M = M_{1} \oplus_{2} M_{2}$ is a regular matroid.
-\end{lemma}
+\end{theorem}
 
 \begin{proof}[Proof sketch]
-  \uses{BinaryMatroid.Is2sumOf,def:BinaryMatroid.IsRegular,lem:code_2_sum_of_TU}
+  \uses{BinaryMatroid.Is2sumOf,BinaryMatroid.IsRegular,lem:code_2_sum_of_TU}
   \leanok
   Let $B$, $B_{1}$, and $B_{2}$ be the representation matrices of $M$, $M_{1}$, and $M_{2}$, respectively.
   Apply Lemma~\ref{lem:code_2_sum_of_TU}.
@@ -114,7 +114,7 @@
 
 \begin{lemma}[left summand of regular $2$-sum is regular]
   \label{BinaryMatroid.Is2sumOf.isRegular_left}
-  \uses{BinaryMatroid.Is2sumOf,def:BinaryMatroid.IsRegular}
+  \uses{BinaryMatroid.Is2sumOf,BinaryMatroid.IsRegular}
   \lean{BinaryMatroid.Is2sumOf.isRegular_left}
   \leanok
   \todo[inline]{add}
@@ -122,7 +122,7 @@
 
 \begin{lemma}[right summand of regular $2$-sum is regular]
   \label{BinaryMatroid.Is2sumOf.isRegular_right}
-  \uses{BinaryMatroid.Is2sumOf,def:BinaryMatroid.IsRegular}
+  \uses{BinaryMatroid.Is2sumOf,BinaryMatroid.IsRegular}
   \lean{BinaryMatroid.Is2sumOf.isRegular_right}
   \leanok
   \todo[inline]{add}

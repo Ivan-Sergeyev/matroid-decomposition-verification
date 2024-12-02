@@ -18,7 +18,7 @@
 
 \begin{definition}[matroid $1$-sum]
   \label{BinaryMatroid.Is1sumOf}
-  \uses{def:BinaryMatroid,Matrix_1sumComposition}
+  \uses{BinaryMatroid,Matrix_1sumComposition}
   \lean{BinaryMatroid.Is1sumOf}
   \leanok
   Let $M$ be a binary matroid with a representation matrix $B$.
@@ -56,18 +56,18 @@
 % todo: lemma 8.2.2.a: graphic with 1-sum decomposition -> graph representations connected via node identification
 % todo: lemma 8.2.2.b: 1-sum composition of graphic (planar) is graphic (planar)
 
-\begin{lemma}[$1$-sum of regular matroids is regular]
+\begin{theorem}[$1$-sum of regular matroids is regular]
   \label{BinaryMatroid.Is1sumOf.isRegular}
   \lean{BinaryMatroid.Is1sumOf.isRegular}
   \leanok
-  \uses{BinaryMatroid.Is1sumOf,def:BinaryMatroid.IsRegular}
+  \uses{BinaryMatroid.Is1sumOf,BinaryMatroid.IsRegular}
   Let $M_{1}$ and $M_{2}$ be regular matroids. Then $M = M_{1} \oplus_{1} M_{2}$ is a regular matroid.
 
   Conversely, if a regular matroid $M$ can be decomposed as a $1$-sum $M = M_{1} \oplus_{1} M_{2}$, then $M_{1}$ and $M_{2}$ are both regular.
-\end{lemma}
+\end{theorem}
 
 \begin{proof}[Proof sketch]
-  \uses{BinaryMatroid.Is1sumOf,def:BinaryMatroid.IsRegular,lem:code_diagonal_with_tu_blocks}
+  \uses{BinaryMatroid.Is1sumOf,BinaryMatroid.IsRegular,lem:code_diagonal_with_tu_blocks}
   \leanok
   \todo[inline]{extract into lemmas about TU matrices}
   Let $B$, $B_{1}$, and $B_{2}$ be the representation matrices of $M$, $M_{1}$, and $M_{2}$, respectively.
@@ -79,7 +79,7 @@
 
 \begin{lemma}[left summand of regular $1$-sum is regular]
   \label{BinaryMatroid.Is1sumOf.isRegular_left}
-  \uses{BinaryMatroid.Is1sumOf,def:BinaryMatroid.IsRegular}
+  \uses{BinaryMatroid.Is1sumOf,BinaryMatroid.IsRegular}
   \lean{BinaryMatroid.Is1sumOf.isRegular_left}
   \leanok
   \todo[inline]{add}
@@ -87,7 +87,7 @@
 
 \begin{lemma}[right summand of regular $1$-sum is regular]
   \label{BinaryMatroid.Is1sumOf.isRegular_right}
-  \uses{BinaryMatroid.Is1sumOf,def:BinaryMatroid.IsRegular}
+  \uses{BinaryMatroid.Is1sumOf,BinaryMatroid.IsRegular}
   \lean{BinaryMatroid.Is1sumOf.isRegular_right}
   \leanok
   \todo[inline]{add}
