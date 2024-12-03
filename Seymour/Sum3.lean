@@ -4,7 +4,7 @@ import Seymour.BinaryMatroid
 variable {α : Type*}
 
 /-- `Matrix`-level 3-sum for matroids defined by their standard representation matrices; does not check legitimacy. -/
-noncomputable abbrev Matrix_3sumComposition {β : Type*} [CommRing β] {X₁ Y₁ : Set α} {X₂ Y₂ : Set α}
+noncomputable abbrev Matrix_3sumComposition {β : Type*} [CommRing β] {X₁ Y₁ X₂ Y₂ : Set α}
     (A₁ : Matrix X₁ (Y₁ ⊕ Fin 2) β) (A₂ : Matrix (Fin 2 ⊕ X₂) Y₂ β)
     (z₁ : Y₁ → β) (z₂ : X₂ → β) (D : Matrix (Fin 2) (Fin 2) β) (D₁ : Matrix (Fin 2) Y₁ β) (D₂ : Matrix X₂ (Fin 2) β) :
     Matrix ((X₁ ⊕ Unit) ⊕ (Fin 2 ⊕ X₂)) ((Y₁ ⊕ Fin 2) ⊕ (Unit ⊕ Y₂)) β :=

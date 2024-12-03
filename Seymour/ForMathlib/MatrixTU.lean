@@ -288,7 +288,7 @@ lemma Matrix.fromBlocks_TU
       rw [Fintype.card_sum] at hk₁ hk₂
       cases hxy <;> omega
     clear hxy
-    -- goal: prove that `det` = `0`
+    -- goal: prove that `det` is `0`
     left
     if hxy₁ :
         Fintype.card { x₁ : Fin k × X₁ // f x₁.fst = Sum.inl x₁.snd } <

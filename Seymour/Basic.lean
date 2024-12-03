@@ -5,7 +5,7 @@ import Seymour.ForMathlib.MatrixTU
 /-- The finite field on two elements; write `Z2` for "value" type but `Fin 2` for "indexing" type. -/
 abbrev Z2 : Type := ZMod 2
 
-/-- Roughly speaking `a ᕃ A = A ∪ {a}`. -/
+/-- Roughly speaking `a ᕃ A` is `A ∪ {a}`. -/
 infixr:66 " ᕃ " => Insert.insert -- TODO (low priority) use `syntax` and write a custom delaborator
 
 /-- Writing `X ⫗ Y` is slightly more general than writing `X ∩ Y = ∅`. -/
@@ -92,12 +92,20 @@ def Matrix.fromMatrixElemElem (C : Matrix T S β) (hT : T = T₁ ∪ T₂) (hS :
     Matrix (T₁ ⊕ T₂) (S₁ ⊕ S₂) β :=
   (hT ▸ hS ▸ C).toMatrixSumSum
 
+/-- Converting a block matrix to a matrix over set unions named as single indexing sets and back to a block matrix gives
+the original matrix, assuming that both said unions are disjoint. -/
 lemma toMatrixElemElem_fromMatrixElemElem (hT : T = T₁ ∪ T₂) (hS : S = S₁ ∪ S₂) (hTT : T₁ ⫗ T₂) (hSS : S₁ ⫗ S₂)
     (C : Matrix (T₁ ⊕ T₂) (S₁ ⊕ S₂) β) :
     (C.toMatrixElemElem hT hS).fromMatrixElemElem hT hS = C := by
-  ext i j
-  cases i <;> cases j <;>
-    simp only [Matrix.toMatrixElemElem, Matrix.fromMatrixElemElem, toMatrixUnionUnion_toMatrixSumSum] <;> sorry
+  subst hS hT
+  exact toMatrixUnionUnion_toMatrixSumSum hTT hSS C
+
+/-- Converting a matrix over set unions named as single indexing sets to a block matrix and back to a matrix over set unions
+named as single indexing sets gives the original matrix. -/
+lemma toMatrixElemElem_fromMatrixElemElem_ (hT : T = T₁ ∪ T₂) (hS : S = S₁ ∪ S₂) (C : Matrix T S β) :
+    (C.fromMatrixElemElem hT hS).toMatrixElemElem hT hS = C := by
+  subst hS hT
+  exact toMatrixSumSum_toMatrixUnionUnion C
 
 /-- A totally unimodular block matrix stays totally unimodular after converting to a matrix over set unions. -/
 lemma Matrix.TU.toMatrixUnionUnion {C : Matrix (T₁ ⊕ T₂) (S₁ ⊕ S₂) ℤ} (hC : C.TU) :
@@ -123,4 +131,5 @@ lemma Matrix.TU.toMatrixElemElem {C : Matrix (T₁ ⊕ T₂) (S₁ ⊕ S₂) ℤ
 a block matrix. -/
 lemma Matrix.TU.fromMatrixElemElem {C : Matrix T S ℤ} (hC : C.TU) (hT : T = T₁ ∪ T₂) (hS : S = S₁ ∪ S₂) :
     (C.fromMatrixElemElem hT hS).TU := by
-  sorry
+  subst hT hS
+  exact hC.toMatrixSumSum

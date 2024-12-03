@@ -6,7 +6,7 @@ import Mathlib.Data.Matroid.Sum
 variable {α : Type*}
 
 /-- `Matrix`-level 1-sum for matroids defined by their standard representation matrices. -/
-abbrev Matrix_1sumComposition {β : Type*} [CommRing β] {X₁ Y₁ : Set α} {X₂ Y₂ : Set α}
+abbrev Matrix_1sumComposition {β : Type*} [Zero β] {X₁ Y₁ X₂ Y₂ : Set α}
     (A₁ : Matrix X₁ Y₁ β) (A₂ : Matrix X₂ Y₂ β) :
     Matrix (X₁ ⊕ X₂) (Y₁ ⊕ Y₂) β :=
   Matrix.fromBlocks A₁ 0 0 A₂
@@ -133,7 +133,6 @@ lemma BinaryMatroid.Is1sumOf.isRegular_left (hMsum : M.Is1sumOf M₁ M₂) (hMre
         = 0
       · sorry
       simp [this] at hBB'
-      --simpa [Matrix.fromMatrixElemElem] using hBB'
       sorry
     else
       sorry
