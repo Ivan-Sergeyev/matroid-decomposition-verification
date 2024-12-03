@@ -81,7 +81,7 @@ def Matrix.toMatrixElemElem (C : Matrix (T₁ ⊕ T₂) (S₁ ⊕ S₂) β) (hT 
     Matrix T S β :=
   hT ▸ hS ▸ C.toMatrixUnionUnion
 
-/-- Direct characterization of what entries `Matrix.toMatrixElemElem` has. -/
+/-- Direct characterization of `Matrix.toMatrixElemElem` entries. -/
 lemma Matrix.toMatrixElemElem_apply (C : Matrix (T₁ ⊕ T₂) (S₁ ⊕ S₂) β) (hT : T = T₁ ∪ T₂) (hS : S = S₁ ∪ S₂) (i : T) (j : S) :
     C.toMatrixElemElem hT hS i j = C (hT ▸ i).toSum (hS ▸ j).toSum := by
   subst hT hS
@@ -91,6 +91,12 @@ lemma Matrix.toMatrixElemElem_apply (C : Matrix (T₁ ⊕ T₂) (S₁ ⊕ S₂) 
 def Matrix.fromMatrixElemElem (C : Matrix T S β) (hT : T = T₁ ∪ T₂) (hS : S = S₁ ∪ S₂) :
     Matrix (T₁ ⊕ T₂) (S₁ ⊕ S₂) β :=
   (hT ▸ hS ▸ C).toMatrixSumSum
+
+/-- Direct characterization of `Matrix.fromMatrixElemElem` entries. -/
+lemma Matrix.fromMatrixElemElem_apply (C : Matrix T S β) (hT : T = T₁ ∪ T₂) (hS : S = S₁ ∪ S₂) (i : T₁ ⊕ T₂) (j : S₁ ⊕ S₂) :
+    C.fromMatrixElemElem hT hS i j = C (hT ▸ i.toUnion) (hS ▸ j.toUnion) := by
+  subst hT hS
+  rfl
 
 /-- Converting a block matrix to a matrix over set unions named as single indexing sets and back to a block matrix gives
 the original matrix, assuming that both said unions are disjoint. -/
@@ -102,7 +108,7 @@ lemma toMatrixElemElem_fromMatrixElemElem (hT : T = T₁ ∪ T₂) (hS : S = S�
 
 /-- Converting a matrix over set unions named as single indexing sets to a block matrix and back to a matrix over set unions
 named as single indexing sets gives the original matrix. -/
-lemma toMatrixElemElem_fromMatrixElemElem_ (hT : T = T₁ ∪ T₂) (hS : S = S₁ ∪ S₂) (C : Matrix T S β) :
+lemma fromMatrixElemElem_toMatrixElemElem (hT : T = T₁ ∪ T₂) (hS : S = S₁ ∪ S₂) (C : Matrix T S β) :
     (C.fromMatrixElemElem hT hS).toMatrixElemElem hT hS = C := by
   subst hS hT
   exact toMatrixSumSum_toMatrixUnionUnion C

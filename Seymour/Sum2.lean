@@ -189,7 +189,11 @@ lemma BinaryMatroid_2sum_isRegular_left {a : α} (ha : M₁.X ∩ M₂.Y = {a}) 
     M₁.IsRegular := by
   obtain ⟨B', hB', hBB'⟩ := hM
   obtain ⟨haX₁, haY₂, hB⟩ := BinaryMatroid_2sum_B ha hXY
-  sorry
+  use B'.submatrix (fun i => ⟨i.val, by sorry⟩) (fun j => ⟨j.val, by sorry⟩)
+  constructor
+  · rw [Matrix.TU_adjoin_id_left_iff] at hB'
+    sorry
+  · sorry
 
 lemma BinaryMatroid_2sum_isRegular_right {a : α} (ha : M₁.X ∩ M₂.Y = {a}) (hXY : M₂.X ⫗ M₁.Y)
     (hM : (BinaryMatroid_2sum ha hXY).fst.IsRegular) :
