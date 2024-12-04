@@ -1,4 +1,5 @@
 import Mathlib.Data.Matrix.ColumnRowPartitioned
+import Mathlib.Data.Matrix.Rank
 import Seymour.ForMathlib.Basic
 
 attribute [-simp] Fintype.card_ofIsEmpty Fintype.card_ofSubsingleton -- major performance issue
@@ -161,6 +162,22 @@ lemma Matrix.TU_adjoin_id_right_iff [DecidableEq X] [DecidableEq Y] (A : Matrix 
 
 variable {X₁ X₂ Y₁ Y₂ : Type*}
 
+lemma Matrix.fromColumns_zero_rank [Fintype Y₁] [Fintype Y₂] (A : Matrix X Y₂ R) :
+    (Matrix.fromColumns (0 : Matrix X Y₁ R) A).rank = A.rank := by
+  sorry
+
+lemma Matrix.fromRows_rank_subadditive [Fintype Y] (A₁ : Matrix X₁ Y R) (A₂ : Matrix X₂ Y R) :
+    (Matrix.fromRows A₁ A₂).rank ≤ A₁.rank + A₂.rank := by
+  sorry
+
+-- Jireh Loreaux proved:
+lemma Matrix.det_zero_of_rank_lt {R : Type*} [LinearOrderedField R] [Fintype X] [DecidableEq X] {A : Matrix X X R}
+    (hA: A.rank < Fintype.card X) :
+    A.det = 0 := by
+  contrapose! hA
+  rw [←isUnit_iff_ne_zero, ←Matrix.isUnit_iff_isUnit_det] at hA
+  exact (A.rank_of_isUnit hA).symm.le
+
 lemma Matrix.fromBlocks_submatrix_apply {β ι γ : Type*} (f : ι → X₁ ⊕ X₂) (g : γ → Y₁ ⊕ Y₂)
     (A₁₁ : Matrix X₁ Y₁ β) (A₁₂ : Matrix X₁ Y₂ β) (A₂₁ : Matrix X₂ Y₁ β) (A₂₂ : Matrix X₂ Y₂ β) (i : ι) (j : γ) :
     (Matrix.fromBlocks A₁₁ A₁₂ A₂₁ A₂₂).submatrix f g i j =
@@ -190,8 +207,23 @@ lemma Matrix.submatrix_det_abs [Fintype X] [DecidableEq X] [Fintype Y] [Decidabl
   rw [hee, hAee, Matrix.det_submatrix_equiv_self, Matrix.det_permute']
   cases' Int.units_eq_one_or (Equiv.Perm.sign (e₁.symm.trans e₂)) with he he <;> rw [he] <;> simp
 
+lemma Matrix.submatrix_det_abs' [Fintype X₁] [DecidableEq X₁] [Fintype X₂] [DecidableEq X₂] [Fintype Y] [DecidableEq Y]
+    (A : Matrix X₁ X₂ R) (e₁ : Y ≃ X₁) (e₂ : Y ≃ X₂) :
+    |(A.submatrix e₁ e₂).det| = |(A.submatrix (e₂.symm.trans e₁) id).det| := by
+  sorry
+
+-- WE MEED :
 /-- A matrix composed of TU blocks on the diagonal is TU. -/
 lemma Matrix.fromBlocks_TU
+    [Fintype X₁] [DecidableEq X₁] [Fintype Y₁] [DecidableEq Y₁] [Fintype X₂] [DecidableEq X₂] [Fintype Y₂] [DecidableEq Y₂]
+    {A₁ : Matrix X₁ Y₁ R} {A₂ : Matrix X₂ Y₂ R}
+    (hA₁ : A₁.TU) (hA₂ : A₂.TU) :
+    (Matrix.fromBlocks A₁ 0 0 A₂).TU := by
+  sorry
+
+-- WIP :
+/-- A matrix composed of TU blocks on the diagonal is TU. -/
+lemma Matrix.fromBlocks_TU_ {R : Type*} [LinearOrderedField R]
     [Fintype X₁] [DecidableEq X₁] [Fintype Y₁] [DecidableEq Y₁] [Fintype X₂] [DecidableEq X₂] [Fintype Y₂] [DecidableEq Y₂]
     {A₁ : Matrix X₁ Y₁ R} {A₂ : Matrix X₂ Y₂ R}
     (hA₁ : A₁.TU) (hA₂ : A₂.TU) :
@@ -233,7 +265,7 @@ lemma Matrix.fromBlocks_TU
     let eY₂ : Fin (Fintype.card { x₂ : Fin k × X₂ // f x₂.fst = Sum.inr x₂.snd }) ≃ { y₂ : Fin k × Y₂ // g y₂.fst = Sum.inr y₂.snd } :=
       (cardi₂ ▸ Fintype.equivFin { y₂ : Fin k × Y₂ // g y₂.fst = Sum.inr y₂.snd }).symm
     -- relating submatrices in blocks to submatrices of `A₁` and `A₂`
-    -- (this is done via a mapping of the form `f ∘ h = (f ∘ g) ∘ (g⁻¹ ∘ h)` where `g⁻¹ ∘ h` is bijective)
+    -- metaphor: function `h` in `f ∘ h` is not bijective, but `f ∘ h` is `(f ∘ g) ∘ (g⁻¹ ∘ h)` where `g⁻¹ ∘ h` is bijective
     have hAfg' :
       (Matrix.fromBlocks
         (A₁.submatrix
@@ -268,8 +300,8 @@ lemma Matrix.fromBlocks_TU
       · split
         · rfl
         · simp
-    -- absolute value of determinant was preserved by previous mappings,
-    -- and we now express it as a product of determinants of submatrices in blocks
+    -- absolute value of determinant was preserved by previous mappings
+    -- we now express it as a product of determinants of submatrices in blocks
     rw [hAfg', ←abs_eq_zero, ←abs_eq_one, Matrix.submatrix_det_abs, Matrix.det_fromBlocks_zero₁₂, abs_eq_zero, abs_eq_one]
     -- determinants of submatrices in blocks are `0` or `±1` by TUness of `A₁` and `A₂`
     apply zom_mul_zom
@@ -290,9 +322,218 @@ lemma Matrix.fromBlocks_TU
     clear hxy
     -- goal: prove that `det` is `0`
     left
-    if hxy₁ :
-        Fintype.card { x₁ : Fin k × X₁ // f x₁.fst = Sum.inl x₁.snd } <
-        Fintype.card { y₁ : Fin k × Y₁ // g y₁.fst = Sum.inl y₁.snd } then
-      sorry -- the bottom half of our submatrix is singular
+    if hxy₁ : Fintype.card { x₁ : Fin k × X₁ // f x₁.fst = Sum.inl x₁.snd }
+            < Fintype.card { y₁ : Fin k × Y₁ // g y₁.fst = Sum.inl y₁.snd }
+    then
+      -- we need to prove that the bottom half of our submatrix does not have maximal rank
+      rw [←abs_eq_zero, Matrix.submatrix_det_abs']
+      have hAfg'' :
+        (Matrix.fromBlocks
+          (A₁.submatrix
+            ((·.val.snd) : { x₁ : Fin k × X₁ // f x₁.fst = Sum.inl x₁.snd } → X₁)
+            ((·.val.snd) : { y₁ : Fin k × Y₁ // g y₁.fst = Sum.inl y₁.snd } → Y₁)
+          ) 0 0
+          (A₂.submatrix
+            ((·.val.snd) : { x₂ : Fin k × X₂ // f x₂.fst = Sum.inr x₂.snd } → X₂)
+            ((·.val.snd) : { y₂ : Fin k × Y₂ // g y₂.fst = Sum.inr y₂.snd } → Y₂)
+          )).submatrix
+            (g.myEquiv.symm.trans f.myEquiv)
+            id
+        =
+        (Matrix.fromBlocks
+          (A₁.submatrix
+            ((·.val.snd) : { x₁ : Fin k × X₁ // f x₁.fst = Sum.inl x₁.snd } → X₁)
+            ((·.val.snd) : { y₁ : Fin k × Y₁ // g y₁.fst = Sum.inl y₁.snd } → Y₁)
+          ) 0 0
+          (A₂.submatrix
+            ((·.val.snd) : { x₂ : Fin k × X₂ // f x₂.fst = Sum.inr x₂.snd } → X₂)
+            ((·.val.snd) : { y₂ : Fin k × Y₂ // g y₂.fst = Sum.inr y₂.snd } → Y₂)
+          )).submatrix
+            (fun z =>
+              match hfg : f (g.myEquiv.symm z) with
+              | Sum.inl b₁ => Sum.inl ⟨⟨g.myEquiv.symm z, b₁⟩, hfg⟩
+              | Sum.inr b₂ => Sum.inr ⟨⟨g.myEquiv.symm z, b₂⟩, hfg⟩
+            ) /-
+              intro x
+              by cases x with
+              | inl x₁ =>
+                exact
+                  match hfg : f (g.myEquiv.symm (Sum.inl x₁)) with
+                  | Sum.inl b₁ => Sum.inl ⟨⟨x₁.val.fst, b₁⟩, hfg⟩
+                  | Sum.inr b₂ => Sum.inr ⟨⟨x₁.val.fst, b₂⟩, hfg⟩
+              | inr x₂ =>
+                exact
+                  match hfg : f (g.myEquiv.symm (Sum.inr x₂)) with
+                  | Sum.inl b₁ => Sum.inl ⟨⟨x₂.val.fst, b₁⟩, hfg⟩
+                  | Sum.inr b₂ => Sum.inr ⟨⟨x₂.val.fst, b₂⟩, hfg⟩
+              -/
+            (Equiv.refl _)
+      · rfl
+      have hAfg''' :
+        (Matrix.fromBlocks
+          (A₁.submatrix
+            ((·.val.snd) : { x₁ : Fin k × X₁ // f x₁.fst = Sum.inl x₁.snd } → X₁)
+            ((·.val.snd) : { y₁ : Fin k × Y₁ // g y₁.fst = Sum.inl y₁.snd } → Y₁)
+          ) 0 0
+          (A₂.submatrix
+            ((·.val.snd) : { x₂ : Fin k × X₂ // f x₂.fst = Sum.inr x₂.snd } → X₂)
+            ((·.val.snd) : { y₂ : Fin k × Y₂ // g y₂.fst = Sum.inr y₂.snd } → Y₂)
+          )).submatrix
+            (fun z =>
+              match hfg : f (g.myEquiv.symm z) with
+              | Sum.inl b₁ => Sum.inl ⟨⟨g.myEquiv.symm z, b₁⟩, hfg⟩
+              | Sum.inr b₂ => Sum.inr ⟨⟨g.myEquiv.symm z, b₂⟩, hfg⟩
+            )
+            (Equiv.refl _)
+        =
+        (Matrix.fromBlocks
+          (A₁.submatrix
+            (((·.val.snd) : { x₁ : Fin k × X₁ // f x₁.fst = Sum.inl x₁.snd } → X₁) ∘ (
+              fun z =>
+                match hfg : f z.val.fst with
+                | Sum.inl b₁ => ⟨⟨z.val.fst, b₁⟩, hfg⟩
+                | Sum.inr b₂ => False.elim (by sorry)
+              ))
+            ((·.val.snd) : { y₁ : Fin k × Y₁ // g y₁.fst = Sum.inl y₁.snd } → Y₁)
+          ) 0 0
+          (A₂.submatrix
+            (((·.val.snd) : { x₂ : Fin k × X₂ // f x₂.fst = Sum.inr x₂.snd } → X₂) ∘ (
+              fun z =>
+                match hfg : f z.val.fst with
+                | Sum.inl b₁ => False.elim (by sorry)
+                | Sum.inr b₂ => ⟨⟨z.val.fst, b₂⟩, hfg⟩
+              ))
+            ((·.val.snd) : { y₂ : Fin k × Y₂ // g y₂.fst = Sum.inr y₂.snd } → Y₂)
+          ))
+      · ext i j
+        cases i <;> cases j <;> sorry
+      have hAfg'''' :
+        (Matrix.fromBlocks
+          (A₁.submatrix
+            (((·.val.snd) : { x₁ : Fin k × X₁ // f x₁.fst = Sum.inl x₁.snd } → X₁) ∘ (
+              fun z : { y₁ : Fin k × Y₁ // g y₁.fst = Sum.inl y₁.snd } =>
+                match hfg : f z.val.fst with
+                | Sum.inl b₁ => ⟨⟨z.val.fst, b₁⟩, hfg⟩
+                | Sum.inr b₂ => False.elim (by sorry)
+              ))
+            ((·.val.snd) : { y₁ : Fin k × Y₁ // g y₁.fst = Sum.inl y₁.snd } → Y₁)
+          ) 0 0
+          (A₂.submatrix
+            (((·.val.snd) : { x₂ : Fin k × X₂ // f x₂.fst = Sum.inr x₂.snd } → X₂) ∘ (
+              fun z : { y₂ : Fin k × Y₂ // g y₂.fst = Sum.inr y₂.snd } =>
+                match hfg : f z.val.fst with
+                | Sum.inl b₁ => False.elim (by sorry)
+                | Sum.inr b₂ => ⟨⟨z.val.fst, b₂⟩, hfg⟩
+              ))
+            ((·.val.snd) : { y₂ : Fin k × Y₂ // g y₂.fst = Sum.inr y₂.snd } → Y₂)
+          ))
+        =
+        (Matrix.fromBlocks
+          (A₁.submatrix
+            (fun y =>
+              match hfg : f y.val.fst with
+              | Sum.inl x₁ => x₁
+              | Sum.inr x₂ => False.elim (by sorry)
+            )
+            ((·.val.snd) : { y₁ : Fin k × Y₁ // g y₁.fst = Sum.inl y₁.snd } → Y₁)
+          ) 0 0
+          (A₂.submatrix
+            (fun y =>
+              match hfg : f y.val.fst with
+              | Sum.inl x₁ => False.elim (by sorry)
+              | Sum.inr x₂ => x₂
+            )
+            ((·.val.snd) : { y₂ : Fin k × Y₂ // g y₂.fst = Sum.inr y₂.snd } → Y₂)
+          ))
+      · ext i j
+        cases i <;> cases j <;> sorry
+      rw [hAfg'', hAfg''', hAfg'''']
+      clear hAfg'' hAfg''' hAfg''''
+      have rankA₂ :
+        (A₂.submatrix
+          (fun y : { y₂ : Fin k × Y₂ // g y₂.fst = Sum.inr y₂.snd } =>
+            match hfg : f y.val.fst with
+            | Sum.inl x₁ => False.elim (by sorry)
+            | Sum.inr x₂ => x₂
+          )
+          ((·.val.snd) : { y₂ : Fin k × Y₂ // g y₂.fst = Sum.inr y₂.snd } → Y₂)
+        ).rank ≤
+          Fintype.card { y₂ : Fin k × Y₂ // g y₂.fst = Sum.inr y₂.snd }
+      · apply Matrix.rank_le_card_height
+      have rank0A₂ :
+        (Matrix.fromColumns
+          (0 : Matrix _ { y₁ : Fin k × Y₁ // g y₁.fst = Sum.inl y₁.snd } _)
+          (A₂.submatrix
+            (fun y : { y₂ : Fin k × Y₂ // g y₂.fst = Sum.inr y₂.snd } =>
+              match hfg : f y.val.fst with
+              | Sum.inl x₁ => False.elim (by sorry)
+              | Sum.inr x₂ => x₂
+            )
+            ((·.val.snd) : { y₂ : Fin k × Y₂ // g y₂.fst = Sum.inr y₂.snd } → Y₂)
+          )
+        ).rank ≤
+          Fintype.card { y₂ : Fin k × Y₂ // g y₂.fst = Sum.inr y₂.snd }
+      · rwa [Matrix.fromColumns_zero_rank]
+      have rankA₁ :
+        (A₁.submatrix
+          (fun y : { y₁ : Fin k × Y₁ // g y₁.fst = Sum.inl y₁.snd } =>
+            match hfg : f y.val.fst with
+            | Sum.inl x₁ => x₁
+            | Sum.inr x₂ => False.elim (by sorry)
+          )
+          ((·.val.snd) : { y₁ : Fin k × Y₁ // g y₁.fst = Sum.inl y₁.snd } → Y₁)
+        ).rank ≤
+          Fintype.card { x₁ : Fin k × X₁ // f x₁.fst = Sum.inl x₁.snd }
+      · sorry -- TODO this looks sus! Look into this first!
+      have rankA₁0 :
+        (Matrix.fromColumns
+          (A₁.submatrix
+            (fun y : { y₁ : Fin k × Y₁ // g y₁.fst = Sum.inl y₁.snd } =>
+              match hfg : f y.val.fst with
+              | Sum.inl x₁ => x₁
+              | Sum.inr x₂ => False.elim (by sorry)
+            )
+            ((·.val.snd) : { y₁ : Fin k × Y₁ // g y₁.fst = Sum.inl y₁.snd } → Y₁)
+          )
+          (0 : Matrix _ { y₂ : Fin k × Y₂ // g y₂.fst = Sum.inr y₂.snd } _)
+        ).rank ≤
+          Fintype.card { x₁ : Fin k × X₁ // f x₁.fst = Sum.inl x₁.snd }
+      · sorry -- swap left<->right, then `rwa [Matrix.fromColumns_zero_rank]`
+      have rankA₁00A₂ :
+        (Matrix.fromRows
+          (Matrix.fromColumns
+            (A₁.submatrix
+              (fun y : { y₁ : Fin k × Y₁ // g y₁.fst = Sum.inl y₁.snd } =>
+                match hfg : f y.val.fst with
+                | Sum.inl x₁ => x₁
+                | Sum.inr x₂ => False.elim (by sorry)
+              )
+              ((·.val.snd) : { y₁ : Fin k × Y₁ // g y₁.fst = Sum.inl y₁.snd } → Y₁)
+            )
+            (0 : Matrix _ { y₂ : Fin k × Y₂ // g y₂.fst = Sum.inr y₂.snd } _)
+          )
+          (Matrix.fromColumns
+            (0 : Matrix _ { y₁ : Fin k × Y₁ // g y₁.fst = Sum.inl y₁.snd } _)
+            (A₂.submatrix
+              (fun y : { y₂ : Fin k × Y₂ // g y₂.fst = Sum.inr y₂.snd } =>
+                match hfg : f y.val.fst with
+                | Sum.inl x₁ => False.elim (by sorry)
+                | Sum.inr x₂ => x₂
+              )
+              ((·.val.snd) : { y₂ : Fin k × Y₂ // g y₂.fst = Sum.inr y₂.snd } → Y₂)
+            )
+          )
+        ).rank ≤
+          Fintype.card { x₁ : Fin k × X₁ // f x₁.fst = Sum.inl x₁.snd } +
+          Fintype.card { y₂ : Fin k × Y₂ // g y₂.fst = Sum.inr y₂.snd }
+      · trans
+        · apply Matrix.fromRows_rank_subadditive
+        · exact Nat.add_le_add rankA₁0 rank0A₂
+      rw [abs_eq_zero]
+      apply Matrix.det_zero_of_rank_lt
+      rw [←Matrix.fromRows_fromColumn_eq_fromBlocks]
+      apply rankA₁00A₂.trans_lt
+      rw [Fintype.card_sum]
+      apply Nat.add_lt_add_right hxy₁
     else
-      sorry -- the top half of our submatrix is singular
+      sorry -- the top half of our submatrix does not have maximal rank
