@@ -114,14 +114,14 @@ lemma fromMatrixElemElem_toMatrixElemElem (hT : T = T₁ ∪ T₂) (hS : S = S�
   exact toMatrixSumSum_toMatrixUnionUnion C
 
 /-- A totally unimodular block matrix stays totally unimodular after converting to a matrix over set unions. -/
-lemma Matrix.TU.toMatrixUnionUnion {C : Matrix (T₁ ⊕ T₂) (S₁ ⊕ S₂) ℤ} (hC : C.TU) :
+lemma Matrix.TU.toMatrixUnionUnion {C : Matrix (T₁ ⊕ T₂) (S₁ ⊕ S₂) ℚ} (hC : C.TU) :
     C.toMatrixUnionUnion.TU := by
   rw [Matrix.TU_iff] at hC ⊢
   intros
   apply hC
 
 /-- A totally unimodular matrix over set unions stays totally unimodular after converting to a block matrix. -/
-lemma Matrix.TU.toMatrixSumSum {C : Matrix (T₁ ∪ T₂).Elem (S₁ ∪ S₂).Elem ℤ} (hC : C.TU) :
+lemma Matrix.TU.toMatrixSumSum {C : Matrix (T₁ ∪ T₂).Elem (S₁ ∪ S₂).Elem ℚ} (hC : C.TU) :
     C.toMatrixSumSum.TU := by
   rw [Matrix.TU_iff] at hC ⊢
   intros
@@ -129,13 +129,13 @@ lemma Matrix.TU.toMatrixSumSum {C : Matrix (T₁ ∪ T₂).Elem (S₁ ∪ S₂).
 
 /-- A totally unimodular block matrix stays totally unimodular after converting to a matrix over set unions named as
 single indexing sets. -/
-lemma Matrix.TU.toMatrixElemElem {C : Matrix (T₁ ⊕ T₂) (S₁ ⊕ S₂) ℤ} (hC : C.TU) (hT : T = T₁ ∪ T₂) (hS : S = S₁ ∪ S₂) :
+lemma Matrix.TU.toMatrixElemElem {C : Matrix (T₁ ⊕ T₂) (S₁ ⊕ S₂) ℚ} (hC : C.TU) (hT : T = T₁ ∪ T₂) (hS : S = S₁ ∪ S₂) :
     (C.toMatrixElemElem hT hS).TU :=
   hT ▸ hS ▸ hC.toMatrixUnionUnion
 
 /-- A totally unimodular matrix over set unions named as single indexing sets stays totally unimodular after converting to
 a block matrix. -/
-lemma Matrix.TU.fromMatrixElemElem {C : Matrix T S ℤ} (hC : C.TU) (hT : T = T₁ ∪ T₂) (hS : S = S₁ ∪ S₂) :
+lemma Matrix.TU.fromMatrixElemElem {C : Matrix T S ℚ} (hC : C.TU) (hT : T = T₁ ∪ T₂) (hS : S = S₁ ∪ S₂) :
     (C.fromMatrixElemElem hT hS).TU := by
   subst hT hS
   exact hC.toMatrixSumSum

@@ -4,7 +4,7 @@
   \label{def:code_tu_matrix}
   \lean{Matrix.TU}
   \leanok
-  A real matrix is \emph{totally unimodular (TU)} if its every subdeterminant (i.e., determinant of every square submatrix) is $0$ or $\pm 1$.
+  A rational matrix is \emph{totally unimodular (TU)} if its every subdeterminant (i.e., determinant of every square submatrix) is $0$ or $\pm 1$.
 \end{definition}
 
 \begin{lemma}[entries of a TU matrix]
@@ -26,7 +26,7 @@
   \uses{def:code_tu_matrix}
   \lean{Matrix.TU.submatrix}
   \leanok
-  Let $A$ be a real matrix that is TU and let $B$ be a submatrix of $A$. Then $B$ is TU.
+  Let $A$ be a rational matrix that is TU and let $B$ be a submatrix of $A$. Then $B$ is TU.
 \end{lemma}
 
 \begin{proof}[Proof sketch]
@@ -213,7 +213,7 @@
   \label{def:code_mvm}
   \uses{def:code_tu_matrix}
   % \lean{} % todo: add reference to corresponding lemma in lean
-  Let $A$ be a real $\{0, \pm 1\}$ matrix that is not TU but all of whose proper submatrices are TU.
+  Let $A$ be a rational $\{0, \pm 1\}$ matrix that is not TU but all of whose proper submatrices are TU.
   Then $A$ is called a \emph{minimal violation matrix of total unimodularity (minimal violation matrix)}.
 \end{definition}
 

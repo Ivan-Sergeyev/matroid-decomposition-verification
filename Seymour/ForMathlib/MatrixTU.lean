@@ -194,9 +194,9 @@ lemma Matrix.fromBlocks_submatrix_apply {β ι γ : Type*} (f : ι → X₁ ⊕ 
   aesop
 
 omit R
-variable {R : Type*} [LinearOrderedCommRing R]
 
-lemma Matrix.submatrix_det_abs [Fintype X] [DecidableEq X] [Fintype Y] [DecidableEq Y]
+lemma Matrix.submatrix_det_abs {R : Type*} [LinearOrderedCommRing R]
+    [Fintype X] [DecidableEq X] [Fintype Y] [DecidableEq Y]
     (A : Matrix X X R) (e₁ e₂ : Y ≃ X) :
     |(A.submatrix e₁ e₂).det| = |A.det| := by
   have hee : e₂ = e₁.trans (e₁.symm.trans e₂)
@@ -207,23 +207,14 @@ lemma Matrix.submatrix_det_abs [Fintype X] [DecidableEq X] [Fintype Y] [Decidabl
   rw [hee, hAee, Matrix.det_submatrix_equiv_self, Matrix.det_permute']
   cases' Int.units_eq_one_or (Equiv.Perm.sign (e₁.symm.trans e₂)) with he he <;> rw [he] <;> simp
 
-lemma Matrix.submatrix_det_abs' [Fintype X₁] [DecidableEq X₁] [Fintype X₂] [DecidableEq X₂] [Fintype Y] [DecidableEq Y]
+lemma Matrix.submatrix_det_abs' {R : Type*} [LinearOrderedCommRing R]
+    [Fintype X₁] [DecidableEq X₁] [Fintype X₂] [DecidableEq X₂] [Fintype Y] [DecidableEq Y]
     (A : Matrix X₁ X₂ R) (e₁ : Y ≃ X₁) (e₂ : Y ≃ X₂) :
     |(A.submatrix e₁ e₂).det| = |(A.submatrix (e₂.symm.trans e₁) id).det| := by
   sorry
 
--- WE MEED :
 /-- A matrix composed of TU blocks on the diagonal is TU. -/
-lemma Matrix.fromBlocks_TU
-    [Fintype X₁] [DecidableEq X₁] [Fintype Y₁] [DecidableEq Y₁] [Fintype X₂] [DecidableEq X₂] [Fintype Y₂] [DecidableEq Y₂]
-    {A₁ : Matrix X₁ Y₁ R} {A₂ : Matrix X₂ Y₂ R}
-    (hA₁ : A₁.TU) (hA₂ : A₂.TU) :
-    (Matrix.fromBlocks A₁ 0 0 A₂).TU := by
-  sorry
-
--- WIP :
-/-- A matrix composed of TU blocks on the diagonal is TU. -/
-lemma Matrix.fromBlocks_TU_ {R : Type*} [LinearOrderedField R]
+lemma Matrix.fromBlocks_TU {R : Type*} [LinearOrderedField R]
     [Fintype X₁] [DecidableEq X₁] [Fintype Y₁] [DecidableEq Y₁] [Fintype X₂] [DecidableEq X₂] [Fintype Y₂] [DecidableEq Y₂]
     {A₁ : Matrix X₁ Y₁ R} {A₂ : Matrix X₂ Y₂ R}
     (hA₁ : A₁.TU) (hA₂ : A₂.TU) :

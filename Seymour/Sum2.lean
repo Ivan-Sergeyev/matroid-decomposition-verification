@@ -77,18 +77,18 @@ lemma BinaryMatroid.Is2sumOf.indep (hM : M.Is2sumOf M₁ M₂) :
   rewrite [hMM]
   rfl
 
-lemma Matrix_2sumComposition_TU {X₁ Y₁ X₂ Y₂ : Set α} {A₁ : Matrix X₁ Y₁ ℤ} {A₂ : Matrix X₂ Y₂ ℤ}
-    (hA₁ : A₁.TU) (hA₂ : A₂.TU) (x : Y₁ → ℤ) (y : X₂ → ℤ) :
+lemma Matrix_2sumComposition_TU {X₁ Y₁ X₂ Y₂ : Set α} {A₁ : Matrix X₁ Y₁ ℚ} {A₂ : Matrix X₂ Y₂ ℚ}
+    (hA₁ : A₁.TU) (hA₂ : A₂.TU) (x : Y₁ → ℚ) (y : X₂ → ℚ) :
     (Matrix_2sumComposition A₁ x A₂ y).TU := by
   sorry
 
-lemma Matrix_2sumComposition_TU_left {X₁ Y₁ X₂ Y₂ : Set α} {A₁ : Matrix X₁ Y₁ ℤ} {A₂ : Matrix X₂ Y₂ ℤ}
-    {x : Y₁ → ℤ} {y : X₂ → ℤ} (hA : (Matrix_2sumComposition A₁ x A₂ y).TU) :
+lemma Matrix_2sumComposition_TU_left {X₁ Y₁ X₂ Y₂ : Set α} {A₁ : Matrix X₁ Y₁ ℚ} {A₂ : Matrix X₂ Y₂ ℚ}
+    {x : Y₁ → ℚ} {y : X₂ → ℚ} (hA : (Matrix_2sumComposition A₁ x A₂ y).TU) :
     A₁.TU := by
   sorry
 
-lemma Matrix_2sumComposition_TU_right {X₁ Y₁ X₂ Y₂ : Set α} {A₁ : Matrix X₁ Y₁ ℤ} {A₂ : Matrix X₂ Y₂ ℤ}
-    {x : Y₁ → ℤ} {y : X₂ → ℤ} (hA : (Matrix_2sumComposition A₁ x A₂ y).TU) :
+lemma Matrix_2sumComposition_TU_right {X₁ Y₁ X₂ Y₂ : Set α} {A₁ : Matrix X₁ Y₁ ℚ} {A₂ : Matrix X₂ Y₂ ℚ}
+    {x : Y₁ → ℚ} {y : X₂ → ℚ} (hA : (Matrix_2sumComposition A₁ x A₂ y).TU) :
     A₂.TU := by
   sorry
 
@@ -110,10 +110,10 @@ lemma BinaryMatroid_2sum_isRegular {a : α} (ha : M₁.X ∩ M₂.Y = {a}) (hXY 
   obtain ⟨B₁, hB₁, hBB₁⟩ := hM₁
   obtain ⟨B₂, hB₂, hBB₂⟩ := hM₂
   obtain ⟨haX₁, haY₂, hB⟩ := BinaryMatroid_2sum_B ha hXY
-  let x' : M₁.Y.Elem → ℤ := B₁ ⟨a, haX₁⟩
-  let y' : M₂.X.Elem → ℤ := (B₂ · ⟨a, haY₂⟩)
-  let A₁' : Matrix (M₁.X \ {a}).Elem M₁.Y.Elem ℤ := B₁ ∘ Set.diff_subset.elem
-  let A₂' : Matrix M₂.X.Elem (M₂.Y \ {a}).Elem ℤ := (B₂ · ∘ Set.diff_subset.elem)
+  let x' : M₁.Y.Elem → ℚ := B₁ ⟨a, haX₁⟩
+  let y' : M₂.X.Elem → ℚ := (B₂ · ⟨a, haY₂⟩)
+  let A₁' : Matrix (M₁.X \ {a}).Elem M₁.Y.Elem ℚ := B₁ ∘ Set.diff_subset.elem
+  let A₂' : Matrix M₂.X.Elem (M₂.Y \ {a}).Elem ℚ := (B₂ · ∘ Set.diff_subset.elem)
   have hB' : (Matrix_2sumComposition A₁' x' A₂' y').TU
   · apply Matrix_2sumComposition_TU
     · rw [Matrix.TU_adjoin_id_left_iff] at hB₁
