@@ -25,9 +25,9 @@ inductive StandardRepresentation.IsGood : StandardRepresentation α → Prop
 | cographic {M : StandardRepresentation α} (hM : M.IsCographic) : M.IsGood
 | theR10 {M : StandardRepresentation α} {e : α ≃ Fin 10} (hM : M.toMatroid.mapEquiv e = MatroidR10.toMatroid) : M.IsGood
 -- fork constructors
-| is1sum {M₁ : StandardRepresentation α} {M₂ : StandardRepresentation α} {M : StandardRepresentation α} (hM : M.Is1sumOf M₁ M₂) : M.IsGood
-| is2sum {M₁ : StandardRepresentation α} {M₂ : StandardRepresentation α} {M : StandardRepresentation α} (hM : M.Is2sumOf M₁ M₂) : M.IsGood
-| is3sum {M₁ : StandardRepresentation α} {M₂ : StandardRepresentation α} {M : StandardRepresentation α} (hM : M.Is3sumOf M₁ M₂) : M.IsGood
+| is1sum {M M₁ M₂ : StandardRepresentation α} (hM : M.Is1sumOf M₁ M₂) : M.IsGood
+| is2sum {M M₁ M₂ : StandardRepresentation α} (hM : M.Is2sumOf M₁ M₂) : M.IsGood
+| is3sum {M M₁ M₂ : StandardRepresentation α} (hM : M.Is3sumOf M₁ M₂) : M.IsGood
 
 theorem hardSeymour {M : StandardRepresentation α} (hM : M.IsRegular) : M.IsGood := by
   sorry
