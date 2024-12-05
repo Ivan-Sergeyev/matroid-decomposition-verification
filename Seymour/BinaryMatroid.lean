@@ -10,6 +10,7 @@ structure BinaryMatroid (α : Type*) [DecidableEq α] where
   decmemY : ∀ a, Decidable (a ∈ Y)
   hXY : X ⫗ Y
   B : Matrix X Y Z2
+-- TODO should `BinaryMatroid` be renamed to something containing the word "representation"?
 
 -- Automatically infer decidability when `BinaryMatroid` is present.
 attribute [instance] BinaryMatroid.decmemX
@@ -82,3 +83,8 @@ def BinaryMatroid.IsRegular (M : BinaryMatroid α) : Prop :=
   ∃ B' : Matrix M.X M.Y ℤ, -- signed version of `B`
     (Matrix.fromColumns (1 : Matrix M.X M.X ℤ) B').TU ∧ -- the signed representation matrix is totally unimodular
     ∀ i : M.X, ∀ j : M.Y, if M.B i j = 0 then B' i j = 0 else B' i j = 1 ∨ B' i j = -1 -- in absolulute values `B' = B`
+
+-- TODO very high priority!
+lemma BinaryMatroid_toMatroid_isRegular_iff {M₁ M₂ : BinaryMatroid α} (hM : M₁.toMatroid = M₂.toMatroid) :
+    M₁.IsRegular ↔ M₂.IsRegular := by
+  sorry

@@ -10,6 +10,7 @@ Matrix.TU_adjoin_id_right_iff
 Matrix.fromBlocks_TU
 BinaryMatroid
 BinaryMatroid.IsRegular
+BinaryMatroid_toMatroid_isRegular_iff
 Matrix_1sumComposition
 BinaryMatroid.Is1sumOf
 BinaryMatroid_1sum_comm

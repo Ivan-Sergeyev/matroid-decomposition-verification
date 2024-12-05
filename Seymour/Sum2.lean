@@ -197,14 +197,20 @@ This is the middle of the three parts of the easy direction of the Seymour's the
 theorem BinaryMatroid.Is2sumOf.isRegular [Fintype M₁.X] [Fintype M₁.Y] [Fintype M₂.X] [Fintype M₂.Y]
     (hM : M.Is2sumOf M₁ M₂) (hM₁ : M₁.IsRegular) (hM₂ : M₂.IsRegular) :
     M.IsRegular := by
-  sorry
+  obtain ⟨a, ha, hXY, hMM, -⟩ := hM
+  rw [BinaryMatroid_toMatroid_isRegular_iff hMM]
+  exact BinaryMatroid_2sum_isRegular ha hXY hM₁ hM₂
 
 /-- If a regular matroid is a 2-sum, then the left summand of the 2-sum is regular. -/
 lemma BinaryMatroid.Is2sumOf.isRegular_left (hMsum : M.Is2sumOf M₁ M₂) (hMreg : M.IsRegular) :
     M₁.IsRegular := by
-  sorry
+  obtain ⟨a, ha, hXY, hMM, -⟩ := hMsum
+  rw [BinaryMatroid_toMatroid_isRegular_iff hMM] at hMreg
+  exact BinaryMatroid_2sum_isRegular_left ha hXY hMreg
 
 /-- If a regular matroid is a 2-sum, then the right summand of the 2-sum is regular. -/
 lemma BinaryMatroid.Is2sumOf.isRegular_right (hMsum : M.Is2sumOf M₁ M₂) (hMreg : M.IsRegular) :
     M₂.IsRegular := by
-  sorry
+  obtain ⟨a, ha, hXY, hMM, -⟩ := hMsum
+  rw [BinaryMatroid_toMatroid_isRegular_iff hMM] at hMreg
+  exact BinaryMatroid_2sum_isRegular_right ha hXY hMreg

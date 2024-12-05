@@ -8,13 +8,13 @@
   Let $\I$ be all index subsets $Z \subseteq E$ such that the columns of $A$ indexed by $Z$ are independent over $\GFtwo$.
   Then $M = \left(E, \I\right)$ is called a \emph{binary matroid} and $B$ is called its \emph{(standard) representation matrix}.
   % Note: binary matroids may also be generated via the same process from arbitrary rectangular binary matrices (not necessarily of the form $\left[ I \mid B \right]$)
-  % Note: different binary matrices may generate the same binary matroid up to isomorphism (in both cases)
+  % Note: different binary matrices may generate the same binary matroid up to isomorphism (in both cases) -- what isomorphism?!
 \end{definition}
 
 \begin{definition}[regular matroid]
   \label{BinaryMatroid.IsRegular}
-  \uses{BinaryMatroid,def:code_tu_matrix}
   \lean{BinaryMatroid.IsRegular}
+  \uses{BinaryMatroid,def:code_tu_matrix}
   \leanok
   Let $M$ be a binary matroid generated from a standard representation matrix $B$. Suppose $B$ has a TU signing, i.e., there exists a real matrix $A$ such that:
   \begin{itemize}
@@ -23,3 +23,11 @@
   \end{itemize}
   Then $M$ is called a \emph{regular matroid}.
 \end{definition}
+
+\begin{lemma}[regularity is ignostic of representation]
+  \label{BinaryMatroid_toMatroid_isRegular_iff}
+  \lean{BinaryMatroid_toMatroid_isRegular_iff}
+  \uses{BinaryMatroid,BinaryMatroid.IsRegular}
+  \leanok % just stated
+  \todo[inline]{add}
+\end{lemma}
