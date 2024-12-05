@@ -11,11 +11,11 @@ abbrev Matrix_1sumComposition {β : Type*} [Zero β] {X₁ Y₁ X₂ Y₂ : Set 
     Matrix (X₁ ⊕ X₂) (Y₁ ⊕ Y₂) β :=
   Matrix.fromBlocks A₁ 0 0 A₂
 
-variable [DecidableEq α] {M₁ M₂ : BinaryMatroid α}
+variable [DecidableEq α] {M₁ M₂ : StandardRepresentation α}
 
-/-- `BinaryMatroid`-level 1-sum of two matroids. It checks that everything is disjoint (returned as `.snd` of the output). -/
-def BinaryMatroid_1sum (hXY : M₁.X ⫗ M₂.Y) (hYX : M₁.Y ⫗ M₂.X) :
-    BinaryMatroid α × Prop :=
+/-- `StandardRepresentation`-level 1-sum of two matroids. It checks that everything is disjoint (returned as `.snd` of the output). -/
+def StandardRepresentation_1sum (hXY : M₁.X ⫗ M₂.Y) (hYX : M₁.Y ⫗ M₂.X) :
+    StandardRepresentation α × Prop :=
   ⟨
     ⟨
       M₁.X ∪ M₂.X,
@@ -29,49 +29,49 @@ def BinaryMatroid_1sum (hXY : M₁.X ⫗ M₂.Y) (hYX : M₁.Y ⫗ M₂.X) :
   ⟩
 
 /-- Binary matroid `M` is a result of 1-summing `M₁` and `M₂` (should be equivalent to disjoint sums). -/
-def BinaryMatroid.Is1sumOf (M : BinaryMatroid α) (M₁ M₂ : BinaryMatroid α) : Prop :=
+def StandardRepresentation.Is1sumOf (M : StandardRepresentation α) (M₁ M₂ : StandardRepresentation α) : Prop :=
   ∃ hXY : M₁.X ⫗ M₂.Y, ∃ hYX : M₁.Y ⫗ M₂.X,
-    let M₀ := BinaryMatroid_1sum hXY hYX
+    let M₀ := StandardRepresentation_1sum hXY hYX
     M.toMatroid = M₀.fst.toMatroid ∧ M₀.snd
 
 /-- Matroid constructed from a valid 1-sum of binary matroids is the same as disjoint sum of matroids constructed from them. -/
-lemma BinaryMatroid_1sum_as_disjoint_sum {hXY : M₁.X ⫗ M₂.Y} {hYX : M₁.Y ⫗ M₂.X} (valid : (BinaryMatroid_1sum hXY hYX).snd) :
-    (BinaryMatroid_1sum hXY hYX).fst.toMatroid = Matroid.disjointSum M₁.toMatroid M₂.toMatroid (by
+lemma StandardRepresentation_1sum_as_disjoint_sum {hXY : M₁.X ⫗ M₂.Y} {hYX : M₁.Y ⫗ M₂.X} (valid : (StandardRepresentation_1sum hXY hYX).snd) :
+    (StandardRepresentation_1sum hXY hYX).fst.toMatroid = Matroid.disjointSum M₁.toMatroid M₂.toMatroid (by
       simp [Set.disjoint_union_left, Set.disjoint_union_right]
       exact ⟨⟨valid.left, hYX⟩, ⟨hXY, valid.right⟩⟩) := by
   apply Matroid.eq_of_indep_iff_indep_forall -- after bumping Mathlib, this line can become `ext`
-  · unfold BinaryMatroid_1sum
+  · unfold StandardRepresentation_1sum
     aesop
   · intro I hI
     sorry -- TODO
 
 /-- A valid 1-sum of binary matroids is commutative. -/
-lemma BinaryMatroid_1sum_comm {hXY : M₁.X ⫗ M₂.Y} {hYX : M₁.Y ⫗ M₂.X} (valid : (BinaryMatroid_1sum hXY hYX).snd) :
-    (BinaryMatroid_1sum hXY hYX).fst.toMatroid = (BinaryMatroid_1sum hYX.symm hXY.symm).fst.toMatroid := by
-  rw [BinaryMatroid_1sum_as_disjoint_sum valid, BinaryMatroid_1sum_as_disjoint_sum, Matroid.disjointSum_comm]
+lemma StandardRepresentation_1sum_comm {hXY : M₁.X ⫗ M₂.Y} {hYX : M₁.Y ⫗ M₂.X} (valid : (StandardRepresentation_1sum hXY hYX).snd) :
+    (StandardRepresentation_1sum hXY hYX).fst.toMatroid = (StandardRepresentation_1sum hYX.symm hXY.symm).fst.toMatroid := by
+  rw [StandardRepresentation_1sum_as_disjoint_sum valid, StandardRepresentation_1sum_as_disjoint_sum, Matroid.disjointSum_comm]
   constructor
   · exact valid.left.symm
   · exact valid.right.symm
 
-variable {M : BinaryMatroid α}
+variable {M : StandardRepresentation α}
 
 -- API for access to individual fields in the definition of 1-sum
 
-lemma BinaryMatroid.Is1sumOf.X_eq (hM : M.Is1sumOf M₁ M₂) :
+lemma StandardRepresentation.Is1sumOf.X_eq (hM : M.Is1sumOf M₁ M₂) :
     M.X = M₁.X ∪ M₂.X := by
-  sorry -- Does not hold for the new definition! TODO find a workaround! Perhaps `BinaryMatroid_toMatroid_isRegular_iff` helps.
+  sorry -- Does not hold for the new definition! TODO find a workaround! Perhaps `StandardRepresentation_toMatroid_isRegular_iff` helps.
 
-lemma BinaryMatroid.Is1sumOf.Y_eq (hM : M.Is1sumOf M₁ M₂) :
+lemma StandardRepresentation.Is1sumOf.Y_eq (hM : M.Is1sumOf M₁ M₂) :
     M.Y = M₁.Y ∪ M₂.Y := by
-  sorry -- Does not hold for the new definition! TODO find a workaround! Perhaps `BinaryMatroid_toMatroid_isRegular_iff` helps.
+  sorry -- Does not hold for the new definition! TODO find a workaround! Perhaps `StandardRepresentation_toMatroid_isRegular_iff` helps.
 
-lemma BinaryMatroid.Is1sumOf.B_eq (hM : M.Is1sumOf M₁ M₂) :
+lemma StandardRepresentation.Is1sumOf.B_eq (hM : M.Is1sumOf M₁ M₂) :
     M.B = hM.X_eq ▸ hM.Y_eq ▸ (Matrix_1sumComposition M₁.B M₂.B).toMatrixUnionUnion := by
-  sorry -- Does not hold for the new definition! TODO find a workaround! Perhaps `BinaryMatroid_toMatroid_isRegular_iff` helps.
+  sorry -- Does not hold for the new definition! TODO find a workaround! Perhaps `StandardRepresentation_toMatroid_isRegular_iff` helps.
 
 /-- Any 1-sum of regular matroids is a regular matroid.
 This is the first of the three parts of the easy direction of the Seymour's theorem. -/
-theorem BinaryMatroid.Is1sumOf.isRegular [Fintype M₁.X] [Fintype M₁.Y] [Fintype M₂.X] [Fintype M₂.Y]
+theorem StandardRepresentation.Is1sumOf.isRegular [Fintype M₁.X] [Fintype M₁.Y] [Fintype M₂.X] [Fintype M₂.Y]
     (hM : M.Is1sumOf M₁ M₂) (hM₁ : M₁.IsRegular) (hM₂ : M₂.IsRegular) :
     M.IsRegular := by
   obtain ⟨B₁, hB₁, hBB₁⟩ := hM₁
@@ -107,7 +107,7 @@ theorem BinaryMatroid.Is1sumOf.isRegular [Fintype M₁.X] [Fintype M₁.Y] [Fint
         simp_all [B']
 
 /-- If a regular matroid is a 1-sum, then the left summand of the 1-sum is regular. -/
-lemma BinaryMatroid.Is1sumOf.isRegular_left (hMsum : M.Is1sumOf M₁ M₂) (hMreg : M.IsRegular) :
+lemma StandardRepresentation.Is1sumOf.isRegular_left (hMsum : M.Is1sumOf M₁ M₂) (hMreg : M.IsRegular) :
     M₁.IsRegular := by
   obtain ⟨B', hB', hBB'⟩ := hMreg
   use (B'.fromMatrixElemElem hMsum.X_eq hMsum.Y_eq).submatrix Sum.inl Sum.inl
@@ -135,7 +135,7 @@ lemma BinaryMatroid.Is1sumOf.isRegular_left (hMsum : M.Is1sumOf M₁ M₂) (hMre
       sorry
 
 /-- If a regular matroid is a 1-sum, then the right summand of the 1-sum is regular. -/
-lemma BinaryMatroid.Is1sumOf.isRegular_right (hMsum : M.Is1sumOf M₁ M₂) (hMreg : M.IsRegular) :
+lemma StandardRepresentation.Is1sumOf.isRegular_right (hMsum : M.Is1sumOf M₁ M₂) (hMreg : M.IsRegular) :
     M₂.IsRegular := by
   obtain ⟨B', hB', hBB'⟩ := hMreg
   use (B'.fromMatrixElemElem hMsum.X_eq hMsum.Y_eq).submatrix Sum.inr Sum.inr

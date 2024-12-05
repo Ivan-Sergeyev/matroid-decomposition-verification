@@ -17,9 +17,9 @@
 \end{definition}
 
 \begin{definition}[matroid $1$-sum]
-  \label{BinaryMatroid.Is1sumOf}
-  \uses{BinaryMatroid,Matrix_1sumComposition}
-  \lean{BinaryMatroid.Is1sumOf}
+  \label{StandardRepresentation.Is1sumOf}
+  \uses{StandardRepresentation,Matrix_1sumComposition}
+  \lean{StandardRepresentation.Is1sumOf}
   \leanok
   Let $M$ be a binary matroid with a representation matrix $B$.
   Suppose that $B$ can be partitioned as in Definition~\ref{Matrix_1sumComposition} with non-zero blocks $B_{1}$ and $B_{2}$.
@@ -33,9 +33,9 @@
 % todo: $1$-sum of matroids is the same as direct sum
 
 \begin{lemma}[$1$-sum is commutative]
-  \label{BinaryMatroid_1sum_comm}
-  \uses{BinaryMatroid.Is1sumOf}
-  \lean{BinaryMatroid_1sum_comm}
+  \label{StandardRepresentation_1sum_comm}
+  \uses{StandardRepresentation.Is1sumOf}
+  \lean{StandardRepresentation_1sum_comm}
   \leanok
   \todo[inline]{add}
 \end{lemma}
@@ -43,13 +43,13 @@
 % % todo: nice to have, but not vital; can be done when working on formalizing k-separations for hard direction
 % \begin{lemma}[$1$-separations and $1$-sums]
 %   \label{lem:code_1_sep_yields_1_sum}
-%   \uses{BinaryMatroid.Is1sumOf,def:code_k_sep}
+%   \uses{StandardRepresentation.Is1sumOf,def:code_k_sep}
 %   Let $M$ be a binary matroid that is $1$-separable.
 %   Then $M$ can be decomposed as a $1$-sum with components given by the $1$-separation.
 % \end{lemma}
 
 % \begin{proof}[Proof sketch]
-%   \uses{BinaryMatroid.Is1sumOf,def:code_k_sep}
+%   \uses{StandardRepresentation.Is1sumOf,def:code_k_sep}
 %   Check by definition.
 % \end{proof}
 
@@ -57,17 +57,17 @@
 % todo: lemma 8.2.2.b: 1-sum composition of graphic (planar) is graphic (planar)
 
 \begin{theorem}[$1$-sum of regular matroids is regular]
-  \label{BinaryMatroid.Is1sumOf.isRegular}
-  \lean{BinaryMatroid.Is1sumOf.isRegular}
+  \label{StandardRepresentation.Is1sumOf.isRegular}
+  \lean{StandardRepresentation.Is1sumOf.isRegular}
   \leanok
-  \uses{BinaryMatroid.Is1sumOf,BinaryMatroid.IsRegular}
+  \uses{StandardRepresentation.Is1sumOf,StandardRepresentation.IsRegular}
   Let $M_{1}$ and $M_{2}$ be regular matroids. Then $M = M_{1} \oplus_{1} M_{2}$ is a regular matroid.
 
   Conversely, if a regular matroid $M$ can be decomposed as a $1$-sum $M = M_{1} \oplus_{1} M_{2}$, then $M_{1}$ and $M_{2}$ are both regular.
 \end{theorem}
 
 \begin{proof}[Proof sketch]
-  \uses{BinaryMatroid.Is1sumOf,BinaryMatroid.IsRegular,lem:code_diagonal_with_tu_blocks}
+  \uses{StandardRepresentation.Is1sumOf,StandardRepresentation.IsRegular,lem:code_diagonal_with_tu_blocks}
   %\leanok
   \todo[inline]{extract into lemmas about TU matrices}
   Let $B$, $B_{1}$, and $B_{2}$ be the representation matrices of $M$, $M_{1}$, and $M_{2}$, respectively.
@@ -78,25 +78,25 @@
 \end{proof}
 
 \begin{lemma}[left summand of regular $1$-sum is regular]
-  \label{BinaryMatroid.Is1sumOf.isRegular_left}
-  \lean{BinaryMatroid.Is1sumOf.isRegular_left}
-  \uses{BinaryMatroid.Is1sumOf,BinaryMatroid.IsRegular}
+  \label{StandardRepresentation.Is1sumOf.isRegular_left}
+  \lean{StandardRepresentation.Is1sumOf.isRegular_left}
+  \uses{StandardRepresentation.Is1sumOf,StandardRepresentation.IsRegular}
   \leanok
   \todo[inline]{add}
 \end{lemma}
 
 \begin{proof}
-  \uses{BinaryMatroid.Is1sumOf,BinaryMatroid.IsRegular, lem:code_submatrix_of_tu}
+  \uses{StandardRepresentation.Is1sumOf,StandardRepresentation.IsRegular, lem:code_submatrix_of_tu}
 \end{proof}
 
 \begin{lemma}[right summand of regular $1$-sum is regular]
-  \label{BinaryMatroid.Is1sumOf.isRegular_right}
-  \lean{BinaryMatroid.Is1sumOf.isRegular_right}
-  \uses{BinaryMatroid.Is1sumOf,BinaryMatroid.IsRegular}
+  \label{StandardRepresentation.Is1sumOf.isRegular_right}
+  \lean{StandardRepresentation.Is1sumOf.isRegular_right}
+  \uses{StandardRepresentation.Is1sumOf,StandardRepresentation.IsRegular}
   \leanok
   \todo[inline]{add}
 \end{lemma}
 
 \begin{proof}
-  \uses{BinaryMatroid.Is1sumOf,BinaryMatroid.IsRegular, lem:code_submatrix_of_tu}
+  \uses{StandardRepresentation.Is1sumOf,StandardRepresentation.IsRegular, lem:code_submatrix_of_tu}
 \end{proof}

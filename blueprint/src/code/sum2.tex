@@ -30,9 +30,9 @@
 \end{definition}
 
 \begin{definition}[matroid $2$-sum]
-  \label{BinaryMatroid.Is2sumOf}
-  \lean{BinaryMatroid.Is2sumOf}
-  \uses{BinaryMatroid,Matrix_2sumComposition}
+  \label{StandardRepresentation.Is2sumOf}
+  \lean{StandardRepresentation.Is2sumOf}
+  \uses{StandardRepresentation,Matrix_2sumComposition}
   \leanok
   Let $M$ be a binary matroid with a representation matrix $B$.
   Suppose $B$, $B_{1}$, and $B_{2}$ satisfy the assumptions of Definition~\ref{Matrix_2sumComposition}.
@@ -46,7 +46,7 @@
 % todo: same as 1-separations and 1-sums
 % \begin{lemma}[$2$-separations and $2$-sums of connected binary matroids]
 %   \label{lem:code_2_sep_2_sum}
-%   \uses{BinaryMatroid.Is2sumOf,def:code_k_sep,def:code_k_conn}
+%   \uses{StandardRepresentation.Is2sumOf,def:code_k_sep,def:code_k_conn}
 %   Let $M$ be a binary matroid that is $2$-separable.
 %   Then $M$ can be decomposed as a $2$-sum with connected components given by the $2$-separation.
 
@@ -54,13 +54,13 @@
 % \end{lemma}
 
 % \begin{proof}[Proof sketch]
-%   \uses{BinaryMatroid.Is2sumOf,def:code_k_sep,def:code_k_conn}
+%   \uses{StandardRepresentation.Is2sumOf,def:code_k_sep,def:code_k_conn}
 %   Check by definition. Connectedness of representation matrices is equivalent to connectedness of corresponding matroids.
 % \end{proof}
 
 \begin{lemma}[$2$-sum of TU matrices is a TU matrix]
   \label{Matrix_2sumComposition_TU}
-  \lean{BinaryMatroid_2sum_isRegular}
+  \lean{StandardRepresentation_2sum_isRegular}
   \uses{Matrix_2sumComposition,def:code_tu_matrix}
   \leanok
   Let $B_{1}$ and $B_{2}$ be TU matrices. Then $B = B_{1} \oplus_{2} B_{2}$ is a TU matrix.
@@ -98,32 +98,32 @@
 \end{proof}
 
 \begin{theorem}[$2$-sum of regular matroids is a regular matroid]
-  \label{BinaryMatroid.Is2sumOf.isRegular}
-  \lean{BinaryMatroid.Is2sumOf.isRegular}
-  \uses{BinaryMatroid.Is2sumOf,BinaryMatroid.IsRegular}
+  \label{StandardRepresentation.Is2sumOf.isRegular}
+  \lean{StandardRepresentation.Is2sumOf.isRegular}
+  \uses{StandardRepresentation.Is2sumOf,StandardRepresentation.IsRegular}
   \leanok
   Let $M_{1}$ and $M_{2}$ be regular matroids. Then $M = M_{1} \oplus_{2} M_{2}$ is a regular matroid.
 \end{theorem}
 
 \begin{proof}[Proof sketch]
-  \uses{BinaryMatroid.Is2sumOf,BinaryMatroid.IsRegular,Matrix_2sumComposition_TU,BinaryMatroid_toMatroid_isRegular_iff}
+  \uses{StandardRepresentation.Is2sumOf,StandardRepresentation.IsRegular,Matrix_2sumComposition_TU,StandardRepresentation_toMatroid_isRegular_iff}
   \leanok
   Let $B$, $B_{1}$, and $B_{2}$ be the representation matrices of $M$, $M_{1}$, and $M_{2}$, respectively.
   Apply Lemma~\ref{Matrix_2sumComposition_TU}.
 \end{proof}
 
 \begin{lemma}[left summand of regular $2$-sum is regular]
-  \label{BinaryMatroid.Is2sumOf.isRegular_left}
-  \lean{BinaryMatroid.Is2sumOf.isRegular_left}
-  \uses{BinaryMatroid.Is2sumOf,BinaryMatroid.IsRegular}
+  \label{StandardRepresentation.Is2sumOf.isRegular_left}
+  \lean{StandardRepresentation.Is2sumOf.isRegular_left}
+  \uses{StandardRepresentation.Is2sumOf,StandardRepresentation.IsRegular}
   \leanok
   \todo[inline]{add}
 \end{lemma}
 
 \begin{lemma}[right summand of regular $2$-sum is regular]
-  \label{BinaryMatroid.Is2sumOf.isRegular_right}
-  \lean{BinaryMatroid.Is2sumOf.isRegular_right}
-  \uses{BinaryMatroid.Is2sumOf,BinaryMatroid.IsRegular}
+  \label{StandardRepresentation.Is2sumOf.isRegular_right}
+  \lean{StandardRepresentation.Is2sumOf.isRegular_right}
+  \uses{StandardRepresentation.Is2sumOf,StandardRepresentation.IsRegular}
   \leanok
   \todo[inline]{add}
 \end{lemma}

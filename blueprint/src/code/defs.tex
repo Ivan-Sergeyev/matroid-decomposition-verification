@@ -1,8 +1,8 @@
 \section{Matroid Definitions}
 
 \begin{definition}[binary matroid]
-  \label{BinaryMatroid}
-  \lean{BinaryMatroid}
+  \label{StandardRepresentation}
+  \lean{StandardRepresentation}
   \leanok
   Let $B$ be a binary matrix, let $A = \left[ I \mid B \right]$, and let $E$ denote the column index set of $A$.
   Let $\I$ be all index subsets $Z \subseteq E$ such that the columns of $A$ indexed by $Z$ are independent over $\GFtwo$.
@@ -12,9 +12,9 @@
 \end{definition}
 
 \begin{definition}[regular matroid]
-  \label{BinaryMatroid.IsRegular}
-  \lean{BinaryMatroid.IsRegular}
-  \uses{BinaryMatroid,def:code_tu_matrix}
+  \label{StandardRepresentation.IsRegular}
+  \lean{StandardRepresentation.IsRegular}
+  \uses{StandardRepresentation,def:code_tu_matrix}
   \leanok
   Let $M$ be a binary matroid generated from a standard representation matrix $B$. Suppose $B$ has a TU signing, i.e., there exists a rational matrix $A$ such that:
   \begin{itemize}
@@ -25,9 +25,9 @@
 \end{definition}
 
 \begin{lemma}[regularity is ignostic of representation]
-  \label{BinaryMatroid_toMatroid_isRegular_iff}
-  \lean{BinaryMatroid_toMatroid_isRegular_iff}
-  \uses{BinaryMatroid,BinaryMatroid.IsRegular}
+  \label{StandardRepresentation_toMatroid_isRegular_iff}
+  \lean{StandardRepresentation_toMatroid_isRegular_iff}
+  \uses{StandardRepresentation,StandardRepresentation.IsRegular}
   \leanok % just stated
   \todo[inline]{add}
 \end{lemma}
