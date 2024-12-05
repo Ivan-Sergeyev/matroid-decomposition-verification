@@ -32,7 +32,7 @@ def BinaryMatroid_1sum (hXY : M₁.X ⫗ M₂.Y) (hYX : M₁.Y ⫗ M₂.X) :
 def BinaryMatroid.Is1sumOf (M : BinaryMatroid α) (M₁ M₂ : BinaryMatroid α) : Prop :=
   ∃ hXY : M₁.X ⫗ M₂.Y, ∃ hYX : M₁.Y ⫗ M₂.X,
     let M₀ := BinaryMatroid_1sum hXY hYX
-    M = M₀.fst ∧ M₀.snd
+    M.toMatroid = M₀.fst.toMatroid ∧ M₀.snd
 
 /-- Matroid constructed from a valid 1-sum of binary matroids is the same as disjoint sum of matroids constructed from them. -/
 lemma BinaryMatroid_1sum_as_disjoint_sum {hXY : M₁.X ⫗ M₂.Y} {hYX : M₁.Y ⫗ M₂.X} (valid : (BinaryMatroid_1sum hXY hYX).snd) :
@@ -59,18 +59,15 @@ variable {M : BinaryMatroid α}
 
 lemma BinaryMatroid.Is1sumOf.X_eq (hM : M.Is1sumOf M₁ M₂) :
     M.X = M₁.X ∪ M₂.X := by
-  obtain ⟨_, _, rfl, -⟩ := hM
-  rfl
+  sorry -- Does not hold for the new definition! TODO find a workaround!
 
 lemma BinaryMatroid.Is1sumOf.Y_eq (hM : M.Is1sumOf M₁ M₂) :
     M.Y = M₁.Y ∪ M₂.Y := by
-  obtain ⟨_, _, rfl, -⟩ := hM
-  rfl
+  sorry -- Does not hold for the new definition! TODO find a workaround!
 
 lemma BinaryMatroid.Is1sumOf.B_eq (hM : M.Is1sumOf M₁ M₂) :
     M.B = hM.X_eq ▸ hM.Y_eq ▸ (Matrix_1sumComposition M₁.B M₂.B).toMatrixUnionUnion := by
-  obtain ⟨_, _, rfl, -⟩ := hM
-  rfl
+  sorry -- Does not hold for the new definition! TODO find a workaround!
 
 /-- Any 1-sum of regular matroids is a regular matroid.
 This is the first of the three parts of the easy direction of the Seymour's theorem. -/

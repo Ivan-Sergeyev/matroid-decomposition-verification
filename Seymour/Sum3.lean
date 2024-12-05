@@ -105,21 +105,11 @@ def BinaryMatroid.Is3sumOf (M : BinaryMatroid α) (M₁ M₂ : BinaryMatroid α)
   ∃ x₁ x₂ x₃ y₁ y₂ y₃ : α,
     ∃ hXX : M₁.X ∩ M₂.X = {x₁, x₂, x₃}, ∃ hYY : M₁.Y ∩ M₂.Y = {y₁, y₂, y₃}, ∃ hXY : M₁.X ⫗ M₂.Y, ∃ hYX : M₁.Y ⫗ M₂.X,
       let M₀ := BinaryMatroid_3sum hXX hYY hXY hYX
-      M = M₀.fst ∧ M₀.snd
+      M.toMatroid = M₀.fst.toMatroid ∧ M₀.snd
 
 variable {M : BinaryMatroid α}
 
--- API for access to individual fields and assumptions in the definition of 2-sum
-
-lemma BinaryMatroid.Is3sumOf.X_eq (hM : M.Is3sumOf M₁ M₂) :
-    M.X = M₁.X ∪ M₂.X := by
-  obtain ⟨_, _, _, _, _, _, hXX, _, _, _, rfl, -⟩ := hM
-  simp [BinaryMatroid_3sum, ←hXX, setminus_inter_union_eq_union]
-
-lemma BinaryMatroid.Is3sumOf.Y_eq (hM : M.Is3sumOf M₁ M₂) :
-    M.Y = M₁.Y ∪ M₂.Y := by
-  obtain ⟨_, _, _, _, _, _, _, hYY, _, _, rfl, -⟩ := hM
-  simp [BinaryMatroid_3sum, ←hYY, setminus_inter_union_eq_union]
+-- API for access to individual assumptions and identities in the definition of 3-sum
 
 lemma BinaryMatroid.Is3sumOf.interXX (hM : M.Is3sumOf M₁ M₂) :
     ∃ x₁ x₂ x₃ : α, M₁.X ∩ M₂.X = {x₁, x₂, x₃} := by
@@ -191,12 +181,12 @@ lemma BinaryMatroid.Is3sumOf.indep (hM : M.Is3sumOf M₁ M₂) :
           )
         )
       ).IndepCols = M.toMatroid.Indep := by
-  obtain ⟨x₁, x₂, x₃, y₁, y₂, y₃, hXX, hYY, -, -, rfl, -⟩ := hM
+  obtain ⟨x₁, x₂, x₃, y₁, y₂, y₃, hXX, hYY, _, _, hMM, -⟩ := hM
   have hxxx₁ : {x₁, x₂, x₃} ⊆ M₁.X := hXX.symm.subset.trans Set.inter_subset_left
   have hxxx₂ : {x₁, x₂, x₃} ⊆ M₂.X := hXX.symm.subset.trans Set.inter_subset_right
   have hyyy₁ : {y₁, y₂, y₃} ⊆ M₁.Y := hYY.symm.subset.trans Set.inter_subset_left
   have hyyy₂ : {y₁, y₂, y₃} ⊆ M₂.Y := hYY.symm.subset.trans Set.inter_subset_right
-  exact ⟨x₁, x₂, x₃, y₁, y₂, y₃,
+  use x₁, x₂, x₃, y₁, y₂, y₃,
     hxxx₁ (Set.mem_insert x₁ {x₂, x₃}),
     hxxx₁ (Set.insert_comm x₁ x₂ {x₃} ▸ Set.mem_insert x₂ {x₁, x₃}),
     hxxx₂ (Set.insert_comm x₁ x₂ {x₃} ▸ Set.mem_insert x₂ {x₁, x₃}),
@@ -206,44 +196,9 @@ lemma BinaryMatroid.Is3sumOf.indep (hM : M.Is3sumOf M₁ M₂) :
     hyyy₁ (Set.insert_comm y₁ y₂ {y₃} ▸ Set.mem_insert y₂ {y₁, y₃}),
     hyyy₂ (Set.insert_comm y₁ y₂ {y₃} ▸ Set.mem_insert y₂ {y₁, y₃}),
     hyyy₁ (Set.mem_insert y₁ {y₂, y₃}),
-    hyyy₂ (Set.mem_insert y₁ {y₂, y₃}),
-    rfl⟩
-
-lemma BinaryMatroid.Is3sumOf.invertibilityD_₁ (hM : M.Is3sumOf M₁ M₂) :
-    ∃ x₂ x₃ y₁ y₂ : α, ∃ x₂inX₁ : x₂ ∈ M₁.X, ∃ x₃inX₁ : x₃ ∈ M₁.X, ∃ y₂inY₁ : y₂ ∈ M₁.Y, ∃ y₁inY₁ : y₁ ∈ M₁.Y,
-      IsUnit (Matrix.of (fun i j => M₁.B (![⟨x₂, x₂inX₁⟩, ⟨x₃, x₃inX₁⟩] i) (![⟨y₂, y₂inY₁⟩, ⟨y₁, y₁inY₁⟩] j))) := by
-  obtain ⟨x₁, x₂, x₃, y₁, y₂, y₃, hXX, hYY, _, _, rfl, valid⟩ := hM
-  use x₂, x₃, y₁, y₂
-  have hxxx : {x₁, x₂, x₃} ⊆ M₁.X := hXX.symm.subset.trans Set.inter_subset_left
-  use hxxx (Set.insert_comm x₁ x₂ {x₃} ▸ Set.mem_insert x₂ {x₁, x₃}), hxxx (by simp)
-  have hyyy : {y₁, y₂, y₃} ⊆ M₁.Y := hYY.symm.subset.trans Set.inter_subset_left
-  use hyyy (Set.insert_comm y₁ y₂ {y₃} ▸ Set.mem_insert y₂ {y₁, y₃}), hyyy (Set.mem_insert y₁ {y₂, y₃})
-  exact valid.left
-
-lemma BinaryMatroid.Is3sumOf.invertibilityD_₂ (hM : M.Is3sumOf M₁ M₂) :
-    ∃ x₂ x₃ y₁ y₂ : α, ∃ x₂inX₂ : x₂ ∈ M₂.X, ∃ x₃inX₂ : x₃ ∈ M₂.X, ∃ y₂inY₂ : y₂ ∈ M₂.Y, ∃ y₁inY₂ : y₁ ∈ M₂.Y,
-      IsUnit (Matrix.of (fun i j => M₂.B (![⟨x₂, x₂inX₂⟩, ⟨x₃, x₃inX₂⟩] i) (![⟨y₂, y₂inY₂⟩, ⟨y₁, y₁inY₂⟩] j))) := by
-  obtain ⟨x₁, x₂, x₃, y₁, y₂, y₃, hXX, hYY, _, _, rfl, valid⟩ := hM
-  use x₂, x₃, y₁, y₂
-  have hxxx : {x₁, x₂, x₃} ⊆ M₂.X := hXX.symm.subset.trans Set.inter_subset_right
-  use hxxx (Set.insert_comm x₁ x₂ {x₃} ▸ Set.mem_insert x₂ {x₁, x₃}), hxxx (by simp)
-  have hyyy : {y₁, y₂, y₃} ⊆ M₂.Y := hYY.symm.subset.trans Set.inter_subset_right
-  use hyyy (Set.insert_comm y₁ y₂ {y₃} ▸ Set.mem_insert y₂ {y₁, y₃}), hyyy (Set.mem_insert y₁ {y₂, y₃})
-  rw [←valid.right.left]
-  exact valid.left
-
-/- TODO missing API for all of the following parts of the 3-sum definition:
-M₁.B ⟨x₁, x₁inX₁⟩ ⟨y₁, y₁inY₁⟩ = 1
-M₁.B ⟨x₁, x₁inX₁⟩ ⟨y₂, y₂inY₁⟩ = 1
-M₁.B ⟨x₂, x₂inX₁⟩ ⟨y₃, y₃inY₁⟩ = 1
-M₁.B ⟨x₃, x₃inX₁⟩ ⟨y₃, y₃inY₁⟩ = 1
-M₂.B ⟨x₁, x₁inX₂⟩ ⟨y₁, y₁inY₂⟩ = 1
-M₂.B ⟨x₁, x₁inX₂⟩ ⟨y₂, y₂inY₂⟩ = 1
-M₂.B ⟨x₂, x₂inX₂⟩ ⟨y₃, y₃inY₂⟩ = 1
-M₂.B ⟨x₃, x₃inX₂⟩ ⟨y₃, y₃inY₂⟩ = 1
-(∀ x : α, ∀ hx : x ∈ M₁.X, x ≠ x₂ ∧ x ≠ x₃ → M₁.B ⟨x, hx⟩ ⟨y₃, y₃inY₁⟩ = 0)
-(∀ y : α, ∀ hy : y ∈ M₂.Y, y ≠ y₂ ∧ y ≠ y₁ → M₂.B ⟨x₁, x₁inX₂⟩ ⟨y, hy⟩ = 0)
--/
+    hyyy₂ (Set.mem_insert y₁ {y₂, y₃})
+  rewrite [hMM]
+  rfl
 
 /-- Any 3-sum of regular matroids is a regular matroid.
 This is the last of the three parts of the easy direction of the Seymour's theorem. -/
