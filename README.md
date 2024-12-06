@@ -6,6 +6,7 @@ The goal of this project is to formally verify Seymour's decomposition theorem i
 
 - You can find the blueprint on the [GitHub Pages site](https://ivan-sergeyev.github.io/seymour/)
 - Quick link to the [dependency graph](https://ivan-sergeyev.github.io/seymour/blueprint/dep_graph_document.html)
+- Quick link to the [documentation](https://ivan-sergeyev.github.io/seymour/docs/Seymour/BinaryMatroid.html)
 
 ## References
 
