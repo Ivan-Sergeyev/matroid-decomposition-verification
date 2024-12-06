@@ -1,6 +1,10 @@
 import Mathlib.Order.CompletePartialOrder
 import Mathlib.Tactic
 
+/-!
+This provides lemmas about sets (mostly dealing with disjointness) that are missing in Mathlib.
+We do not use out custom notation here because this file is higher than `Basic.lean` in the import hierarchy.
+-/
 
 variable {α : Type*} {X Y : Set α}
 

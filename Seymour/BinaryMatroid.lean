@@ -1,6 +1,9 @@
 import Mathlib.Data.Matroid.IndepAxioms
 import Seymour.Basic
 
+/-!
+This file defines binary matroids and regular matroids. Basic API is provided.
+-/
 
 /-- Data describing a binary matroid on the ground set `X ∪ Y` where `X` and `Y` are bundled. -/
 structure StandardRepresentation (α : Type*) [DecidableEq α] where

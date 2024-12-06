@@ -1,6 +1,9 @@
 import Seymour.Mathlib.Sets
 import Seymour.ForMathlib.MatrixTU
 
+/-!
+This file provides notation used in the project and conversions between set-theoretical and type-theoretical definitions.
+-/
 
 /-- The finite field on two elements; write `Z2` for "value" type but `Fin 2` for "indexing" type. -/
 abbrev Z2 : Type := ZMod 2

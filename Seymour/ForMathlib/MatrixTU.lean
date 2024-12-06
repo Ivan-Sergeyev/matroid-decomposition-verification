@@ -2,6 +2,11 @@ import Mathlib.Data.Matrix.ColumnRowPartitioned
 import Mathlib.Data.Matrix.Rank
 import Seymour.ForMathlib.Basic
 
+/-!
+This file defines totally unimodular matrices and provides lemmas about them.
+It will be soon replaced by the implementation that got into Mathlib (slighlty different but mathematically equivalent).
+-/
+
 attribute [-simp] Fintype.card_ofIsEmpty Fintype.card_ofSubsingleton -- major performance issue
 
 open scoped Matrix
@@ -170,7 +175,7 @@ lemma Matrix.fromRows_rank_subadditive [Fintype Y] (A₁ : Matrix X₁ Y R) (A�
     (Matrix.fromRows A₁ A₂).rank ≤ A₁.rank + A₂.rank := by
   sorry
 
--- Jireh Loreaux proved:
+-- Jireh Loreaux proved (but a more general version might land into Mathlib soonish):
 lemma Matrix.det_zero_of_rank_lt {R : Type*} [LinearOrderedField R] [Fintype X] [DecidableEq X] {A : Matrix X X R}
     (hA: A.rank < Fintype.card X) :
     A.det = 0 := by
@@ -211,7 +216,7 @@ lemma Matrix.submatrix_det_abs' {R : Type*} [LinearOrderedCommRing R]
     [Fintype X₁] [DecidableEq X₁] [Fintype X₂] [DecidableEq X₂] [Fintype Y] [DecidableEq Y]
     (A : Matrix X₁ X₂ R) (e₁ : Y ≃ X₁) (e₂ : Y ≃ X₂) :
     |(A.submatrix e₁ e₂).det| = |(A.submatrix (e₂.symm.trans e₁) id).det| := by
-  sorry
+  sorry -- might be useless in the end
 
 /-- A matrix composed of TU blocks on the diagonal is TU. -/
 lemma Matrix.fromBlocks_TU {R : Type*} [LinearOrderedField R]

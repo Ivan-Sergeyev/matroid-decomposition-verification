@@ -3,18 +3,21 @@ import Seymour.Sum1
 import Seymour.Sum2
 import Seymour.Sum3
 
+/-!
+This file states the Seymour decomposition theorem. Proving `hardSeymour` is the ultimate goal of this project.
+-/
 
 variable {α : Type} [DecidableEq α]
 
--- TODO define graphics matroids.
+/-- TODO define graphics matroids. -/
 def StandardRepresentation.IsGraphic (M : StandardRepresentation α) : Prop :=
   sorry
 
--- TODO define cographics matroids.
+/-- TODO define cographics matroids. -/
 def StandardRepresentation.IsCographic (M : StandardRepresentation α) : Prop :=
   sorry
 
--- TODO define R10.
+/-- TODO define R10. -/
 def MatroidR10 : StandardRepresentation α :=
   sorry -- inside we have some `Fin 10 ↪ α` whose image is `E`
 

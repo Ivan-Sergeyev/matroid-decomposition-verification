@@ -1,5 +1,8 @@
 import Seymour.BinaryMatroid
 
+/-!
+This file contains everything about 2-sum of binary matroids.
+-/
 
 variable {α : Type*}
 
