@@ -74,6 +74,22 @@ lemma toMatrixSumSum_toMatrixUnionUnion (C : Matrix (T₁ ∪ T₂).Elem (S₁ �
   ext
   simp_all [Matrix.toMatrixUnionUnion, Matrix.toMatrixSumSum, toSum_toUnion]
 
+/-- A totally unimodular block matrix stays totally unimodular after converting to a matrix over set unions. -/
+lemma Matrix.TU.toMatrixUnionUnion {C : Matrix (T₁ ⊕ T₂) (S₁ ⊕ S₂) ℚ} (hC : C.TU) :
+    C.toMatrixUnionUnion.TU := by
+  rw [Matrix.TU_iff] at hC ⊢
+  intros
+  apply hC
+
+/- OLD API:
+
+/-- A totally unimodular matrix over set unions stays totally unimodular after converting to a block matrix. -/
+lemma Matrix.TU.toMatrixSumSum {C : Matrix (T₁ ∪ T₂).Elem (S₁ ∪ S₂).Elem ℚ} (hC : C.TU) :
+    C.toMatrixSumSum.TU := by
+  rw [Matrix.TU_iff] at hC ⊢
+  intros
+  apply hC
+
 variable {T S : Set α}
 
 /-- Convert a block matrix to a matrix over set unions named as single indexing sets. -/
@@ -113,20 +129,6 @@ lemma fromMatrixElemElem_toMatrixElemElem (hT : T = T₁ ∪ T₂) (hS : S = S�
   subst hS hT
   exact toMatrixSumSum_toMatrixUnionUnion C
 
-/-- A totally unimodular block matrix stays totally unimodular after converting to a matrix over set unions. -/
-lemma Matrix.TU.toMatrixUnionUnion {C : Matrix (T₁ ⊕ T₂) (S₁ ⊕ S₂) ℚ} (hC : C.TU) :
-    C.toMatrixUnionUnion.TU := by
-  rw [Matrix.TU_iff] at hC ⊢
-  intros
-  apply hC
-
-/-- A totally unimodular matrix over set unions stays totally unimodular after converting to a block matrix. -/
-lemma Matrix.TU.toMatrixSumSum {C : Matrix (T₁ ∪ T₂).Elem (S₁ ∪ S₂).Elem ℚ} (hC : C.TU) :
-    C.toMatrixSumSum.TU := by
-  rw [Matrix.TU_iff] at hC ⊢
-  intros
-  apply hC
-
 /-- A totally unimodular block matrix stays totally unimodular after converting to a matrix over set unions named as
 single indexing sets. -/
 lemma Matrix.TU.toMatrixElemElem {C : Matrix (T₁ ⊕ T₂) (S₁ ⊕ S₂) ℚ} (hC : C.TU) (hT : T = T₁ ∪ T₂) (hS : S = S₁ ∪ S₂) :
@@ -139,3 +141,4 @@ lemma Matrix.TU.fromMatrixElemElem {C : Matrix T S ℚ} (hC : C.TU) (hT : T = T�
     (C.fromMatrixElemElem hT hS).TU := by
   subst hT hS
   exact hC.toMatrixSumSum
+-/

@@ -1,6 +1,5 @@
 import Seymour.BinaryMatroid
 import Seymour.ForMathlib.Matroid
-import Mathlib.Data.Matroid.Sum
 
 
 variable {α : Type*}
@@ -13,7 +12,8 @@ abbrev Matrix_1sumComposition {β : Type*} [Zero β] {X₁ Y₁ X₂ Y₂ : Set 
 
 variable [DecidableEq α] {M₁ M₂ : StandardRepresentation α}
 
-/-- `StandardRepresentation`-level 1-sum of two matroids. It checks that everything is disjoint (returned as `.snd` of the output). -/
+/-- `StandardRepresentation`-level 1-sum of two matroids.
+It checks that everything is disjoint (returned as `.snd` of the output). -/
 def StandardRepresentation_1sum (hXY : M₁.X ⫗ M₂.Y) (hYX : M₁.Y ⫗ M₂.X) :
     StandardRepresentation α × Prop :=
   ⟨
@@ -35,7 +35,8 @@ def StandardRepresentation.Is1sumOf (M : StandardRepresentation α) (M₁ M₂ :
     M.toMatroid = M₀.fst.toMatroid ∧ M₀.snd
 
 /-- Matroid constructed from a valid 1-sum of binary matroids is the same as disjoint sum of matroids constructed from them. -/
-lemma StandardRepresentation_1sum_as_disjoint_sum {hXY : M₁.X ⫗ M₂.Y} {hYX : M₁.Y ⫗ M₂.X} (valid : (StandardRepresentation_1sum hXY hYX).snd) :
+lemma StandardRepresentation_1sum_as_disjoint_sum {hXY : M₁.X ⫗ M₂.Y} {hYX : M₁.Y ⫗ M₂.X}
+    (valid : (StandardRepresentation_1sum hXY hYX).snd) :
     (StandardRepresentation_1sum hXY hYX).fst.toMatroid = Matroid.disjointSum M₁.toMatroid M₂.toMatroid (by
       simp [Set.disjoint_union_left, Set.disjoint_union_right]
       exact ⟨⟨valid.left, hYX⟩, ⟨hXY, valid.right⟩⟩) := by
@@ -46,7 +47,8 @@ lemma StandardRepresentation_1sum_as_disjoint_sum {hXY : M₁.X ⫗ M₂.Y} {hYX
     sorry -- TODO
 
 /-- A valid 1-sum of binary matroids is commutative. -/
-lemma StandardRepresentation_1sum_comm {hXY : M₁.X ⫗ M₂.Y} {hYX : M₁.Y ⫗ M₂.X} (valid : (StandardRepresentation_1sum hXY hYX).snd) :
+lemma StandardRepresentation_1sum_comm {hXY : M₁.X ⫗ M₂.Y} {hYX : M₁.Y ⫗ M₂.X}
+    (valid : (StandardRepresentation_1sum hXY hYX).snd) :
     (StandardRepresentation_1sum hXY hYX).fst.toMatroid = (StandardRepresentation_1sum hYX.symm hXY.symm).fst.toMatroid := by
   rw [StandardRepresentation_1sum_as_disjoint_sum valid, StandardRepresentation_1sum_as_disjoint_sum, Matroid.disjointSum_comm]
   constructor
@@ -55,98 +57,57 @@ lemma StandardRepresentation_1sum_comm {hXY : M₁.X ⫗ M₂.Y} {hYX : M₁.Y �
 
 variable {M : StandardRepresentation α}
 
--- API for access to individual fields in the definition of 1-sum
-
-lemma StandardRepresentation.Is1sumOf.X_eq (hM : M.Is1sumOf M₁ M₂) :
-    M.X = M₁.X ∪ M₂.X := by
-  sorry -- Does not hold for the new definition! TODO find a workaround! Perhaps `StandardRepresentation_toMatroid_isRegular_iff` helps.
-
-lemma StandardRepresentation.Is1sumOf.Y_eq (hM : M.Is1sumOf M₁ M₂) :
-    M.Y = M₁.Y ∪ M₂.Y := by
-  sorry -- Does not hold for the new definition! TODO find a workaround! Perhaps `StandardRepresentation_toMatroid_isRegular_iff` helps.
-
-lemma StandardRepresentation.Is1sumOf.B_eq (hM : M.Is1sumOf M₁ M₂) :
-    M.B = hM.X_eq ▸ hM.Y_eq ▸ (Matrix_1sumComposition M₁.B M₂.B).toMatrixUnionUnion := by
-  sorry -- Does not hold for the new definition! TODO find a workaround! Perhaps `StandardRepresentation_toMatroid_isRegular_iff` helps.
+lemma StandardRepresentation_1sum_isRegular [Fintype M₁.X] [Fintype M₁.Y] [Fintype M₂.X] [Fintype M₂.Y]
+    (hXY : M₁.X ⫗ M₂.Y) (hYX : M₁.Y ⫗ M₂.X) (hM₁ : M₁.IsRegular) (hM₂ : M₂.IsRegular) :
+    (StandardRepresentation_1sum hXY hYX).fst.IsRegular := by
+  obtain ⟨B₁, hB₁, hBB₁⟩ := hM₁
+  obtain ⟨B₂, hB₂, hBB₂⟩ := hM₂
+  have hB : (StandardRepresentation_1sum hXY hYX).fst.B = (Matrix_1sumComposition M₁.B M₂.B).toMatrixUnionUnion
+  · rfl
+  let B' := Matrix_1sumComposition B₁ B₂ -- the signing is obtained using the same function
+  have hB' : B'.TU
+  · apply Matrix.fromBlocks_TU
+    · rwa [Matrix.TU_adjoin_id_left_iff] at hB₁
+    · rwa [Matrix.TU_adjoin_id_left_iff] at hB₂
+  use B'.toMatrixUnionUnion
+  constructor
+  · rw [Matrix.TU_adjoin_id_left_iff]
+    exact hB'.toMatrixUnionUnion
+  · intro i j
+    simp only [hB, B', Matrix.toMatrixUnionUnion, Function.comp_apply]
+    cases i.toSum with
+    | inl i₁ =>
+      cases j.toSum with
+      | inl j₁ =>
+        specialize hBB₁ i₁ j₁
+        simp_all
+      | inr j₂ =>
+        simp_all
+    | inr i₂ =>
+      cases j.toSum with
+      | inl j₁ =>
+        simp_all
+      | inr j₂ =>
+        specialize hBB₂ i₂ j₂
+        simp_all
 
 /-- Any 1-sum of regular matroids is a regular matroid.
 This is the first of the three parts of the easy direction of the Seymour's theorem. -/
 theorem StandardRepresentation.Is1sumOf.isRegular [Fintype M₁.X] [Fintype M₁.Y] [Fintype M₂.X] [Fintype M₂.Y]
     (hM : M.Is1sumOf M₁ M₂) (hM₁ : M₁.IsRegular) (hM₂ : M₂.IsRegular) :
     M.IsRegular := by
-  obtain ⟨B₁, hB₁, hBB₁⟩ := hM₁
-  obtain ⟨B₂, hB₂, hBB₂⟩ := hM₂
-  let B' := Matrix_1sumComposition B₁ B₂ -- the signing is obtained using the same function
-  have hB' : B'.TU
-  · apply Matrix.fromBlocks_TU
-    · rwa [Matrix.TU_adjoin_id_left_iff] at hB₁
-    · rwa [Matrix.TU_adjoin_id_left_iff] at hB₂
-  have hMB : M.B = (Matrix_1sumComposition M₁.B M₂.B).toMatrixElemElem hM.X_eq hM.Y_eq
-  · rewrite [hM.B_eq]
-    rfl
-  use B'.toMatrixElemElem hM.X_eq hM.Y_eq
-  constructor
-  · rw [Matrix.TU_adjoin_id_left_iff]
-    exact hB'.toMatrixElemElem hM.X_eq hM.Y_eq
-  · intro i j
-    simp only [hMB, Matrix_1sumComposition, Matrix.toMatrixElemElem_apply]
-    cases (hM.X_eq ▸ i).toSum with
-    | inl i₁ =>
-      cases (hM.Y_eq ▸ j).toSum with
-      | inl j₁ =>
-        specialize hBB₁ i₁ j₁
-        simp_all [B']
-      | inr j₂ =>
-        simp_all [B']
-    | inr i₂ =>
-      cases (hM.Y_eq ▸ j).toSum with
-      | inl j₁ =>
-        simp_all [B']
-      | inr j₂ =>
-        specialize hBB₂ i₂ j₂
-        simp_all [B']
+  obtain ⟨hXY, hYX, hMM, -⟩ := hM
+  rw [StandardRepresentation_toMatroid_isRegular_iff hMM]
+  exact StandardRepresentation_1sum_isRegular hXY hYX hM₁ hM₂
 
 /-- If a regular matroid is a 1-sum, then the left summand of the 1-sum is regular. -/
 lemma StandardRepresentation.Is1sumOf.isRegular_left (hMsum : M.Is1sumOf M₁ M₂) (hMreg : M.IsRegular) :
     M₁.IsRegular := by
   obtain ⟨B', hB', hBB'⟩ := hMreg
-  use (B'.fromMatrixElemElem hMsum.X_eq hMsum.Y_eq).submatrix Sum.inl Sum.inl
-  constructor
-  · rw [Matrix.TU_adjoin_id_left_iff] at hB' ⊢
-    apply Matrix.TU.submatrix
-    apply Matrix.TU.fromMatrixElemElem
-    exact hB'
-  · intro i j
-    specialize hBB'
-      ⟨i.val, hMsum.X_eq ▸ Set.mem_union_left M₂.X i.property⟩
-      ⟨j.val, hMsum.Y_eq ▸ Set.mem_union_left M₂.Y j.property⟩
-    rw [hMsum.B_eq] at hBB'
-    if h0 : M₁.B i j = 0 then
-      simp [h0]
-      have :
-        (hMsum.X_eq ▸ hMsum.Y_eq ▸ (Matrix_1sumComposition M₁.B M₂.B).toMatrixUnionUnion)
-          ⟨i.val, hMsum.X_eq ▸ Set.mem_union_left M₂.X i.property⟩
-          ⟨j.val, hMsum.Y_eq ▸ Set.mem_union_left M₂.Y j.property⟩
-        = 0
-      · sorry
-      simp [this] at hBB'
-      sorry
-    else
-      sorry
+  sorry
 
 /-- If a regular matroid is a 1-sum, then the right summand of the 1-sum is regular. -/
 lemma StandardRepresentation.Is1sumOf.isRegular_right (hMsum : M.Is1sumOf M₁ M₂) (hMreg : M.IsRegular) :
     M₂.IsRegular := by
   obtain ⟨B', hB', hBB'⟩ := hMreg
-  use (B'.fromMatrixElemElem hMsum.X_eq hMsum.Y_eq).submatrix Sum.inr Sum.inr
-  constructor
-  · rw [Matrix.TU_adjoin_id_left_iff] at hB' ⊢
-    apply Matrix.TU.submatrix
-    apply Matrix.TU.fromMatrixElemElem
-    exact hB'
-  · intro i j
-    if h0 : M₂.B i j = 0 then
-      simp [h0]
-      sorry
-    else
-      sorry
+  sorry

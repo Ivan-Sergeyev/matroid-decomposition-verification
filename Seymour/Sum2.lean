@@ -68,8 +68,8 @@ lemma StandardRepresentation.Is2sumOf.indep (hM : M.Is2sumOf M₁ M₂) :
     ∃ a : α, ∃ ha : M₁.X ∩ M₂.Y = {a},
       let A₁ : Matrix (M₁.X \ {a}).Elem M₁.Y.Elem Z2 := M₁.B ∘ Set.diff_subset.elem -- the top submatrix of `B₁`
       let A₂ : Matrix M₂.X.Elem (M₂.Y \ {a}).Elem Z2 := (M₂.B · ∘ Set.diff_subset.elem) -- the right submatrix of `B₂`
-      let x : M₁.Y.Elem → Z2 := M₁.B ⟨a, Set.mem_of_mem_inter_left (by rw [ha]; rfl)⟩ -- the bottom row of `B₁`
-      let y : M₂.X.Elem → Z2 := (M₂.B · ⟨a, Set.mem_of_mem_inter_right (by rw [ha]; rfl)⟩) -- the left column of `B₂`
+      let x : M₁.Y.Elem → Z2 := M₁.B ⟨a, Set.mem_of_mem_inter_left (by rewrite [ha]; rfl)⟩ -- the bottom row of `B₁`
+      let y : M₂.X.Elem → Z2 := (M₂.B · ⟨a, Set.mem_of_mem_inter_right (by rewrite [ha]; rfl)⟩) -- the left column of `B₂`
       (Matrix_2sumComposition A₁ x A₂ y).toMatrixUnionUnion.IndepCols =
       M.toMatroid.Indep := by
   obtain ⟨a, ha, _, hMM, -⟩ := hM
@@ -114,7 +114,8 @@ lemma StandardRepresentation_2sum_isRegular {a : α} (ha : M₁.X ∩ M₂.Y = {
   let y' : M₂.X.Elem → ℚ := (B₂ · ⟨a, haY₂⟩)
   let A₁' : Matrix (M₁.X \ {a}).Elem M₁.Y.Elem ℚ := B₁ ∘ Set.diff_subset.elem
   let A₂' : Matrix M₂.X.Elem (M₂.Y \ {a}).Elem ℚ := (B₂ · ∘ Set.diff_subset.elem)
-  have hB' : (Matrix_2sumComposition A₁' x' A₂' y').TU
+  let B' := (Matrix_2sumComposition A₁' x' A₂' y') -- the signing is obtained using the same function
+  have hB' : B'.TU
   · apply Matrix_2sumComposition_TU
     · rw [Matrix.TU_adjoin_id_left_iff] at hB₁
       apply hB₁.comp_rows
@@ -136,7 +137,7 @@ lemma StandardRepresentation_2sum_isRegular {a : α} (ha : M₁.X ∩ M₂.Y = {
   have hy' : ∀ i, if M₂.B i ⟨a, haY₂⟩ = 0 then y' i = 0 else y' i = 1 ∨ y' i = -1
   · intro i
     exact hBB₂ i ⟨a, haY₂⟩
-  use (Matrix_2sumComposition A₁' x' A₂' y').toMatrixUnionUnion
+  use B'.toMatrixUnionUnion
   constructor
   · rw [Matrix.TU_adjoin_id_left_iff]
     exact hB'.toMatrixUnionUnion
@@ -147,13 +148,13 @@ lemma StandardRepresentation_2sum_isRegular {a : α} (ha : M₁.X ∩ M₂.Y = {
       cases j.toSum with
       | inl j₁ =>
         specialize hA₁ i₁ j₁
-        simp_all
+        simp_all [B']
       | inr j₂ =>
-        simp_all
+        simp_all [B']
     | inr i₂ =>
       cases hj : j.toSum with
       | inl j₁ =>
-        split <;> rename_i h0 <;> simp only [Matrix.of_apply, Matrix.fromBlocks_apply₂₁, mul_eq_zero, hi, hj] at h0 ⊢
+        split <;> rename_i h0 <;> simp only [B', Matrix.of_apply, Matrix.fromBlocks_apply₂₁, mul_eq_zero, hi, hj] at h0 ⊢
         · cases h0 with
           | inl hi₂ =>
             left
@@ -172,7 +173,7 @@ lemma StandardRepresentation_2sum_isRegular {a : α} (ha : M₁.X ∩ M₂.Y = {
           cases hx' <;> cases hy' <;> simp_all
       | inr j₂ =>
         specialize hA₂ i₂ j₂
-        simp_all [x', y', A₁', A₂']
+        simp_all [x', y', A₁', A₂', B']
 
 lemma StandardRepresentation_2sum_isRegular_left {a : α} (ha : M₁.X ∩ M₂.Y = {a}) (hXY : M₂.X ⫗ M₁.Y)
     (hM : (StandardRepresentation_2sum ha hXY).fst.IsRegular) :
