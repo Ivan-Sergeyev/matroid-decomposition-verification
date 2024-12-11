@@ -93,6 +93,15 @@ def StandardRepresentation.IsRegular (M : StandardRepresentation α) : Prop :=
     B'.TU ∧ -- the signed standard representation matrix is totally unimodular
     ∀ i : M.X, ∀ j : M.Y, if M.B i j = 0 then B' i j = 0 else B' i j = 1 ∨ B' i j = -1 -- in absolulute values `B = B'`
 
+lemma StandardRepresentation.isRegular_iff (M : StandardRepresentation α) :
+    M.IsRegular ↔ ∃ B' : Matrix M.X M.Y ℚ,
+      (Matrix.fromColumns (1 : Matrix M.X M.X ℚ) B').TU ∧
+      ∀ i : M.X, ∀ j : M.Y, if M.B i j = 0 then B' i j = 0 else B' i j = 1 ∨ B' i j = -1 := by
+  constructor <;>
+    intro ⟨B', hB', hBB'⟩ <;> refine ⟨B', ?_, hBB'⟩
+  · rwa [Matrix.TU_adjoin_id_left_iff]
+  · rwa [Matrix.TU_adjoin_id_left_iff] at hB'
+
 -- TODO very high priority!
 lemma StandardRepresentation_toMatroid_isRegular_iff {M₁ M₂ : StandardRepresentation α} (hM : M₁.toMatroid = M₂.toMatroid) :
     M₁.IsRegular ↔ M₂.IsRegular := by
