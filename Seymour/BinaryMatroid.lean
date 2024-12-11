@@ -41,7 +41,11 @@ theorem Matrix.IndepCols_subset {B : Matrix X Y Z2} (I J : Set α) (hBJ : B.Inde
   change LinearIndependent Z2 (fun j x => Matrix.fromColumns 1 B x (hJ.elem j).toSum) at hB
   show   LinearIndependent Z2 (fun i x => Matrix.fromColumns 1 B x (((hIJ.trans hJ).elem i).toSum))
   show   LinearIndependent Z2 (fun i x => Matrix.fromColumns 1 B x ((hJ.elem (Subtype.map id hIJ i)).toSum))
-  sorry
+  apply hB.comp
+  intros i1 i2 f
+  dsimp [Subtype.map] at f
+  simp at f
+  exact Subtype.eq f
 
 /-- A nonmaximal linearly independent set of columns can be augmented with another linearly independent column. -/
 theorem Matrix.IndepCols_augment {B : Matrix X Y Z2} (I J : Set α)
