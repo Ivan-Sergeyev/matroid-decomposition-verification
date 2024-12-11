@@ -87,20 +87,19 @@ lemma StandardRepresentation.indep_eq (M : StandardRepresentation α) : M.toMatr
 instance : Coe (StandardRepresentation α) (Matroid α) where coe := StandardRepresentation.toMatroid
 
 
-/-- The binary matroid is regular iff it has a totally unimodular signing. -/
+/-- The binary matroid is regular iff the standard representation matrix has a totally unimodular signing. -/
 def StandardRepresentation.IsRegular (M : StandardRepresentation α) : Prop :=
   ∃ B' : Matrix M.X M.Y ℚ, -- signed version of the standard representation matrix
     B'.TU ∧ -- the signed standard representation matrix is totally unimodular
     ∀ i : M.X, ∀ j : M.Y, if M.B i j = 0 then B' i j = 0 else B' i j = 1 ∨ B' i j = -1 -- in absolulute values `B = B'`
 
+/-- The binary matroid is regular iff the entire matrix has a totally unimodular signing. -/
 lemma StandardRepresentation.isRegular_iff (M : StandardRepresentation α) :
     M.IsRegular ↔ ∃ B' : Matrix M.X M.Y ℚ,
-      (Matrix.fromColumns (1 : Matrix M.X M.X ℚ) B').TU ∧
-      ∀ i : M.X, ∀ j : M.Y, if M.B i j = 0 then B' i j = 0 else B' i j = 1 ∨ B' i j = -1 := by
-  constructor <;>
-    intro ⟨B', hB', hBB'⟩ <;> refine ⟨B', ?_, hBB'⟩
-  · rwa [Matrix.TU_adjoin_id_left_iff]
-  · rwa [Matrix.TU_adjoin_id_left_iff] at hB'
+      (Matrix.fromColumns (1 : Matrix M.X M.X ℚ) B').TU ∧ ∀ i : M.X, ∀ j : M.Y,
+        if M.B i j = 0 then B' i j = 0 else B' i j = 1 ∨ B' i j = -1
+    := by
+  simp [StandardRepresentation.IsRegular, Matrix.TU_adjoin_id_left_iff]
 
 -- TODO very high priority!
 lemma StandardRepresentation_toMatroid_isRegular_iff {M₁ M₂ : StandardRepresentation α} (hM : M₁.toMatroid = M₂.toMatroid) :
