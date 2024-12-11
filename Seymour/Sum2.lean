@@ -117,11 +117,6 @@ lemma StandardRepresentation_2sum_isRegular {a : α} (ha : M₁.X ∩ M₂.Y = {
   let y' : M₂.X.Elem → ℚ := (B₂ · ⟨a, haY₂⟩)
   let A₁' : Matrix (M₁.X \ {a}).Elem M₁.Y.Elem ℚ := B₁ ∘ Set.diff_subset.elem
   let A₂' : Matrix M₂.X.Elem (M₂.Y \ {a}).Elem ℚ := (B₂ · ∘ Set.diff_subset.elem)
-  let B' := (Matrix_2sumComposition A₁' x' A₂' y') -- the signing is obtained using the same function
-  have hB' : B'.TU
-  · apply Matrix_2sumComposition_TU
-    · apply hB₁.comp_rows
-    · apply hB₂.comp_cols
   have hA₁ : -- cannot be inlined
     ∀ i : (M₁.X \ {a}).Elem, ∀ j : M₁.Y.Elem,
       if M₁.B (Set.diff_subset.elem i) j = 0 then A₁' i j = 0 else A₁' i j = 1 ∨ A₁' i j = -1
@@ -138,9 +133,13 @@ lemma StandardRepresentation_2sum_isRegular {a : α} (ha : M₁.X ∩ M₂.Y = {
   have hy' : ∀ i, if M₂.B i ⟨a, haY₂⟩ = 0 then y' i = 0 else y' i = 1 ∨ y' i = -1
   · intro i
     exact hBB₂ i ⟨a, haY₂⟩
+  let B' := Matrix_2sumComposition A₁' x' A₂' y' -- the signing is obtained using the same function but for `ℚ`
   use B'.toMatrixUnionUnion
   constructor
-  · exact hB'.toMatrixUnionUnion
+  · apply Matrix.TU.toMatrixUnionUnion
+    apply Matrix_2sumComposition_TU
+    · apply hB₁.comp_rows
+    · apply hB₂.comp_cols
   · intro i j
     simp only [hB, Matrix.toMatrixUnionUnion, Function.comp_apply]
     cases hi : i.toSum with

@@ -67,14 +67,10 @@ lemma StandardRepresentation_1sum_isRegular [Fintype M₁.X] [Fintype M₁.Y] [F
   obtain ⟨B₂, hB₂, hBB₂⟩ := hM₂
   have hB : (StandardRepresentation_1sum hXY hYX).fst.B = (Matrix_1sumComposition M₁.B M₂.B).toMatrixUnionUnion
   · rfl
-  let B' := Matrix_1sumComposition B₁ B₂ -- the signing is obtained using the same function
-  have hB' : B'.TU
-  · apply Matrix.fromBlocks_TU
-    · exact hB₁
-    · exact hB₂
+  let B' := Matrix_1sumComposition B₁ B₂ -- the signing is obtained using the same function but for `ℚ`
   use B'.toMatrixUnionUnion
   constructor
-  · exact hB'.toMatrixUnionUnion
+  · exact (Matrix.fromBlocks_TU hB₁ hB₂).toMatrixUnionUnion
   · intro i j
     simp only [hB, B', Matrix.toMatrixUnionUnion, Function.comp_apply]
     cases i.toSum with
