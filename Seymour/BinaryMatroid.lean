@@ -7,11 +7,17 @@ This file defines binary matroids and regular matroids. Basic API is provided.
 
 /-- Data describing a binary matroid on the ground set `X ∪ Y` where `X` and `Y` are bundled. -/
 structure StandardRepresentation (α : Type*) [DecidableEq α] where
+  /-- Basis elements -> row indices of [`1 | B`] -/
   X : Set α
+  /-- Nonbasis elements -> column indices of `B` -/
   Y : Set α
+  /-- Necessary decidability -/
   decmemX : ∀ a, Decidable (a ∈ X)
+  /-- Necessary decidability -/
   decmemY : ∀ a, Decidable (a ∈ Y)
+  /-- Basis and nonbasis elements are disjoint -/
   hXY : X ⫗ Y
+  /-- The standard representation matrix -/
   B : Matrix X Y Z2
 
 -- Automatically infer decidability when `StandardRepresentation` is present.
@@ -22,7 +28,7 @@ attribute [instance] StandardRepresentation.decmemY
 variable {α : Type*} [DecidableEq α] {X Y : Set α} [∀ a, Decidable (a ∈ X)] [∀ a, Decidable (a ∈ Y)]
 -- Note that `variable [DecidablePred X.Mem] [DecidablePred Y.Mem]` does not work.
 
-/-- Given matrix `B`, is the set of columns `S` in the (standard) representation [`1` | `B`] `Z2`-independent? -/
+/-- Given matrix `B`, is the set of columns `S` in the (standard) representation [`1 | B`] `Z2`-independent? -/
 def Matrix.IndepCols (B : Matrix X Y Z2) (S : Set α) : Prop :=
   ∃ hs : S ⊆ X ∪ Y,
     LinearIndependent Z2 ((Matrix.fromColumns 1 B).submatrix id (Subtype.toSum ∘ hs.elem)).transpose
@@ -85,11 +91,19 @@ lemma StandardRepresentation.indep_eq (M : StandardRepresentation α) : M.toMatr
 instance : Coe (StandardRepresentation α) (Matroid α) where coe := StandardRepresentation.toMatroid
 
 
-/-- The binary matroid is regular iff it has a totally unimodular signing. -/
+/-- The binary matroid is regular iff the standard representation matrix has a totally unimodular signing. -/
 def StandardRepresentation.IsRegular (M : StandardRepresentation α) : Prop :=
-  ∃ B' : Matrix M.X M.Y ℚ, -- signed version of `B`
-    (Matrix.fromColumns (1 : Matrix M.X M.X ℚ) B').TU ∧ -- the signed representation matrix is totally unimodular
-    ∀ i : M.X, ∀ j : M.Y, if M.B i j = 0 then B' i j = 0 else B' i j = 1 ∨ B' i j = -1 -- in absolulute values `B' = B`
+  ∃ B' : Matrix M.X M.Y ℚ, -- signed version of the standard representation matrix
+    B'.TU ∧ -- the signed standard representation matrix is totally unimodular
+    ∀ i : M.X, ∀ j : M.Y, if M.B i j = 0 then B' i j = 0 else B' i j = 1 ∨ B' i j = -1 -- in absolulute values `B = B'`
+
+/-- The binary matroid is regular iff the entire matrix has a totally unimodular signing. -/
+lemma StandardRepresentation.isRegular_iff (M : StandardRepresentation α) :
+    M.IsRegular ↔ ∃ B' : Matrix M.X M.Y ℚ,
+      (Matrix.fromColumns (1 : Matrix M.X M.X ℚ) B').TU ∧ ∀ i : M.X, ∀ j : M.Y,
+        if M.B i j = 0 then B' i j = 0 else B' i j = 1 ∨ B' i j = -1
+    := by
+  simp [StandardRepresentation.IsRegular, Matrix.TU_adjoin_id_left_iff]
 
 -- TODO very high priority!
 lemma StandardRepresentation_toMatroid_isRegular_iff {M₁ M₂ : StandardRepresentation α} (hM : M₁.toMatroid = M₂.toMatroid) :
