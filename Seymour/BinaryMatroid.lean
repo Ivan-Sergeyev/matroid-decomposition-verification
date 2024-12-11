@@ -34,12 +34,12 @@ def Matrix.IndepCols (B : Matrix X Y Z2) (S : Set α) : Prop :=
     LinearIndependent Z2 ((Matrix.fromColumns 1 B).submatrix id (Subtype.toSum ∘ hs.elem)).transpose
 
 
-/-- The empty set of columns in linearly independent. -/
+/-- The empty set of columns is linearly independent. -/
 theorem Matrix.IndepCols_empty {B : Matrix X Y Z2} : B.IndepCols ∅ := by
   use Set.empty_subset (X ∪ Y)
   exact linearIndependent_empty_type
 
-/-- A subset of a linearly independent set of columns in linearly independent. -/
+/-- A subset of a linearly independent set of columns is linearly independent. -/
 theorem Matrix.IndepCols_subset {B : Matrix X Y Z2} (I J : Set α) (hBJ : B.IndepCols J) (hIJ : I ⊆ J) :
     B.IndepCols I := by
   obtain ⟨hJ, hB⟩ := hBJ
