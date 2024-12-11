@@ -84,7 +84,7 @@ instance : Coe (StandardRepresentation α) (Matroid α) where coe := StandardRep
 /-- The binary matroid is regular iff it has a totally unimodular signing. -/
 def StandardRepresentation.IsRegular (M : StandardRepresentation α) : Prop :=
   ∃ B' : Matrix M.X M.Y ℚ, -- signed version of `B`
-    (Matrix.fromColumns (1 : Matrix M.X M.X ℚ) B').TU ∧ -- the signed representation matrix is totally unimodular
+    B'.TU ∧ -- the signed representation matrix is totally unimodular
     ∀ i : M.X, ∀ j : M.Y, if M.B i j = 0 then B' i j = 0 else B' i j = 1 ∨ B' i j = -1 -- in absolulute values `B' = B`
 
 -- TODO very high priority!

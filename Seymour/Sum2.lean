@@ -120,10 +120,8 @@ lemma StandardRepresentation_2sum_isRegular {a : α} (ha : M₁.X ∩ M₂.Y = {
   let B' := (Matrix_2sumComposition A₁' x' A₂' y') -- the signing is obtained using the same function
   have hB' : B'.TU
   · apply Matrix_2sumComposition_TU
-    · rw [Matrix.TU_adjoin_id_left_iff] at hB₁
-      apply hB₁.comp_rows
-    · rw [Matrix.TU_adjoin_id_left_iff] at hB₂
-      apply hB₂.comp_cols
+    · apply hB₁.comp_rows
+    · apply hB₂.comp_cols
   have hA₁ : -- cannot be inlined
     ∀ i : (M₁.X \ {a}).Elem, ∀ j : M₁.Y.Elem,
       if M₁.B (Set.diff_subset.elem i) j = 0 then A₁' i j = 0 else A₁' i j = 1 ∨ A₁' i j = -1
@@ -142,8 +140,7 @@ lemma StandardRepresentation_2sum_isRegular {a : α} (ha : M₁.X ∩ M₂.Y = {
     exact hBB₂ i ⟨a, haY₂⟩
   use B'.toMatrixUnionUnion
   constructor
-  · rw [Matrix.TU_adjoin_id_left_iff]
-    exact hB'.toMatrixUnionUnion
+  · exact hB'.toMatrixUnionUnion
   · intro i j
     simp only [hB, Matrix.toMatrixUnionUnion, Function.comp_apply]
     cases hi : i.toSum with
@@ -185,8 +182,7 @@ lemma StandardRepresentation_2sum_isRegular_left {a : α} (ha : M₁.X ∩ M₂.
   obtain ⟨haX₁, haY₂, hB⟩ := StandardRepresentation_2sum_B ha hXY
   use B'.submatrix (fun i => ⟨i.val, by sorry⟩) (fun j => ⟨j.val, by sorry⟩)
   constructor
-  · rw [Matrix.TU_adjoin_id_left_iff] at hB'
-    sorry
+  · sorry
   · sorry
 
 lemma StandardRepresentation_2sum_isRegular_right {a : α} (ha : M₁.X ∩ M₂.Y = {a}) (hXY : M₂.X ⫗ M₁.Y)
