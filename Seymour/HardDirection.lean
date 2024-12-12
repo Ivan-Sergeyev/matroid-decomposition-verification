@@ -10,27 +10,27 @@ This file states the Seymour decomposition theorem. Proving `hardSeymour` is the
 variable {α : Type} [DecidableEq α]
 
 /-- TODO define graphics matroids. -/
-def StandardRepresentation.IsGraphic (M : StandardRepresentation α) : Prop :=
+def BinaryMatroidStandardRepr.IsGraphic (M : BinaryMatroidStandardRepr α) : Prop :=
   sorry
 
 /-- TODO define cographics matroids. -/
-def StandardRepresentation.IsCographic (M : StandardRepresentation α) : Prop :=
+def BinaryMatroidStandardRepr.IsCographic (M : BinaryMatroidStandardRepr α) : Prop :=
   sorry
 
 /-- TODO define R10. -/
-def MatroidR10 : StandardRepresentation α :=
+def MatroidR10 : BinaryMatroidStandardRepr α :=
   sorry -- inside we have some `Fin 10 ↪ α` whose image is `E`
 
 /-- Given matroid can be constructed from graphic matroids, cographics matroids, and R10 using 1-sums, 2-sums, and 3-sums. -/
-inductive StandardRepresentation.IsGood : StandardRepresentation α → Prop
+inductive BinaryMatroidStandardRepr.IsGood : BinaryMatroidStandardRepr α → Prop
 -- leaf constructors
-| graphic {M : StandardRepresentation α} (hM : M.IsGraphic) : M.IsGood
-| cographic {M : StandardRepresentation α} (hM : M.IsCographic) : M.IsGood
-| theR10 {M : StandardRepresentation α} {e : α ≃ Fin 10} (hM : M.toMatroid.mapEquiv e = MatroidR10.toMatroid) : M.IsGood
+| graphic {M : BinaryMatroidStandardRepr α} (hM : M.IsGraphic) : M.IsGood
+| cographic {M : BinaryMatroidStandardRepr α} (hM : M.IsCographic) : M.IsGood
+| theR10 {M : BinaryMatroidStandardRepr α} {e : α ≃ Fin 10} (hM : M.matroid.mapEquiv e = MatroidR10.matroid) : M.IsGood
 -- fork constructors
-| is1sum {M M₁ M₂ : StandardRepresentation α} (hM : M.Is1sumOf M₁ M₂) : M.IsGood
-| is2sum {M M₁ M₂ : StandardRepresentation α} (hM : M.Is2sumOf M₁ M₂) : M.IsGood
-| is3sum {M M₁ M₂ : StandardRepresentation α} (hM : M.Is3sumOf M₁ M₂) : M.IsGood
+| is1sum {M M₁ M₂ : BinaryMatroidStandardRepr α} (hM : M.Is1sumOf M₁ M₂) : M.IsGood
+| is2sum {M M₁ M₂ : BinaryMatroidStandardRepr α} (hM : M.Is2sumOf M₁ M₂) : M.IsGood
+| is3sum {M M₁ M₂ : BinaryMatroidStandardRepr α} (hM : M.Is3sumOf M₁ M₂) : M.IsGood
 
-theorem hardSeymour {M : StandardRepresentation α} (hM : M.IsRegular) : M.IsGood := by
+theorem hardSeymour {M : BinaryMatroidStandardRepr α} (hM : M.Regular) : M.IsGood := by
   sorry

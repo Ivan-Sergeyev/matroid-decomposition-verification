@@ -1,4 +1,4 @@
-import Seymour.BinaryMatroid
+import Seymour.RegularMatroid
 
 /-!
 This file contains everything about 3-sum of binary matroids.
@@ -17,13 +17,13 @@ noncomputable abbrev Matrix_3sumComposition {β : Type*} [CommRing β] {X₁ Y�
     (Matrix.fromRows A₁ (Matrix.row Unit (Sum.elim z₁ ![1, 1]))) 0
     (Matrix.fromBlocks D₁ D D₁₂ D₂) (Matrix.fromColumns (Matrix.col Unit (Sum.elim ![1, 1] z₂)) A₂)
 
-variable [DecidableEq α] {M₁ M₂ : StandardRepresentation α}
+variable [DecidableEq α] {M₁ M₂ : BinaryMatroidStandardRepr α}
 
-/-- `StandardRepresentation`-level 3-sum of two matroids.
+/-- `BinaryMatroidStandardRepr`-level 3-sum of two matroids.
 The second part checks legitimacy (invertibility of a certain 2x2 submatrix and specific 1s and 0s on concrete positions). -/
-noncomputable def StandardRepresentation_3sum {x₁ x₂ x₃ y₁ y₂ y₃ : α}
+noncomputable def BinaryMatroidStandardRepr_3sum {x₁ x₂ x₃ y₁ y₂ y₃ : α}
     (hXX : M₁.X ∩ M₂.X = {x₁, x₂, x₃}) (hYY : M₁.Y ∩ M₂.Y = {y₁, y₂, y₃}) (hXY : M₁.X ⫗ M₂.Y) (hYX : M₁.Y ⫗ M₂.X) :
-    StandardRepresentation α × Prop :=
+    BinaryMatroidStandardRepr α × Prop :=
   have hxxx₁ : {x₁, x₂, x₃} ⊆ M₁.X := hXX.symm.subset.trans Set.inter_subset_left
   have hxxx₂ : {x₁, x₂, x₃} ⊆ M₂.X := hXX.symm.subset.trans Set.inter_subset_right
   have hyyy₁ : {y₁, y₂, y₃} ⊆ M₁.Y := hYY.symm.subset.trans Set.inter_subset_left
@@ -104,37 +104,37 @@ noncomputable def StandardRepresentation_3sum {x₁ x₂ x₃ y₁ y₂ y₃ : �
   ⟩
 
 /-- Binary matroid `M` is a result of 3-summing `M₁` and `M₂` in some way. -/
-def StandardRepresentation.Is3sumOf (M : StandardRepresentation α) (M₁ M₂ : StandardRepresentation α) : Prop :=
+def BinaryMatroidStandardRepr.Is3sumOf (M : BinaryMatroidStandardRepr α) (M₁ M₂ : BinaryMatroidStandardRepr α) : Prop :=
   ∃ x₁ x₂ x₃ y₁ y₂ y₃ : α,
     ∃ hXX : M₁.X ∩ M₂.X = {x₁, x₂, x₃}, ∃ hYY : M₁.Y ∩ M₂.Y = {y₁, y₂, y₃}, ∃ hXY : M₁.X ⫗ M₂.Y, ∃ hYX : M₁.Y ⫗ M₂.X,
-      let M₀ := StandardRepresentation_3sum hXX hYY hXY hYX
-      M.toMatroid = M₀.fst.toMatroid ∧ M₀.snd
+      let M₀ := BinaryMatroidStandardRepr_3sum hXX hYY hXY hYX
+      M.matroid = M₀.fst.matroid ∧ M₀.snd
 
-variable {M : StandardRepresentation α}
+variable {M : BinaryMatroidStandardRepr α}
 
 -- API for access to individual assumptions and identities in the definition of 3-sum
 
-lemma StandardRepresentation.Is3sumOf.interXX (hM : M.Is3sumOf M₁ M₂) :
+lemma BinaryMatroidStandardRepr.Is3sumOf.interXX (hM : M.Is3sumOf M₁ M₂) :
     ∃ x₁ x₂ x₃ : α, M₁.X ∩ M₂.X = {x₁, x₂, x₃} := by
   obtain ⟨x₁, x₂, x₃, -, -, -, hXX, -⟩ := hM
   exact ⟨x₁, x₂, x₃, hXX⟩
 
-lemma StandardRepresentation.Is3sumOf.interYY (hM : M.Is3sumOf M₁ M₂) :
+lemma BinaryMatroidStandardRepr.Is3sumOf.interYY (hM : M.Is3sumOf M₁ M₂) :
     ∃ y₁ y₂ y₃ : α, M₁.Y ∩ M₂.Y = {y₁, y₂, y₃} := by
   obtain ⟨-, -, -, y₁, y₂, y₃, -, hYY, -⟩ := hM
   exact ⟨y₁, y₂, y₃, hYY⟩
 
-lemma StandardRepresentation.Is3sumOf.disjoXY (hM : M.Is3sumOf M₁ M₂) :
+lemma BinaryMatroidStandardRepr.Is3sumOf.disjoXY (hM : M.Is3sumOf M₁ M₂) :
     M₁.X ⫗ M₂.Y := by
   obtain ⟨-, -, -, -, -, -, -, -, hXY, -⟩ := hM
   exact hXY
 
-lemma StandardRepresentation.Is3sumOf.disjoYX (hM : M.Is3sumOf M₁ M₂) :
+lemma BinaryMatroidStandardRepr.Is3sumOf.disjoYX (hM : M.Is3sumOf M₁ M₂) :
     M₁.Y ⫗ M₂.X := by
   obtain ⟨-, -, -, -, -, -, -, -, -, hYX, -⟩ := hM
   exact hYX
 
-lemma StandardRepresentation.Is3sumOf.indep (hM : M.Is3sumOf M₁ M₂) :
+lemma BinaryMatroidStandardRepr.Is3sumOf.indep (hM : M.Is3sumOf M₁ M₂) :
     ∃ x₁ x₂ x₃ y₁ y₂ y₃ : α,
     ∃ x₁inX₁ : x₁ ∈ M₁.X,
     ∃ x₂inX₁ : x₂ ∈ M₁.X,
@@ -183,7 +183,7 @@ lemma StandardRepresentation.Is3sumOf.indep (hM : M.Is3sumOf M₁ M₂) :
             (j.property.elim (by simp_all) hj₂).elim
           )
         )
-      ).IndepCols = M.toMatroid.Indep := by
+      ).IndepCols = M.matroid.Indep := by
   obtain ⟨x₁, x₂, x₃, y₁, y₂, y₃, hXX, hYY, _, _, hMM, -⟩ := hM
   have hxxx₁ : {x₁, x₂, x₃} ⊆ M₁.X := hXX.symm.subset.trans Set.inter_subset_left
   have hxxx₂ : {x₁, x₂, x₃} ⊆ M₂.X := hXX.symm.subset.trans Set.inter_subset_right
@@ -201,21 +201,21 @@ lemma StandardRepresentation.Is3sumOf.indep (hM : M.Is3sumOf M₁ M₂) :
     hyyy₁ (Set.mem_insert y₁ {y₂, y₃}),
     hyyy₂ (Set.mem_insert y₁ {y₂, y₃})
   rewrite [hMM]
-  rfl
+  sorry -- todo: rfl used to solve this
 
 /-- Any 3-sum of regular matroids is a regular matroid.
 This is the last of the three parts of the easy direction of the Seymour's theorem. -/
-theorem StandardRepresentation.Is3sumOf.isRegular [Fintype M₁.X] [Fintype M₁.Y] [Fintype M₂.X] [Fintype M₂.Y]
-    (hM : M.Is3sumOf M₁ M₂) (hM₁ : M₁.IsRegular) (hM₂ : M₂.IsRegular) :
-    M.IsRegular := by
+theorem BinaryMatroidStandardRepr.Is3sumOf.Regular [Fintype M₁.X] [Fintype M₁.Y] [Fintype M₂.X] [Fintype M₂.Y]
+    (hM : M.Is3sumOf M₁ M₂) (hM₁ : M₁.Regular) (hM₂ : M₂.Regular) :
+    M.Regular := by
   sorry
 
 /-- If a regular matroid is a 3-sum, then the left summand of the 3-sum is regular. -/
-lemma StandardRepresentation.Is3sumOf.isRegular_left (hMsum : M.Is3sumOf M₁ M₂) (hMreg : M.IsRegular) :
-    M₁.IsRegular := by
+lemma BinaryMatroidStandardRepr.Is3sumOf.Regular_left (hMsum : M.Is3sumOf M₁ M₂) (hMreg : M.Regular) :
+    M₁.Regular := by
   sorry
 
 /-- If a regular matroid is a 3-sum, then the right summand of the 3-sum is regular. -/
-lemma StandardRepresentation.Is3sumOf.isRegular_right (hMsum : M.Is3sumOf M₁ M₂) (hMreg : M.IsRegular) :
-    M₂.IsRegular := by
+lemma BinaryMatroidStandardRepr.Is3sumOf.Regular_right (hMsum : M.Is3sumOf M₁ M₂) (hMreg : M.Regular) :
+    M₂.Regular := by
   sorry
