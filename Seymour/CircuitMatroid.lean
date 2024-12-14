@@ -5,13 +5,13 @@ import Seymour.Basic
 section CircuitMatroid
 
 /-- Independence predicate derived from circuit predicate. -/
-def CircPred.Indep {α : Type*} (Circuit : Set α → Prop) (E : Set α) : Set α → Prop :=
-  fun I => I ⊆ E ∧ ∀ C, Circuit C → ¬C ⊆ I -- independent sets are all maximal non-circuits
+def CircPredToIndep {α : Type*} (CircuitPred : Set α → Prop) (E : Set α) : Set α → Prop :=
+  fun I => I ⊆ E ∧ ∀ C, CircuitPred C → ¬C ⊆ I -- independent sets are all maximal non-circuits
 
 /-- Family of circuits satisfying assumptions of circuit axiom (C3) from Bruhn et al. -/
-structure CircPred.ValidXFamily {α : Type*} (Circuit : Set α → Prop) (C X : Set α) where
+structure CircPred.ValidXFamily {α : Type*} (CircuitPred : Set α → Prop) (C X : Set α) where
   F : X → Set α
-  hF : ∀ x, Circuit (F x)
+  hF : ∀ x, CircuitPred (F x)
   Valid : ∀ x ∈ X, ∀ y : X, x ∈ (F y) ↔ x = (y : α)
 
 -- todo: lemma: ∀ x : X, (x : α) ∈ F.F x
@@ -27,26 +27,26 @@ structure CircuitMatroid (α : Type*) where
   /-- The ground set -/
   (E : Set α)
   /-- The circuit predicate -/
-  (Circuit : Set α → Prop)
+  (CircuitPred : Set α → Prop)
   /-- Empty set is not a circuit -/
-  (not_circuit_empty : ¬Circuit ∅)
+  (not_circuit_empty : ¬CircuitPred ∅)
   /-- No circuit is a subset of another circuit -/
-  (circuit_not_subset : ∀ ⦃C C'⦄, Circuit C → C' ⊆ C → C' = C)
+  (circuit_not_subset : ∀ ⦃C C'⦄, CircuitPred C → CircuitPred C' → ¬C' ⊂ C)
   /-- Axiom (C3) from Bruhn et al. -/
-  (circuit_c3 : ∀ ⦃X C⦄, ∀ F : CircPred.ValidXFamily Circuit C X,
-    ∀ z ∈ C \ F.Union, ∃ C', Circuit C' ∧ z ∈ C' ∧ C' ⊆ (C ∪ F.Union) \ X)
+  (circuit_c3 : ∀ ⦃X C⦄, ∀ F : CircPred.ValidXFamily CircuitPred C X,
+    ∀ z ∈ C \ F.Union, ∃ C', CircuitPred C' ∧ z ∈ C' ∧ C' ⊆ (C ∪ F.Union) \ X)
   /-- Corresponding family of independent sets satisfies has the maximal subset property -/
-  (circuit_maximal : ∀ X, X ⊆ E → Matroid.ExistsMaximalSubsetProperty (CircPred.Indep Circuit E) X)
+  (circuit_maximal : ∀ X, X ⊆ E → Matroid.ExistsMaximalSubsetProperty (CircPredToIndep CircuitPred E) X)
   /-- Every circuit is a subset of the ground set -/
-  (subset_ground : ∀ C, Circuit C → C ⊆ E)
+  (subset_ground : ∀ C, CircuitPred C → C ⊆ E)
 
 /-- Independence predicate in circuit matroid construction. -/
 def CircuitMatroid.Indep {α : Type*} (M : CircuitMatroid α) : Set α → Prop :=
-  CircPred.Indep M.Circuit M.E
+  CircPredToIndep M.CircuitPred M.E
 
 /-- Empty set is independent in circuit matroid construction. -/
 lemma CircuitMatroid.Indep_empty {α : Type*} (M : CircuitMatroid α) : M.Indep ∅ := by
-  unfold CircuitMatroid.Indep CircPred.Indep
+  unfold CircuitMatroid.Indep CircPredToIndep
   constructor
   · exact Set.empty_subset M.E
   · intro C hC nC
@@ -59,8 +59,8 @@ lemma CircuitMatroid.Indep_empty {α : Type*} (M : CircuitMatroid α) : M.Indep 
 /-- Subset of independent set is independent in circuit matroid construction. -/
 lemma CircuitMatroid.Indep_subset {α : Type*} {I J : Set α}
     (M : CircuitMatroid α) (hI : M.Indep I) (hJI : J ⊆ I) : M.Indep J := by
-  unfold CircuitMatroid.Indep CircPred.Indep
-  unfold CircuitMatroid.Indep CircPred.Indep at hI
+  unfold CircuitMatroid.Indep CircPredToIndep
+  unfold CircuitMatroid.Indep CircPredToIndep at hI
   constructor
   · exact Set.Subset.trans hJI hI.1
   · intro C hC
@@ -157,7 +157,7 @@ lemma CircuitMatroid.Indep_aug {α : Type*} {I I' : Set α}
       have tmp : J' ≠ I' := Set.insert_ne_self.mpr hzI'
       tauto
 
-    unfold CircuitMatroid.Indep CircPred.Indep at hJ'
+    unfold CircuitMatroid.Indep CircPredToIndep at hJ'
     push_neg at hJ'
     specialize hJ' hJ'ground
     obtain ⟨C, ⟨hCcirc, hCJ'⟩⟩ := hJ'
@@ -183,7 +183,7 @@ lemma CircuitMatroid.Indep_aug {α : Type*} {I I' : Set α}
       tauto
 
     by_contra hx
-    unfold CircuitMatroid.Indep CircPred.Indep at hx
+    unfold CircuitMatroid.Indep CircPredToIndep at hx
     push_neg at hx
 
     have hIxground : ∀ x ∈ M.E, x ᕃ I ⊆ M.E := fun x a => Set.insert_subset a fun ⦃a⦄ a_1 => hBground (hIB a_1)
@@ -201,7 +201,7 @@ lemma CircuitMatroid.Indep_aug {α : Type*} {I I' : Set α}
       exact ne_not_ins hzx hzI
 
     -- for every x ∈ X, take corresponding C from hx and put it into F
-    let F : CircPred.ValidXFamily M.Circuit C X := sorry -- todo: construction
+    let F : CircPred.ValidXFamily M.CircuitPred C X := sorry -- todo: construction
     have hzxF : ∀ x, F.F x ⊆ (x : α) ᕃ I := sorry -- todo: holds by constructoin
     have hzF : z ∈ C \ F.Union := sorry -- todo: holds by construction
     apply M.circuit_c3 at hzF
@@ -217,7 +217,7 @@ lemma CircuitMatroid.Indep_aug {α : Type*} {I I' : Set α}
 
     -- contradiction: C' is a cycle and a subset of an independent set
     have hC'indep : M.Indep C' := M.Indep_subset hBindep hC'B
-    unfold CircuitMatroid.Indep CircPred.Indep at hC'indep
+    unfold CircuitMatroid.Indep CircPredToIndep at hC'indep
     obtain ⟨hC'ground, hC'nosubcircuit⟩ := hC'indep
     specialize hC'nosubcircuit C' hC'
     tauto
