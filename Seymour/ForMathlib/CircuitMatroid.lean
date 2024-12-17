@@ -2,29 +2,33 @@ import Mathlib.Data.Matroid.IndepAxioms
 import Seymour.Basic
 
 
-variable {α : Type*}
-
 /-- Independence predicate derived from circuit predicate `P`. -/
-def CircPredToIndep (P : Set α → Prop) (E I : Set α) : Prop :=
+def CircPredToIndep {α : Type*} (P : Set α → Prop) (E I : Set α) : Prop :=
   I ⊆ E ∧ ∀ C : Set α, P C → ¬(C ⊆ I) -- independent sets are all non-circuits
 
 /-- Family of circuits satisfying assumptions of circuit condition (C3) from Bruhn et al. -/
-structure ValidXFamily (P : Set α → Prop) (C X : Set α) where
+structure ValidXFamily {α : Type*} (P : Set α → Prop) (C X : Set α) where
   F : X.Elem → Set α
   hPF : ∀ x : X.Elem, P (F x)
   hF : ∀ x ∈ X, ∀ y : X.Elem, x ∈ F y ↔ x = y.val
 
-lemma ValidXFamily.mem_of_elem {P : Set α → Prop} {C X : Set α} (F : ValidXFamily P C X) (x : X.Elem) : x.val ∈ F.F x := by
+section helpersValidXFamily
+variable {α : Type*} {P : Set α → Prop} {C X : Set α}
+
+lemma ValidXFamily.mem_of_elem (F : ValidXFamily P C X) (x : X.Elem) : x.val ∈ F.F x := by
   rw [F.hF]
   exact x.property
 
-/-- Shorthand for union of sets in `CircPred.ValidXFamily` -/
-def ValidXFamily.union {P : Set α → Prop} {C X : Set α}
-    (F : ValidXFamily P C X) : Set α :=
+/-- Shorthand for union of sets in `ValidXFamily` -/
+def ValidXFamily.union (F : ValidXFamily P C X) : Set α :=
   Set.iUnion F.F
 
-lemma lll {P : Set α → Prop} {C X : Set α} {F : ValidXFamily P C X} {z : α} (hz : z ∈ C \ F.union) : z ∉ X := by
-  sorry
+lemma ValidXFamily.outside {F : ValidXFamily P C X} {z : α} (hzCF : z ∈ C \ F.union) : z ∉ X := by
+  intro hz
+  have := F.hF z hz ⟨z, hz⟩
+  simp_all [ValidXFamily.union]
+
+end helpersValidXFamily
 
 /-- A matroid defined by circuit conditions. -/
 structure CircuitMatroid (α : Type*) where
@@ -37,12 +41,14 @@ structure CircuitMatroid (α : Type*) where
   /-- No circuit is a subset of another circuit -/
   (circuit_not_subset : ∀ ⦃C C' : Set α⦄, CircuitPred C → CircuitPred C' → ¬(C' ⊂ C))
   /-- Condition (C3) from Bruhn et al. -/
-  (circuit_c3 : ∀ ⦃X C : Set α⦄, ∀ F : ValidXFamily CircuitPred C X,
-      ∀ z ∈ C \ F.union, ∃ C' : Set α, CircuitPred C' ∧ z ∈ C' ∧ C' ⊆ (C ∪ F.union) \ X)
+  (circuit_c3 : ∀ ⦃X C : Set α⦄, ∀ F : ValidXFamily CircuitPred C X, ∀ z ∈ C \ F.union,
+      ∃ C' : Set α, CircuitPred C' ∧ z ∈ C' ∧ C' ⊆ (C ∪ F.union) \ X)
   /-- Corresponding family of independent sets satisfies has the maximal subset property -/
   (circuit_maximal : ∀ X : Set α, X ⊆ E → Matroid.ExistsMaximalSubsetProperty (CircPredToIndep CircuitPred E) X)
   /-- Every circuit is a subset of the ground set -/
   (subset_ground : ∀ C : Set α, CircuitPred C → C ⊆ E)
+
+variable {α : Type*}
 
 /-- Independence predicate in circuit matroid construction. -/
 def CircuitMatroid.isIndep (M : CircuitMatroid α) : Set α → Prop :=
