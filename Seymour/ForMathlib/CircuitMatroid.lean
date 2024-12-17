@@ -14,13 +14,17 @@ structure ValidXFamily (P : Set α → Prop) (C X : Set α) where
   hPF : ∀ x : X.Elem, P (F x)
   hF : ∀ x ∈ X, ∀ y : X.Elem, x ∈ F y ↔ x = y.val
 
--- todo: lemma: ∀ x : X, (x : α) ∈ F.F x
--- todo: lemma: ∀ z ∈ C \ F.union, z ∉ X
+lemma ValidXFamily.mem_of_elem {P : Set α → Prop} {C X : Set α} (F : ValidXFamily P C X) (x : X.Elem) : x.val ∈ F.F x := by
+  rw [F.hF]
+  exact x.property
 
 /-- Shorthand for union of sets in `CircPred.ValidXFamily` -/
 def ValidXFamily.union {P : Set α → Prop} {C X : Set α}
     (F : ValidXFamily P C X) : Set α :=
   Set.iUnion F.F
+
+lemma lll {P : Set α → Prop} {C X : Set α} {F : ValidXFamily P C X} {z : α} (hz : z ∈ C \ F.union) : z ∉ X := by
+  sorry
 
 /-- A matroid defined by circuit conditions. -/
 structure CircuitMatroid (α : Type*) where
@@ -59,7 +63,7 @@ lemma CircuitMatroid.Maximal_iff (M : CircuitMatroid α) (B : Set α) :
    fun hB => ⟨⟨hB.left, hB.left.left⟩, fun _ hA => hB.right hA.left⟩⟩
 
 -- TODO move
-lemma nmem_insert {z x : α} {I : Set α} (hz : z ≠ x) (hI : z ∉ I) : z ∉ x ᕃ I := by
+lemma nmem_insert {z x : α} {I : Set α} (hx : z ≠ x) (hI : z ∉ I) : z ∉ x ᕃ I := by
   simp_all [Set.insert]
 
 theorem CircuitMatroid.isIndep_aug {I I' : Set α}
@@ -76,15 +80,13 @@ theorem CircuitMatroid.isIndep_aug {I I' : Set α}
   have hIBstrict : I ⊂ B
   · rw [Set.ssubset_def]
     by_contra! hBI
-    have hIBeq : I = B := hIB.antisymm (hBI hIB)
     unfold Maximal at hMI
     push_neg at hMI
     obtain ⟨J, hJindep, hIJ, hnJI⟩ := hMI hI
     have hIJneq : I ≠ J := (ne_of_not_le hnJI).symm
     have hBJ : B ⊆ J := (hBI hIB).trans hIJ
-    have hBJeq : B = J := hBJ.antisymm (hBmax hJindep hJindep.1 hBJ)
-    rw [hIBeq, hBJeq] at hIJneq
-    tauto
+    rw [hIB.antisymm (hBI hIB), hBJ.antisymm (hBmax hJindep hJindep.1 hBJ)] at hIJneq
+    exact hIJneq rfl
 
   obtain ⟨z, hzB, hzI⟩ := Set.exists_of_ssubset hIBstrict
 
@@ -96,9 +98,7 @@ theorem CircuitMatroid.isIndep_aug {I I' : Set α}
     have hJ' : ¬M.isIndep J'
     · intro hJ'indep
       obtain ⟨hI'indep, hI'max⟩ := hMI'
-      specialize hI'max hJ'indep (Set.subset_insert z I')
-      have : J' ≠ I' := Set.insert_ne_self.mpr hzI'
-      tauto
+      exact hzI' (hI'max hJ'indep (Set.subset_insert z I') (Or.inl rfl))
 
     unfold CircuitMatroid.isIndep CircPredToIndep at hJ'
     push_neg at hJ'
@@ -126,7 +126,7 @@ theorem CircuitMatroid.isIndep_aug {I I' : Set α}
 
     have hz : ∀ x ∈ X, z ∉ x ᕃ I
     · intro x hxx
-      have hxI'mI : x ∈ I' \ I := (hXII' hxx)
+      have hxI'mI : x ∈ I' \ I := hXII' hxx
       have hxIground : x ᕃ I ⊆ M.E := hIxground x (hJ'ground (hXJ' hxx))
       obtain ⟨Cx, ⟨hCx, hCxI⟩⟩ := hx x hxI'mI hxIground
       have hzx : z ≠ x := (ne_of_mem_of_not_mem (hXI' hxx) hzI').symm
@@ -137,7 +137,7 @@ theorem CircuitMatroid.isIndep_aug {I I' : Set α}
     have hzxF : ∀ x, F.F x ⊆ (x : α) ᕃ I := sorry -- holds by constructoin
     have hzF : z ∈ C \ F.union := sorry -- holds by construction
     apply M.circuit_c3 at hzF
-    obtain ⟨C', ⟨hC', hzC', hC'CFX⟩⟩ := hzF
+    obtain ⟨C', hC', hzC', hC'CFX⟩ := hzF
 
     have hCxI : ∀ x, F.F x \ X ⊆ I := sorry -- follows from `hzxF`
     have hCxB : ∀ x, F.F x \ X ⊆ B := fun x _ hFFxX => hIB (hCxI x hFFxX)
@@ -149,7 +149,7 @@ theorem CircuitMatroid.isIndep_aug {I I' : Set α}
 
     -- contradiction: `C'` is a cycle and a subset of an independent set
     obtain ⟨hC'ground, hC'nosubcircuit⟩ := M.isIndep_subset hBindep hC'B
-    tauto
+    exact hC'nosubcircuit C' hC' (fun _ => id)
 
   rfl
 
