@@ -1,6 +1,6 @@
 import Mathlib.Data.Matroid.Dual
 import Seymour.MatroidCircuit
-import Seymour.CircuitMatroid
+import Seymour.ForMathlib.CircuitMatroid
 import Seymour.MatroidConnectivity
 
 
