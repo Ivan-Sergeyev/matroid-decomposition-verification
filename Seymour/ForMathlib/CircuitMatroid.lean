@@ -1,9 +1,8 @@
 import Mathlib.Data.Matroid.IndepAxioms
 import Seymour.Basic
 
-variable {α : Type*}
 
-section CircuitMatroid
+variable {α : Type*}
 
 /-- Independence predicate derived from circuit predicate `P`. -/
 def CircPredToIndep (P : Set α → Prop) (E I : Set α) : Prop :=
