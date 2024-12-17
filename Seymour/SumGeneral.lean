@@ -29,14 +29,12 @@ lemma set_inter_eq_singleton_subset_left {α : Type*} {X Y : Set α} {a : α} (h
   have haXY : a ∈ X ∩ Y := by rw [ha]; rfl
   have haX : a ∈ X := Set.mem_of_mem_inter_left haXY
   exact Set.singleton_subset_iff.mpr haX
-  -- todo: simplify
 
 /-- todo: desc -/
 lemma set_inter_eq_singleton_subset_right {α : Type*} {X Y : Set α} {a : α} (ha : X ∩ Y = {a}) : {a} ⊆ Y := by
   have haXY : a ∈ X ∩ Y := by rw [ha]; rfl
   have haY : a ∈ Y := Set.mem_of_mem_inter_right haXY
   exact Set.singleton_subset_iff.mpr haY
-  -- todo: simplify
 
 
 section TwoSum
@@ -47,7 +45,7 @@ def BinaryMatroidStandardRepr.TwoSum.x {α : Type*} [DecidableEq α] {a : α}
   M₁.ChosenRow (by
     apply set_inter_eq_singleton_subset_left
     exact ha
-  ) -- todo: simplify
+  )
 
 /-- todo: desc -/
 def BinaryMatroidStandardRepr.TwoSum.A₁ {α : Type*} [DecidableEq α] {a : α}
@@ -55,7 +53,7 @@ def BinaryMatroidStandardRepr.TwoSum.A₁ {α : Type*} [DecidableEq α] {a : α}
   M₁.ChosenRowComplement (by
     apply set_inter_eq_singleton_subset_left
     exact ha
-  ) -- todo: simplify
+  )
 
 /-- todo: desc -/
 def BinaryMatroidStandardRepr.TwoSum.y {α : Type*} [DecidableEq α] {a : α}
@@ -63,7 +61,7 @@ def BinaryMatroidStandardRepr.TwoSum.y {α : Type*} [DecidableEq α] {a : α}
   M₂.ChosenCol (by
     apply set_inter_eq_singleton_subset_right
     exact ha
-  ) -- todo: simplify
+  )
 
 /-- todo: desc -/
 def BinaryMatroidStandardRepr.TwoSum.A₂ {α : Type*} [DecidableEq α] {a : α}
@@ -71,7 +69,7 @@ def BinaryMatroidStandardRepr.TwoSum.A₂ {α : Type*} [DecidableEq α] {a : α}
   M₂.ChosenColComplement (by
     apply set_inter_eq_singleton_subset_right
     exact ha
-  ) -- todo: simplify
+  )
 
 /-- todo: desc -/
 structure BinaryMatroidStandardRepr.TwoSum.Assumptions {α : Type*} [DecidableEq α]
@@ -105,7 +103,8 @@ def BinaryMatroidStandardRepr.TwoSum.BinaryMatroidStandardRepr {α : Type*} [Dec
       exact ⟨
         ⟨M₁.hXY.disjoint_sdiff_left, id (Disjoint.symm Assumptions.hYX)⟩,
         ⟨disjoint_of_singleton_intersection_both_wo Assumptions.ha, M₂.hXY.disjoint_sdiff_right⟩
-      ⟩, (Matrix.fromBlocks A₁ 0 (fun i j => y i * x j) A₂).toMatrixUnionUnion
+      ⟩,
+      (Matrix.fromBlocks A₁ 0 (fun i j => y i * x j) A₂).toMatrixUnionUnion
   ⟩
 
 -- todo: lemma: `TwoSum.BinaryMatroidStandardRepr` is a special case of `GeneralSum.BinaryMatroidStandardRepr`

@@ -24,7 +24,7 @@ def BinaryMatroidStandardRepr.Regular {α : Type*} [DecidableEq α] (M : BinaryM
 
 
 /-- If matroid is represented by a totally unimodular matrix `A` over `ℚ`, then it is represented by `A` over any field `F`. -/
-theorem Matroid.RepresentableTU_RepresentableAnyField {α : Type*} {X Y : Set α} {A : Matrix X Y ℚ}
+theorem Matroid.RepresentableTU_RepresentableAnyField {α X : Type*} {Y : Set α} {A : Matrix X Y ℚ}
     (M : Matroid α) (hM : M.RepresentedBy A) (hA : A.TU) :
     ∀ F : Type*, ∃ hF : Field F, M.RepresentableOver F := by -- todo: check correctness of Field F
   sorry

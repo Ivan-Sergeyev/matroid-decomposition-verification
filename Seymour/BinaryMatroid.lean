@@ -22,6 +22,10 @@ def Matrix.GlueColumns {α : Type*} {X Y : Set α} [∀ a, Decidable (a ∈ X)] 
     (M : Matrix X (X ⊕ Y) Z2) : Matrix X (X ∪ Y).Elem Z2 :=
   fun i j => M i j.toSum
 
+/-- Ground set of a binary matroid is union of row and column index sets of its standard matrix representation. -/
+def BinaryMatroidStandardRepr.E {α : Type*} [DecidableEq α]
+    (M : BinaryMatroidStandardRepr α) : Set α := M.X ∪ M.Y
+
 /-- Full representation matrix of binary matroid is `[I | B]`. -/
 def BinaryMatroidStandardRepr.A {α : Type*} [DecidableEq α]
     (M : BinaryMatroidStandardRepr α) : Matrix M.X (M.X ∪ M.Y).Elem Z2 :=
@@ -29,8 +33,8 @@ def BinaryMatroidStandardRepr.A {α : Type*} [DecidableEq α]
 
 /-- Binary matroid converted to `VectorMatroid`. -/
 def BinaryMatroidStandardRepr.VectorMatroid {α : Type*} [DecidableEq α]
-    (M : BinaryMatroidStandardRepr α) : VectorMatroid α Z2 :=
-  ⟨M.X, M.X ∪ M.Y, M.A⟩
+    (M : BinaryMatroidStandardRepr α) : VectorMatroid M.X α Z2 :=
+  ⟨M.X ∪ M.Y, M.A⟩
 
 /-- Binary matroid converted to `Matroid`. -/
 def BinaryMatroidStandardRepr.matroid {α : Type*} [DecidableEq α]
