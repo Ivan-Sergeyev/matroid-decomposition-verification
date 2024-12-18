@@ -1,4 +1,5 @@
 import Seymour.Basic
+import Seymour.SetTheory
 import Seymour.BinaryMatroid
 
 
@@ -23,18 +24,6 @@ def BinaryMatroidStandardRepr.ChosenCol {α : Type*} [DecidableEq α] {a : α}
 def BinaryMatroidStandardRepr.ChosenColComplement {α : Type*} [DecidableEq α] {a : α}
     (M : BinaryMatroidStandardRepr α) (ha : {a} ⊆ M.Y) : Matrix M.X.Elem (M.Y \ {a}).Elem Z2 :=
  (M.B · ∘ Set.diff_subset.elem)
-
-/-- todo: desc -/
-lemma set_inter_eq_singleton_subset_left {α : Type*} {X Y : Set α} {a : α} (ha : X ∩ Y = {a}) : {a} ⊆ X := by
-  have haXY : a ∈ X ∩ Y := by rw [ha]; rfl
-  have haX : a ∈ X := Set.mem_of_mem_inter_left haXY
-  exact Set.singleton_subset_iff.mpr haX
-
-/-- todo: desc -/
-lemma set_inter_eq_singleton_subset_right {α : Type*} {X Y : Set α} {a : α} (ha : X ∩ Y = {a}) : {a} ⊆ Y := by
-  have haXY : a ∈ X ∩ Y := by rw [ha]; rfl
-  have haY : a ∈ Y := Set.mem_of_mem_inter_right haXY
-  exact Set.singleton_subset_iff.mpr haY
 
 
 section TwoSum

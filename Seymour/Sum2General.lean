@@ -1,4 +1,5 @@
 import Mathlib.Data.Matroid.Dual
+import Seymour.SetTheory
 import Seymour.MatroidCircuit
 import Seymour.ForMathlib.CircuitMatroid
 import Seymour.MatroidConnectivity
@@ -156,106 +157,6 @@ lemma Matroid.TwoSum.CircuitType3_inter_M₂_Nonempty {α : Type*} {M₁ M₂ : 
   rw [hCM₂empty, Set.empty_union, ←Matroid.Loop.IffCircuit] at hCM₁circ
   have hpM₁ := Matroid.TwoSum.pNotLoopOrColoopM₂ Assumptions
   tauto
-
-/-- todo: desc -/
-lemma disjoint_nonempty_not_subset {α : Type*} {A B : Set α}
-    (hAB : Disjoint A B) (hA : A.Nonempty) : ¬(A ⊆ B) := by
-  by_contra hAsubB
-  apply Disjoint.eq_bot_of_le hAB at hAsubB
-  rw [hAsubB] at hA
-  unfold Set.Nonempty at hA
-  tauto
-
-/-- todo: desc -/
-lemma disjoint_nonempty_not_ssubset {α : Type*} {A B : Set α}
-    (hAB : Disjoint A B) (hA : A.Nonempty) : ¬(A ⊂ B) := by
-  apply disjoint_nonempty_not_subset hAB at hA
-  by_contra hAssubB
-  obtain ⟨hAsubB, _hnBsubA⟩ := hAssubB
-  tauto
-
-/-- todo: desc -/
-lemma disjoint_inter_nonempty_inter_empty {α : Type*} {A B E : Set α}
-    (hA : (A ∩ E).Nonempty) (hB : B ∩ E = ∅) : ¬(A ⊂ B) := by
-  by_contra hAB
-  obtain ⟨hAsubB, _hnBsubA⟩ := hAB
-  obtain ⟨x, hxAE⟩  := hA
-  have hxBE : x ∈ B ∩ E := (Set.inter_subset_inter hAsubB fun ⦃a⦄ a => a) hxAE
-  rw [hB] at hxBE
-  tauto
-
-/-- todo: desc -/
-lemma ssubset_union_self_elem_notin {α : Type*} {a : α} {X : Set α}
-    (ha : a ∉ X) : X ⊂ X ∪ {a} := by
-  constructor
-  · exact Set.subset_union_left
-  · by_contra hX
-    rw [Set.union_subset_iff] at hX
-    obtain ⟨_, haa⟩ := hX
-    tauto
-
-/-- todo: desc -/
-lemma union_ssubset_union_iff {α : Type*} {a : α} {A B : Set α}
-    (haA : a ∉ A) (haB : a ∉ B) : A ∪ {a} ⊂ B ∪ {a} ↔ A ⊂ B := by
-  constructor
-  · intro hAB
-    obtain ⟨hABl, hABr⟩ := hAB
-    constructor
-    · intro x hx
-      specialize hABl (Set.mem_union_left {a} hx)
-      apply ne_of_mem_of_not_mem hx at haA
-      cases hABl with
-      | inl h => exact h
-      | inr h => tauto
-    · by_contra hBA
-      apply Set.union_subset_union_left {a} at hBA
-      tauto
-  · intro hAB
-    obtain ⟨hABl, hABr⟩ := hAB
-    constructor
-    · exact Set.union_subset_union_left {a} hABl
-    · by_contra hBA
-      rw [Set.union_singleton, Set.union_singleton] at hBA
-      apply (Set.insert_subset_insert_iff haB).mp at hBA
-      tauto
-
-/-- todo: desc -/
-lemma ssub_parts_ssub {α : Type*} {A B E₁ E₂ : Set α}
-    (hA : A ⊆ E₁ ∪ E₂) (hB : B ⊆ E₁ ∪ E₂) : (A ∩ E₁ ⊂ B ∩ E₁) ∧ (A ∩ E₂ ⊂ B ∩ E₂) → A ⊂ B := by
-  intro hAB
-  obtain ⟨hAB₁, hAB₂⟩ := hAB
-  constructor
-  · obtain ⟨h₁, _⟩ := hAB₁
-    obtain ⟨h₂, _⟩ := hAB₂
-    apply Set.union_subset_union h₁ at h₂
-    rw [←Set.inter_union_distrib_left, ←Set.inter_union_distrib_left] at h₂
-    rw [←Set.left_eq_inter.mpr, ←Set.left_eq_inter.mpr] at h₂
-    exact h₂
-    exact hB
-    exact hA
-  · by_contra hBA
-    obtain ⟨_, h₁⟩ := hAB₁
-    obtain ⟨x, ⟨hxBE₁, hxnAE₁⟩⟩ := Set.not_subset.mp h₁
-    have hxB : x ∈ B := Set.mem_of_mem_inter_left hxBE₁
-    have hxE₁ : x ∈ E₁ := Set.mem_of_mem_inter_right hxBE₁
-    have _hxnA : x ∉ A := by tauto
-    tauto
-
-/-- todo: desc -/
-lemma elem_notin_set_minus_singleton {α : Type*} (a : α) (X : Set α) : a ∉ X \ {a} := Set.not_mem_diff_of_mem rfl
-
-/-- todo: desc -/
-lemma sub_parts_eq {α : Type*} {A E₁ E₂ : Set α}
-    (hA : A ⊆ E₁ ∪ E₂) : (A ∩ E₁) ∪ (A ∩ E₂) = A := by
-  have t1 : (A ∩ E₁) ∪ (A ∩ E₂) ⊆ A := Set.union_subset Set.inter_subset_left Set.inter_subset_left
-  have t2 : A ⊆ (A ∩ E₁) ∪ (A ∩ E₂) := subset_of_subset_of_eq
-    (Set.subset_inter (fun ⦃a⦄ a => a) hA)
-    (Set.inter_union_distrib_left A E₁ E₂)
-  exact Eq.symm (Set.Subset.antisymm t2 t1)
-
-/-- todo: desc -/
-lemma sub_union_diff_sub_union {α : Type*} {A B C : Set α}
-    (hA : A ⊆ B \ C) : A ⊆ B := fun ⦃_a⦄ a_1 => Set.diff_subset (hA a_1)
 
 /-- todo: desc -/
 lemma Matroid.TwoSum.CircuitNotSubsetCircuit {α : Type*} {M₁ M₂ : Matroid α} {p : α}

@@ -14,7 +14,7 @@ structure VectorMatroid (X α F : Type*) [Field F] where
 def Matrix.VectorMatroid {X α F : Type*} [Field F] {Y : Set α} (A : Matrix X Y F) : VectorMatroid X α F :=
   ⟨Y, A⟩
 
-/-- todo: remove after 2-sum is fixed -/
+/-- todo: desc -/
 def Matrix.IndepCols {X α F : Type*} [Field F] {Y : Set α} (A : Matrix X Y F) (S : Set α) : Prop :=
   ∃ hS : S ⊆ Y, LinearIndependent F (A.submatrix id hS.elem).transpose
 
