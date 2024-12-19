@@ -1,5 +1,6 @@
 import Mathlib.Data.Matroid.IndepAxioms
 import Seymour.Basic
+import Seymour.MatroidCircuit
 
 
 -- TODO move
@@ -293,9 +294,6 @@ lemma SetPredicate.CircuitToIndep.finite_weak_circuit_elim_indep_aug {α : Type*
   obtain ⟨K, hK⟩ := hKmin
   let hImKnonempty : (I \ K).Nonempty := sorry
   obtain ⟨e, he⟩ := hImKnonempty
-
-
-
   sorry
 -- todo: formalize proof below
 -- To prove (I3), suppose that I1 and I2 are members of I and |I1| < |I2|.
@@ -378,8 +376,27 @@ lemma CircuitMatroid.Maximal_iff {α : Type*} (M : CircuitMatroid α) (B : Set �
   ⟨fun hB => ⟨hB.left.left, fun _ hA hBA => hB.right ⟨hA, hA.left⟩ hBA⟩,
    fun hB => ⟨⟨hB.left, hB.left.left⟩, fun _ hA => hB.right hA.left⟩⟩
 
+@[simp]
+lemma CircuitMatroid.E_eq {α : Type*}
+  (M : CircuitMatroid α) : M.matroid.E = M.E := rfl
+
+@[simp]
+lemma CircuitMatroid.indep_eq {α : Type*}
+  (M : CircuitMatroid α) : M.matroid.Indep = M.IndepPred := rfl
+
+@[simp]
+lemma CircuitMatroid.circuit_eq {α : Type*}
+  (M : CircuitMatroid α) : M.matroid.Circuit = M.CircuitPred := sorry
+
+/-- Registered conversion from `CircuitMatroid` to `Matroid`. -/
+instance {α : Type*} : Coe (CircuitMatroid α) (Matroid α) where
+  coe := CircuitMatroid.matroid
+
+
 
 section FiniteCircuitMatroid
+
+-- note: Peter Nelson's repository already implements this
 
 /-- If `E` is finite, then weak circuit elimination is sufficient to define circuit matroid. -/
 def CircuitMatroid.ofFinite {α : Type*} {E : Set α} (hE : E.Finite) (P : SetPredicate α)

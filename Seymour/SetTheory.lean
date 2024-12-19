@@ -21,8 +21,12 @@ lemma disjoint_nonempty_not_ssubset {α : Type*} {A B : Set α}
   obtain ⟨hAsubB, _hnBsubA⟩ := hAssubB
   tauto
 
+lemma disjoint_empty_inter {α : Type*} {A B : Set α} (h : Disjoint A B) : A ∩ B = ∅ := by
+
+  exact Disjoint.inter_eq h
+
 /-- todo: desc -/
-lemma nonempty_inter_not_ssubset_emprt_inter {α : Type*} {A B E : Set α}
+lemma nonempty_inter_not_ssubset_empty_inter {α : Type*} {A B E : Set α}
     (hA : (A ∩ E).Nonempty) (hB : B ∩ E = ∅) : ¬(A ⊂ B) := by
   by_contra hAB
   obtain ⟨hAsubB, _hnBsubA⟩ := hAB
@@ -140,11 +144,6 @@ lemma symmDiff_disjoint_inter {α : Type*} (X₁ X₂ : Set α) :
     Disjoint (symmDiff X₁ X₂) (X₁ ∩ X₂) := by
   rw [symmDiff_def_alt]
   exact Set.disjoint_sdiff_left
-
-/-- Symmetric difference of subsets is subset of symmetric difference. -/
-lemma symmDiff_subset_subset_symmDiff {α : Type*} {X₁ X₂ E₁ E₂ : Set α} (hX₁ : X₁ ⊆ E₁) (hX₂ : X₂ ⊆ E₂) :
-    symmDiff X₁ X₂ ⊆ symmDiff E₁ E₂ := by
-  sorry
 
 /-- Being a subset is preserved under subtracting sets. -/
 lemma diff_subset_parent {α : Type*} {X₁ X₂ E : Set α} (hX₁E : X₁ ⊆ E) :

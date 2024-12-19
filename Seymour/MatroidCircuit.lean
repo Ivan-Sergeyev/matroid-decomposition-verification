@@ -6,7 +6,7 @@ section MatroidCircuit
 
 /-- Circuit is a minimal dependent subset. -/
 def Matroid.Circuit {α : Type*} (M : Matroid α) (C : Set α) : Prop :=
-  (C ⊆ M.E) ∧ ¬M.Indep C ∧ (∀ C', C' ⊂ C → M.Indep C')
+  (C ⊆ M.E) ∧ ¬M.Indep C ∧ (∀ C', C' ⊂ C → M.Indep C') -- todo : switch to Minimal M.Dep?
 
 /-- Every circuit is a subset of the ground set. -/
 lemma Matroid.Circuit.SubsetGround {α : Type*} (M : Matroid α) {C : Set α}
@@ -17,13 +17,13 @@ lemma Matroid.Circuit.NotIndep {α : Type*} (M : Matroid α) {C : Set α}
   (hC : M.Circuit C) : ¬M.Indep C := hC.2.1
 
 /-- Every strict subset of a circuit is independent. -/
-lemma Matroid.Circuit.SsubIndep {α : Type*} (M : Matroid α) {C C' : Set α}
+lemma Matroid.Circuit.SsubIndep {α : Type*} {M : Matroid α} {C C' : Set α}
   (hC : M.Circuit C) (hC' : C' ⊂ C) : M.Indep C' := hC.2.2 C' hC'
 
 /-- Deleting one element from a circuit produces an independent set. -/
-lemma Matroid.Circuit.DelSingleIndep  {α : Type*} (M : Matroid α) {C : Set α} {a : α}
+lemma Matroid.Circuit.DelSingleIndep  {α : Type*} {M : Matroid α} {C : Set α} {a : α}
     (hC : M.Circuit C) (ha : a ∈ C) : M.Indep (C \ {a}) :=
-  Matroid.Circuit.SsubIndep M hC (Set.diff_singleton_sSubset.mpr ha)
+  Matroid.Circuit.SsubIndep hC (Set.diff_singleton_sSubset.mpr ha)
 
 /-- Empty set is not a circuit. -/
 lemma Matroid.Circuit.NotCircuitEmpty {α : Type*} (M : Matroid α) : ¬M.Circuit ∅ := by
@@ -32,16 +32,15 @@ lemma Matroid.Circuit.NotCircuitEmpty {α : Type*} (M : Matroid α) : ¬M.Circui
   exact M.empty_indep
 
 /-- Every circuit is nonempty. -/
-lemma Matroid.Circuit.Nonempty {α : Type*} (M : Matroid α) {C : Set α} (hC : M.Circuit C) : C.Nonempty := by
+lemma Matroid.Circuit.Nonempty {α : Type*} {M : Matroid α} {C : Set α} (hC : M.Circuit C) : C.Nonempty := by
   by_contra hC'
   push_neg at hC'
   rw [hC'] at hC
   apply Matroid.Circuit.NotCircuitEmpty at hC
-  tauto
+  exact hC
 
 /-- Independent set is not a circuit. -/
-lemma Matroid.Circuit.NotCircuitIndep {α : Type*} {M : Matroid α} {I : Set α}
-    (hI : M.Indep I) : ¬M.Circuit I := by
+lemma Matroid.Circuit.NotCircuitIndep {α : Type*} {M : Matroid α} {I : Set α} (hI : M.Indep I) : ¬M.Circuit I := by
   unfold Matroid.Circuit
   tauto
 
@@ -71,7 +70,7 @@ lemma Matroid.Circuit.SsubsetNotCircuit_alt {α : Type*} {M : Matroid α} {C C' 
 
 /-- Every dependent set contains a circuit. -/
 lemma Matroid.Circuit.DepHasCircuit {α : Type*} {M : Matroid α} {D : Set α}
-    (hDM : D ⊆ M.E) (hD : ¬M.Indep D) : ∃ C, C ⊆ D ∧ M.Circuit D := by
+    (hDM : D ⊆ M.E) (hD : ¬M.Indep D) : ∃ C, C ⊆ D ∧ M.Circuit C := by
   sorry -- todo: adapt from Lemma 3.8 in Bruhn et al.
 
 /-- todo: desc -/
@@ -89,6 +88,18 @@ lemma Matroid.Circuit.IndepExtDepHasCircuit {α : Type*} {M : Matroid α} {I : S
 -- (circuit_maximal : ∀ X, X ⊆ E → Matroid.ExistsMaximalSubsetProperty (CircPredToIndep CircuitPred E) X)
 
 -- todo: `CircuitMatroid` constructed from `Circuit`'s of a `Matroid` produces the same `Matroid`
+
+
+section EqualityCircuits
+
+theorem Matroid.eq_of_circuit_iff_circuit_forall {α : Type*} {M₁ M₂ : Matroid α} (hE : M₁.E = M₂.E)
+    (h : ∀ C, C ⊆ M₁.E → (M₁.Circuit C ↔ M₂.Circuit C)) : M₁ = M₂ := by
+  sorry
+
+/-- Two matroids are equal iff they have the same circuits. -/
+theorem Matroid.eq_iff_circuit_iff_circuit_forall {α : Type*} {M₁ M₂ : Matroid α} :
+    M₁ = M₂ ↔ (M₁.E = M₂.E) ∧ ∀ C, C ⊆ M₁.E → (M₁.Circuit C ↔ M₂.Circuit C) :=
+  ⟨fun h ↦ by (subst h; simp), fun h ↦ eq_of_circuit_iff_circuit_forall h.1 h.2⟩
 
 
 section MatroidLoop
@@ -131,7 +142,7 @@ lemma Matroid.Coloop.IffInNoCircuit {α : Type*} (M : Matroid α) {a : α} :
     · intro C hC
       apply hanIndep at haE
       by_contra haC
-      have hCmaIndep : M.Indep (C \ {a}) := Matroid.Circuit.DelSingleIndep M hC haC
+      have hCmaIndep : M.Indep (C \ {a}) := Matroid.Circuit.DelSingleIndep hC haC
       apply Matroid.Indep.exists_base_superset at hCmaIndep
       obtain ⟨B, hBbase, hCmaB⟩ := hCmaIndep
       specialize haE B hBbase

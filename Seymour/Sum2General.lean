@@ -170,7 +170,7 @@ lemma Matroid.TwoSum.CircuitNotSubsetCircuit {α : Type*} {M₁ M₂ : Matroid �
     | inr hC₁ => cases hC₁ with
       | inl hC₁ =>
         have hC₁C₂ : Disjoint C₁ C₂ := (disjoint_CircuitM₁mp_CircuitM₂mp Assumptions hC₂ hC₁).symm
-        have hC₂ne : C₂.Nonempty := Circuit.Nonempty M₁ hC₂.2
+        have hC₂ne : C₂.Nonempty := Circuit.Nonempty hC₂.2
         exact disjoint_nonempty_not_ssubset (Disjoint.symm hC₁C₂) hC₂ne
       | inr hC₁ =>
         by_contra hC₂C₁
@@ -179,13 +179,13 @@ lemma Matroid.TwoSum.CircuitNotSubsetCircuit {α : Type*} {M₁ M₂ : Matroid �
 
         have hC₂inter : C₂ ⊆ C₁ ∩ M₁.E := Set.subset_inter hC₂C₁ hC₂.2.1
         have hC₂p : C₂ ∪ {p} ⊆ C₁ ∩ M₁.E ∪ {p} := Set.union_subset_union_left {p} hC₂inter
-        have hC₂ssubC₂p : C₂ ⊂ C₂ ∪ {p} := ssubset_union_self_elem_notin hC₂.1
+        have hC₂ssubC₂p : C₂ ⊂ C₂ ∪ {p} := ssubset_self_union_other_elem hC₂.1
         exact Set.ssubset_of_ssubset_of_subset hC₂ssubC₂p hC₂p
   | inr hC₂ => cases hC₂ with
     | inl hC₂ => cases hC₁ with
       | inl hC₁ =>
           have hC₁C₂ : Disjoint C₁ C₂ := disjoint_CircuitM₁mp_CircuitM₂mp Assumptions hC₁ hC₂
-          have hC₂ne : C₂.Nonempty := Circuit.Nonempty M₂ hC₂.2
+          have hC₂ne : C₂.Nonempty := Circuit.Nonempty hC₂.2
           exact disjoint_nonempty_not_ssubset (id (Disjoint.symm hC₁C₂)) hC₂ne
       | inr hC₁ => cases hC₁ with
         | inl hC₁ => exact Circuit.CircuitNotSsubsetCircuit hC₁.2 hC₂.2
@@ -196,19 +196,19 @@ lemma Matroid.TwoSum.CircuitNotSubsetCircuit {α : Type*} {M₁ M₂ : Matroid �
 
           have hC₂inter : C₂ ⊆ C₁ ∩ M₂.E := Set.subset_inter hC₂C₁ hC₂.2.1
           have hC₂p : C₂ ∪ {p} ⊆ C₁ ∩ M₂.E ∪ {p} := Set.union_subset_union_left {p} hC₂inter
-          have hC₂ssubC₂p : C₂ ⊂ C₂ ∪ {p} := ssubset_union_self_elem_notin hC₂.1
+          have hC₂ssubC₂p : C₂ ⊂ C₂ ∪ {p} := ssubset_self_union_other_elem hC₂.1
           exact Set.ssubset_of_ssubset_of_subset hC₂ssubC₂p hC₂p
     | inr hC₂ =>
       cases hC₁ with
       | inl hC₁ =>
         have hC₂M₂nempty : (C₂ ∩ M₂.E).Nonempty := CircuitType3_inter_M₂_Nonempty Assumptions hC₂
         have hC₁M₂empty : C₁ ∩ M₂.E = ∅ := CircuitM₁mp_inter_M₂_empty Assumptions hC₁
-        exact disjoint_inter_nonempty_inter_empty hC₂M₂nempty hC₁M₂empty
+        exact nonempty_inter_not_ssubset_empty_inter hC₂M₂nempty hC₁M₂empty
       | inr hC₁ => cases hC₁ with
         | inl hC₁ =>
           have hC₂M₂nempty : (C₂ ∩ M₁.E).Nonempty := CircuitType3_inter_M₁_Nonempty Assumptions hC₂
           have hC₁M₁empty : C₁ ∩ M₁.E = ∅ := CircuitM₂mp_inter_M₁_empty Assumptions hC₁
-          exact disjoint_inter_nonempty_inter_empty hC₂M₂nempty hC₁M₁empty
+          exact nonempty_inter_not_ssubset_empty_inter hC₂M₂nempty hC₁M₁empty
         | inr hC₁ =>
             have hpC₁ : p ∉ C₁ := fun a => (elem_notin_set_minus_singleton p (M₁.E ∪ M₂.E)) (hC₁.1 a)
             have hpC₁M₁ : p ∉ C₁ ∩ M₁.E := by
@@ -229,8 +229,8 @@ lemma Matroid.TwoSum.CircuitNotSubsetCircuit {α : Type*} {M₁ M₂ : Matroid �
             have hnC₂C₁M₁ := Circuit.CircuitNotSsubsetCircuit hC₁.2.1 hC₂.2.1
             have hnC₂C₁M₂ := Circuit.CircuitNotSsubsetCircuit hC₁.2.2 hC₂.2.2
 
-            rw [union_ssubset_union_iff hpC₂M₁ hpC₁M₁] at hnC₂C₁M₁
-            rw [union_ssubset_union_iff hpC₂M₂ hpC₁M₂] at hnC₂C₁M₂
+            rw [singleton_union_ssubset_union_iff hpC₂M₁ hpC₁M₁] at hnC₂C₁M₁
+            rw [singleton_union_ssubset_union_iff hpC₂M₂ hpC₁M₂] at hnC₂C₁M₂
 
             by_contra hC₂C₁
             obtain ⟨hC₂C₁, hnC₁C₂⟩ := hC₂C₁
@@ -258,7 +258,6 @@ lemma Matroid.TwoSum.CircuitNotSubsetCircuit {α : Type*} {M₁ M₂ : Matroid �
             have hC₁C₂ : C₁ ⊆ C₂ := Eq.subset hC₂eq.symm
             tauto
 
-
 /-- todo: desc -/
 lemma Matroid.TwoSum.CircuitGround {α : Type*} (M₁ M₂ : Matroid α) (p : α) :
     ∀ (C : Set α), CircuitPred M₁ M₂ p C → C ⊆ E M₁ M₂ p := by
@@ -277,16 +276,33 @@ lemma Matroid.TwoSum.CircuitGround {α : Type*} (M₁ M₂ : Matroid α) (p : α
         exact Set.subset_union_of_subset_right (Set.subset_diff_singleton hCE hpC) (M₁.E \ {p})
     | inr hC => exact hC.1
 
+/-- todo: desc -/
 def Matroid.TwoSum.CircuitMatroid {α : Type*} {M₁ M₂ : Matroid α} {p : α}
-    (Assumptions : Matroid.TwoSum.Assumptions M₁ M₂ p) : CircuitMatroid α :=
-  ⟨
-    Matroid.TwoSum.E M₁ M₂ p,
-    Matroid.TwoSum.CircuitPred M₁ M₂ p,
-    Matroid.TwoSum.NotCircuitEmpty Assumptions,
-    Matroid.TwoSum.CircuitNotSubsetCircuit Assumptions,
-    sorry, -- todo: should simplify in finite case
-    sorry, -- todo: should simplify in finite case
-    Matroid.TwoSum.CircuitGround M₁ M₂ p
-  ⟩
+    (Assumptions : Matroid.TwoSum.Assumptions M₁ M₂ p) : CircuitMatroid α where
+  E := Matroid.TwoSum.E M₁ M₂ p
+  CircuitPred := Matroid.TwoSum.CircuitPred M₁ M₂ p
+  not_circuit_empty := Matroid.TwoSum.NotCircuitEmpty Assumptions
+  circuit_not_subset := Matroid.TwoSum.CircuitNotSubsetCircuit Assumptions
+  circuit_c3 := sorry -- todo: should simplify in finite case
+  circuit_maximal := sorry -- todo: should simplify in finite case
+  subset_ground := Matroid.TwoSum.CircuitGround M₁ M₂ p
+
+/-- todo: desc -/
+def Matroid.TwoSum.matroid {α : Type*} {M₁ M₂ : Matroid α} {p : α}
+    (Assumptions : Matroid.TwoSum.Assumptions M₁ M₂ p) : Matroid α :=
+  (Matroid.TwoSum.CircuitMatroid Assumptions).matroid
+
+@[simp]
+lemma Matroid.TwoSum.E_eq {α : Type*} {M₁ M₂ : Matroid α} {p : α}
+    (Assumptions : Matroid.TwoSum.Assumptions M₁ M₂ p) :
+    (Matroid.TwoSum.matroid Assumptions).E = (M₁.E ∪ M₂.E) \ {p} := rfl
+
+@[simp]
+lemma Matroid.TwoSum.circuit_eq {α : Type*} {M₁ M₂ : Matroid α} {p : α}
+    (Assumptions : Matroid.TwoSum.Assumptions M₁ M₂ p) :
+    (Matroid.TwoSum.matroid Assumptions).Circuit = Matroid.TwoSum.CircuitPred M₁ M₂ p := by
+  unfold matroid
+  rw [CircuitMatroid.circuit_eq]
+  rfl
 
 -- todo: different definitions of 2-sum are equivalent
