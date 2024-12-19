@@ -1,11 +1,10 @@
 import Mathlib.Data.Matroid.Dual
-import Seymour.SetTheory
-import Seymour.MatroidCircuit
-import Seymour.ForMathlib.CircuitMatroid
-import Seymour.MatroidConnectivity
 
+import Seymour.ForMathlib.SetTheory
+import Seymour.Matroid.Notions.Circuit
+import Seymour.Matroid.Constructors.CircuitMatroid
+import Seymour.Matroid.Notions.Connectivity
 
-section MatroidTwoSum
 
 /-- todo: desc -/
 structure Matroid.TwoSum.Assumptions {α : Type*} (M₁ M₂ : Matroid α) (p : α) where
@@ -298,11 +297,9 @@ lemma Matroid.TwoSum.E_eq {α : Type*} {M₁ M₂ : Matroid α} {p : α}
     (Matroid.TwoSum.matroid Assumptions).E = (M₁.E ∪ M₂.E) \ {p} := rfl
 
 @[simp]
-lemma Matroid.TwoSum.circuit_eq {α : Type*} {M₁ M₂ : Matroid α} {p : α}
-    (Assumptions : Matroid.TwoSum.Assumptions M₁ M₂ p) :
-    (Matroid.TwoSum.matroid Assumptions).Circuit = Matroid.TwoSum.CircuitPred M₁ M₂ p := by
+lemma Matroid.TwoSum.circuit_iff {α : Type*} {M₁ M₂ : Matroid α} {p : α}
+    (Assumptions : Matroid.TwoSum.Assumptions M₁ M₂ p) {C : Set α} :
+    (Matroid.TwoSum.matroid Assumptions).Circuit C ↔ Matroid.TwoSum.CircuitPred M₁ M₂ p C := by
   unfold matroid
-  rw [CircuitMatroid.circuit_eq]
+  rw [CircuitMatroid.circuit_iff]
   rfl
-
--- todo: different definitions of 2-sum are equivalent

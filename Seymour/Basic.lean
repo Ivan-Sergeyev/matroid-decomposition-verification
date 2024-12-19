@@ -17,6 +17,9 @@ infix:61 " ⫗ " => Disjoint
 
 variable {α : Type*}
 
+lemma nmem_insert {z x : α} {I : Set α} (hx : z ≠ x) (hI : z ∉ I) : z ∉ x ᕃ I := by
+  simp_all [Set.insert]
+
 /-- Given `X ⊆ Y` cast an element of `X` as an element of `Y`. -/
 def HasSubset.Subset.elem {X Y : Set α} (hXY : X ⊆ Y) (x : X.Elem) : Y.Elem :=
   ⟨x.val, hXY x.property⟩

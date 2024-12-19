@@ -1,7 +1,7 @@
-import Seymour.MatroidCircuit
+import Seymour.Matroid.Notions.Circuit
+import Seymour.Matroid.Notions.Loop
+import Seymour.Matroid.Notions.Coloop
 
-
-section MatroidConnectivity
 
 /-- Connectivity relation, aka ξ in Oxley's book. -/
 def Matroid.ConnectivityRelation {α : Type*} (M : Matroid α) (e f : α) : Prop :=

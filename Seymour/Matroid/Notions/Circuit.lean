@@ -1,8 +1,5 @@
 import Mathlib.Data.Matroid.Basic
-import Mathlib.Data.Matroid.Dual
 
-
-section MatroidCircuit
 
 /-- Circuit is a minimal dependent subset. -/
 def Matroid.Circuit {α : Type*} (M : Matroid α) (C : Set α) : Prop :=
@@ -87,11 +84,6 @@ lemma Matroid.Circuit.IndepExtDepHasCircuit {α : Type*} {M : Matroid α} {I : S
 -- /-- Corresponding family of independent sets satisfies has the maximal subset property -/
 -- (circuit_maximal : ∀ X, X ⊆ E → Matroid.ExistsMaximalSubsetProperty (CircPredToIndep CircuitPred E) X)
 
--- todo: `CircuitMatroid` constructed from `Circuit`'s of a `Matroid` produces the same `Matroid`
-
-
-section EqualityCircuits
-
 theorem Matroid.eq_of_circuit_iff_circuit_forall {α : Type*} {M₁ M₂ : Matroid α} (hE : M₁.E = M₂.E)
     (h : ∀ C, C ⊆ M₁.E → (M₁.Circuit C ↔ M₂.Circuit C)) : M₁ = M₂ := by
   sorry
@@ -100,77 +92,3 @@ theorem Matroid.eq_of_circuit_iff_circuit_forall {α : Type*} {M₁ M₂ : Matro
 theorem Matroid.eq_iff_circuit_iff_circuit_forall {α : Type*} {M₁ M₂ : Matroid α} :
     M₁ = M₂ ↔ (M₁.E = M₂.E) ∧ ∀ C, C ⊆ M₁.E → (M₁.Circuit C ↔ M₂.Circuit C) :=
   ⟨fun h ↦ by (subst h; simp), fun h ↦ eq_of_circuit_iff_circuit_forall h.1 h.2⟩
-
-
-section MatroidLoop
-
-/-- Loop is an element of the ground set that is not independent when viewed as a singleton set. -/
-def Matroid.Loop {α : Type*} (M : Matroid α) (a : α) : Prop :=
-  a ∈ M.E ∧ ¬M.Indep {a}
-
-/-- An element is a loop iff its singleton set is a circuit. -/
-lemma Matroid.Loop.IffCircuit {α : Type*} (M : Matroid α) {a : α} :
-    M.Loop a ↔ M.Circuit {a} := by
-  constructor
-  · intro ha
-    exact ⟨
-      Set.singleton_subset_iff.mpr ha.1,
-      ha.2,
-      by
-        intro C' hC'
-        rw [Set.ssubset_singleton_iff.mp hC']
-        exact M.empty_indep
-    ⟩
-  · intro ha
-    exact ⟨ha.1 rfl, Circuit.NotIndep M ha⟩
-
-/-- Coloop is a loop in the dual matroid. -/
-def Matroid.Coloop {α : Type*} (M : Matroid α) (a : α) : Prop :=
-  M.dual.Loop a
-
-/-- An element is a coloop iff it belongs to no circuit. -/
-lemma Matroid.Coloop.IffInNoCircuit {α : Type*} (M : Matroid α) {a : α} :
-    M.Coloop a ↔ a ∈ M.E ∧ ∀ C, M.Circuit C → a ∉ C := by
-  constructor
-  · intro ha
-    obtain ⟨haE, hanIndep⟩ := ha
-    unfold Matroid.dual Matroid.dualIndepMatroid at hanIndep
-    simp at haE
-    simp at hanIndep
-    constructor
-    · exact haE
-    · intro C hC
-      apply hanIndep at haE
-      by_contra haC
-      have hCmaIndep : M.Indep (C \ {a}) := Matroid.Circuit.DelSingleIndep hC haC
-      apply Matroid.Indep.exists_base_superset at hCmaIndep
-      obtain ⟨B, hBbase, hCmaB⟩ := hCmaIndep
-      specialize haE B hBbase
-
-      rw [←Set.singleton_subset_iff] at haE
-      rw [←Set.singleton_subset_iff] at haC
-      apply Set.union_subset_union_left {a} at hCmaB
-      rw [Set.diff_union_of_subset haC, Set.union_eq_self_of_subset_right haE] at hCmaB
-
-      apply Matroid.Indep.subset (Base.indep hBbase) at hCmaB
-      apply Matroid.Circuit.NotIndep M at hC
-      tauto
-  · intro ha
-    obtain ⟨haE, haC⟩ := ha
-    unfold Coloop Matroid.dual Matroid.dualIndepMatroid Loop
-    simp
-    constructor
-    · exact haE
-    · intro haE' B hB
-      by_contra haB
-      have hBIndep : M.Indep B := Base.indep hB
-      have hBinsanIndep : ¬M.Indep (insert a B) := by
-        have hBins : B ⊂ insert a B := Set.ssubset_insert haB
-        apply Matroid.Base.dep_of_ssubset hB at hBins
-        unfold Dep at hBins
-        tauto
-      have hBanIndep : ¬M.Indep (B ∪ {a}) := Eq.mpr_not (congrArg M.Indep Set.union_singleton) hBinsanIndep
-      have hC : ∃ C, a ∈ C ∧ C ⊆ B ∪ {a} ∧ M.Circuit C := Matroid.Circuit.IndepExtDepHasCircuit hBIndep haE hBanIndep
-      obtain ⟨C, hCBa, _hCIndep, hCCirc⟩ := hC
-      specialize haC C hCCirc
-      tauto

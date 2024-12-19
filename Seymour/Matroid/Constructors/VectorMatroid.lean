@@ -2,8 +2,6 @@ import Mathlib.Data.Matroid.IndepAxioms
 import Seymour.Basic
 
 
-section VectorMatroid
-
 /-- Vector matroid `M[A]` of matrix `A`. -/
 structure VectorMatroid (X α F : Type*) [Field F] where
   -- X -- row index set
@@ -66,22 +64,6 @@ def VectorMatroid.IndepMatroid {X α F : Type*} [Field F] (M : VectorMatroid X �
 /-- Vector matroid converted to `Matroid`. -/
 def VectorMatroid.matroid {X α F : Type*} [Field F] (M : VectorMatroid X α F) : Matroid α :=
   M.IndepMatroid.matroid
-
-
-section Representability
-
-def Matroid.RepresentedBy {X α F : Type*} {Y : Set α} [Field F] (M : Matroid α) (A : Matrix X Y F) : Prop :=
-  M = (⟨Y, A⟩ : VectorMatroid X α F).IndepMatroid.matroid
-
-def Matroid.RepresentableOver {α : Type*} (M : Matroid α) (F : Type*) [Field F] : Prop :=
-  ∃ X : Type*, ∃ M' : VectorMatroid X α F, M'.IndepMatroid.matroid = M
-
--- todo: this doesn't compile due to "universe-level metavariables"
--- def Matroid.Representable {α : Type*} (M : Matroid α) : Prop :=
---   ∃ F : Type*, ∃ _ : Field F, M.RepresentableOver F -- todo: check correctness of Field F
-
-
-section API
 
 @[simp]
 lemma VectorMatroid.E_eq {X α F : Type*} [Field F]

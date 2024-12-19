@@ -1,36 +1,33 @@
 import Mathlib.Data.Matroid.IndepAxioms
 import Seymour.Basic
-import Seymour.MatroidCircuit
+import Seymour.Matroid.Notions.Circuit
 
 
--- TODO move
-lemma nmem_insert {α : Type*} {z x : α} {I : Set α} (hx : z ≠ x) (hI : z ∉ I) : z ∉ x ᕃ I := by
-  simp_all [Set.insert]
-
-abbrev SetPredicate (α : Type*) := Set α → Prop
+abbrev CircuitPredicate (α : Type*) := Set α → Prop
+abbrev IndepPredicate (α : Type*) := Set α → Prop
 
 
 section ValidXFamily
 
 /-- Family of circuits satisfying assumptions of circuit axiom (C3) from Bruhn et al. -/
-structure ValidXFamily {α : Type*} (P : SetPredicate α) (C X : Set α) where
+structure ValidXFamily {α : Type*} (P : CircuitPredicate α) (C X : Set α) where
   F : X.Elem → Set α
   hPF : ∀ x : X.Elem, P (F x)
   hF : ∀ x ∈ X, ∀ y : X, x ∈ F y ↔ x = y
 
 /-- Shorthand for union of sets in `ValidXFamily` -/
 @[simp]
-def ValidXFamily.union {α : Type*} {P : SetPredicate α} {C X : Set α} (F : ValidXFamily P C X) : Set α :=
+def ValidXFamily.union {α : Type*} {P : CircuitPredicate α} {C X : Set α} (F : ValidXFamily P C X) : Set α :=
   Set.iUnion F.F
 
 -- question: unused API?
-lemma ValidXFamily.mem_of_elem {α : Type*} {P : SetPredicate α} {C X : Set α} (F : ValidXFamily P C X) (x : X.Elem) :
+lemma ValidXFamily.mem_of_elem {α : Type*} {P : CircuitPredicate α} {C X : Set α} (F : ValidXFamily P C X) (x : X.Elem) :
     x.val ∈ F.F x := by
   rw [F.hF]
   exact x.property
 
 -- question: unused API?
-lemma ValidXFamily.outside {α : Type*} {P : SetPredicate α} {C X : Set α} {F : ValidXFamily P C X} {z : α}
+lemma ValidXFamily.outside {α : Type*} {P : CircuitPredicate α} {C X : Set α} {F : ValidXFamily P C X} {z : α}
     (hzCF : z ∈ C \ F.union) : z ∉ X := by
   intro hz
   have := F.hF z hz ⟨z, hz⟩
@@ -40,19 +37,18 @@ lemma ValidXFamily.outside {α : Type*} {P : SetPredicate α} {C X : Set α} {F 
 section CircuitIndepPredicate
 
 /-- Circuit predicate `P` defines independence predicate: independent sets are all non-circuits. -/
-def SetPredicate.CircuitToIndep {α : Type*} (P : SetPredicate α) (E I : Set α) : Prop :=
-  I ⊆ E ∧ ∀ C, P C → ¬C ⊆ I
+def CircuitPredicate.ToIndepPredicate {α : Type*} (P : CircuitPredicate α) (E : Set α) : IndepPredicate α :=
+  fun I => I ⊆ E ∧ ∀ C, P C → ¬C ⊆ I
 
 /-- Independence predicate defines following circuit predicate: circuits are minimal dependent sets. -/
-def SetPredicate.IndepToCircuit {α : Type*} (P : SetPredicate α) (E C : Set α) : Prop :=
-  C ⊆ E ∧ ¬P C ∧ ∀ C', C' ⊂ C → P C'
+def IndepPredicate.ToCircuitPredicate {α : Type*} (P : CircuitPredicate α) (E : Set α) : CircuitPredicate α :=
+  fun C => C ⊆ E ∧ ¬P C ∧ ∀ C', C' ⊂ C → P C'
 
 /-- Converting independence predicate to circuit predicate and then to independence predicate
     yields the original independence predicate. -/
 lemma Matroid_Indep_ToCircuit_ToIndep_rfl {α : Type*} (M : Matroid α) :
-    ∀ I, I ⊆ M.E ∧ M.Indep I ↔ SetPredicate.CircuitToIndep (SetPredicate.IndepToCircuit M.Indep M.E) M.E I := by
+    ∀ I, I ⊆ M.E ∧ M.Indep I ↔ CircuitPredicate.ToIndepPredicate (IndepPredicate.ToCircuitPredicate M.Indep M.E) M.E I := by
   intro I
-  unfold SetPredicate.CircuitToIndep SetPredicate.IndepToCircuit
   constructor
   · intro ⟨hIE, hIindep⟩
     constructor
@@ -91,42 +87,42 @@ lemma Matroid_Indep_ToCircuit_ToIndep_rfl {α : Type*} (M : Matroid α) :
 section CircuitAxioms
 
 /-- Axiom (C1): empty set is not a circuit. -/
-def SetPredicate.not_circuit_empty {α : Type*} (P : SetPredicate α) := ¬P ∅
-alias SetPredicate.C1 := SetPredicate.not_circuit_empty
+def CircuitPredicate.not_circuit_empty {α : Type*} (P : CircuitPredicate α) := ¬P ∅
+alias CircuitPredicate.axiom_c1 := CircuitPredicate.not_circuit_empty
 
 /-- Axiom (C2): no circuit is a subset of another circuit. -/
-def SetPredicate.circuit_not_subset {α : Type*} (P : SetPredicate α) := ∀ C C', P C → P C' → ¬(C' ⊂ C)
-alias SetPredicate.C2 := SetPredicate.circuit_not_subset
+def CircuitPredicate.circuit_not_subset {α : Type*} (P : CircuitPredicate α) := ∀ C C', P C → P C' → ¬(C' ⊂ C)
+alias CircuitPredicate.axiom_c2 := CircuitPredicate.circuit_not_subset
 
 /-- Axiom (C3) from Bruhn et al. -/
-def SetPredicate.C3 {α : Type*} (P : SetPredicate α) :=
+def CircuitPredicate.axiom_c3 {α : Type*} (P : CircuitPredicate α) :=
   ∀ X C, ∀ F : ValidXFamily P C X, ∀ z ∈ C \ F.union, ∃ C', P C' ∧ z ∈ C' ∧ C' ⊆ (C ∪ F.union) \ X
 
 /-- Axiom (CM) from Bruhn et al.: set of all independent sets has the maximal subset property. -/
-def SetPredicate.circuit_maximal {α : Type*} (P : SetPredicate α) (E : Set α) :=
-  ∀ X, X ⊆ E → Matroid.ExistsMaximalSubsetProperty (SetPredicate.CircuitToIndep P E) X
-alias SetPredicate.CM := SetPredicate.circuit_maximal
+def CircuitPredicate.circuit_maximal {α : Type*} (P : CircuitPredicate α) (E : Set α) :=
+  ∀ X, X ⊆ E → Matroid.ExistsMaximalSubsetProperty (CircuitPredicate.ToIndepPredicate P E) X
+alias CircuitPredicate.axiom_cm := CircuitPredicate.circuit_maximal
 
 /-- Every circuit is a subset of the ground set. -/
-def SetPredicate.subset_ground {α : Type*} (P : SetPredicate α) (E : Set α) := ∀ C, P C → C ⊆ E
-alias SetPredicate.CE := SetPredicate.subset_ground
+def CircuitPredicate.subset_ground {α : Type*} (P : CircuitPredicate α) (E : Set α) := ∀ C, P C → C ⊆ E
+alias CircuitPredicate.axiom_ce := CircuitPredicate.subset_ground
 
 /-- Strong circuit elimination axiom: if `C₁` and `C₂` are circuits with `e ∈ C₁ ∩ C₂` and `f ∈ C₁ \ C₂`,
     then there is circuit `C₃` such that `f ∈ C₃ ⊆ C₁ ∪ C₂ \ {e}. -/
-def SetPredicate.StrongCircuitElim {α : Type*} (P : SetPredicate α) : Prop :=
+def CircuitPredicate.StrongCircuitElim {α : Type*} (P : CircuitPredicate α) : Prop :=
   ∀ C₁ C₂, ∀ e f, P C₁ ∧ P C₂ ∧ e ∈ C₁ ∩ C₂ ∧ f ∈ C₁ \ C₂ → ∃ C₃, P C₃ ∧ f ∈ C₃ ∧ C₃ ⊆ (C₁ ∪ C₂) \ {e}
 
 /-- Weak circuit elimination axiom: if `C₁` and `C₂` are distinct circuits and `e ∈ C₁ ∩ C₂`,
     then there is circuit `C₃` such that `C₃ ⊆ C₁ ∪ C₂ \ {e}`. -/
-def SetPredicate.WeakCircuitElim {α : Type*} (P : SetPredicate α) : Prop :=
+def CircuitPredicate.WeakCircuitElim {α : Type*} (P : CircuitPredicate α) : Prop :=
   ∀ C₁ C₂, C₁ ≠ C₂ → P C₁ → P C₂ → ∀ e ∈ C₁ ∩ C₂, ∃ C₃, P C₃ ∧ C₃ ⊆ (C₁ ∪ C₂) \ {e}
 
 
 section AxiomRelations
 
 /-- Axiom (C3) implies strong circuit elimination. -/
-lemma SetPredicate.C3_StrongCircuitElim {α : Type*} (P : SetPredicate α) :
-    P.C3 → P.StrongCircuitElim := by
+lemma CircuitPredicate.C3_StrongCircuitElim {α : Type*} (P : CircuitPredicate α) :
+    P.axiom_c3 → P.StrongCircuitElim := by
   intro hPC3 C₁ C₂ x z hxz
   obtain ⟨_hC₁, hC₂, hx, hz⟩ := hxz
   let F : ValidXFamily P C₁ {x} :=
@@ -143,7 +139,7 @@ lemma SetPredicate.C3_StrongCircuitElim {α : Type*} (P : SetPredicate α) :
   exact hPC3
 
 /-- Strong circuit elimination implies weak circuit elimination. -/
-lemma SetPredicate.StrongCircuitElim_WeakCircuitElim {α : Type*} (P : SetPredicate α) :
+lemma CircuitPredicate.StrongCircuitElim_WeakCircuitElim {α : Type*} (P : CircuitPredicate α) :
     P.StrongCircuitElim → P.WeakCircuitElim := by
   intro hP C₁ C₂ hC₁C₂ hC₁ hC₂ e he
   if hf : ∃ f, f ∈ C₁ \ C₂ then
@@ -166,24 +162,24 @@ lemma SetPredicate.StrongCircuitElim_WeakCircuitElim {α : Type*} (P : SetPredic
     rw [Set.union_comm] at hC₃C₁C₂e
     use C₃
 
--- todo: lemma SetPredicate.Finite_WeakCircuitElim_C3 {}
+-- todo: lemma CircuitPredicate.Finite_WeakCircuitElim_C3 {}
 
 /-- Independence predicate constructed from circuit predicate satisfies (I1): empty set is independent. -/
-lemma SetPredicate.CircuitToIndep.indep_empty {α : Type*} {P : SetPredicate α}
-    (hP : P.not_circuit_empty) (E : Set α) : P.CircuitToIndep E ∅ :=
+lemma CircuitPredicate.ToIndepPredicate.indep_empty {α : Type*} {P : CircuitPredicate α}
+    (hP : P.not_circuit_empty) (E : Set α) : P.ToIndepPredicate E ∅ :=
   ⟨E.empty_subset, fun _ hC hCempty => hP (Set.subset_eq_empty hCempty rfl ▸ hC)⟩
 
 /-- Independence predicate constructed from circuit predicate satisfies (I2): subsets of independent sets are independent. -/
-lemma SetPredicate.CircuitToIndep.indep_subset {α : Type*} {P : SetPredicate α} {E I J : Set α}
-    (hJ : P.CircuitToIndep E J) (hIJ : I ⊆ J) : P.CircuitToIndep E I :=
+lemma CircuitPredicate.ToIndepPredicate.indep_subset {α : Type*} {P : CircuitPredicate α} {E I J : Set α}
+    (hJ : P.ToIndepPredicate E J) (hIJ : I ⊆ J) : P.ToIndepPredicate E I :=
   ⟨hIJ.trans hJ.left, fun C hPC hCI => hJ.right C hPC (hCI.trans hIJ)⟩
 
 /-- Independence predicate constructed from circuit predicate satisfies (I3): independent sets have augmentation property. -/
-lemma SetPredicate.CircuitToIndep.indep_aug {α : Type*} {P : SetPredicate α} {E I I' : Set α}
-    (hPCM : P.circuit_maximal E) (hPC3 : P.C3)
-    (hI : P.CircuitToIndep E I) (hPI : ¬Maximal (P.CircuitToIndep E) I)
-    (hPI' : Maximal (P.CircuitToIndep E) I') :
-    ∃ x ∈ I' \ I, P.CircuitToIndep E (x ᕃ I) := by
+lemma CircuitPredicate.ToIndepPredicate.indep_aug {α : Type*} {P : CircuitPredicate α} {E I I' : Set α}
+    (hPCM : P.circuit_maximal E) (hPC3 : P.axiom_c3)
+    (hI : P.ToIndepPredicate E I) (hPI : ¬Maximal (P.ToIndepPredicate E) I)
+    (hPI' : Maximal (P.ToIndepPredicate E) I') :
+    ∃ x ∈ I' \ I, P.ToIndepPredicate E (x ᕃ I) := by
   -- Proof adapted from Bruhn et al., Theorem 4.2 (ii), backward direction
   have hB := hI
   apply hPCM at hB
@@ -210,12 +206,12 @@ lemma SetPredicate.CircuitToIndep.indep_aug {α : Type*} {P : SetPredicate α} {
   else
     let J' := z ᕃ I'
     have hJ'ground : J' ⊆ E := Set.insert_subset (hBground hzB) hPI'.1.1
-    have hJ' : ¬P.CircuitToIndep E J'
+    have hJ' : ¬P.ToIndepPredicate E J'
     · intro hJ'indep
       obtain ⟨hI'indep, hI'max⟩ := hPI'
       exact hzI' (hI'max hJ'indep (Set.subset_insert z I') (Or.inl rfl))
 
-    unfold SetPredicate.CircuitToIndep at hJ'
+    unfold CircuitPredicate.ToIndepPredicate at hJ'
     push_neg at hJ'
     specialize hJ' hJ'ground
     obtain ⟨C, ⟨hCcirc, hCJ'⟩⟩ := hJ'
@@ -232,7 +228,7 @@ lemma SetPredicate.CircuitToIndep.indep_aug {α : Type*} {P : SetPredicate α} {
     have hXII' : X ⊆ I' \ I := Set.subset_diff.mpr ⟨hXI', hIXdisj.symm⟩
 
     by_contra hx
-    unfold SetPredicate.CircuitToIndep at hx
+    unfold CircuitPredicate.ToIndepPredicate at hx
     push_neg at hx
 
     have hIxground : ∀ x ∈ E, x ᕃ I ⊆ E := fun x a => Set.insert_subset a (fun _ hxI => hBground (hIB hxI))
@@ -269,27 +265,27 @@ lemma SetPredicate.CircuitToIndep.indep_aug {α : Type*} {P : SetPredicate α} {
   rfl
 
 /-- Independence predicate constructed from circuit predicate satisfies (IM): independent sets have maximal property. -/
-lemma SetPredicate.CircuitToIndep.indep_maximal {α : Type*} {P : SetPredicate α} {E : Set α} :
-    ∀ X ⊆ E, Matroid.ExistsMaximalSubsetProperty (P.CircuitToIndep E) X :=
+lemma CircuitPredicate.ToIndepPredicate.indep_maximal {α : Type*} {P : CircuitPredicate α} {E : Set α} :
+    ∀ X ⊆ E, Matroid.ExistsMaximalSubsetProperty (P.ToIndepPredicate E) X :=
   sorry
 
 /-- Independence predicate constructed from circuit predicate satisfies (IE): independent sets are subsets of ground set. -/
-lemma SetPredicate.CircuitToIndep.subset_ground {α : Type*} {P : SetPredicate α} {E I : Set α}
-    (hI : P.CircuitToIndep E I) : I ⊆ E :=
+lemma CircuitPredicate.ToIndepPredicate.subset_ground {α : Type*} {P : CircuitPredicate α} {E I : Set α}
+    (hI : P.ToIndepPredicate E I) : I ⊆ E :=
   hI.left
 
 /-- Independence predicate constructed from circuit predicate satisfies augmentation property
     if weak circuit elimination axiom holds in finite case. -/
-lemma SetPredicate.CircuitToIndep.finite_weak_circuit_elim_indep_aug {α : Type*} {P : SetPredicate α} {E I J : Set α}
+lemma CircuitPredicate.ToIndepPredicate.finite_weak_circuit_elim_indep_aug {α : Type*} {P : CircuitPredicate α} {E I J : Set α}
     -- todo: add hP: necessary assumptions on circuit predicate
-    (hE : E.Finite) (hI : P.CircuitToIndep E I) (hJ : P.CircuitToIndep E J) (hIJ : I.ncard < J.ncard) :
-    ∃ e ∈ J, e ∉ I ∧ P.CircuitToIndep E (e ᕃ I) := by
-  unfold CircuitToIndep at hI hJ
+    (hE : E.Finite) (hI : P.ToIndepPredicate E I) (hJ : P.ToIndepPredicate E J) (hIJ : I.ncard < J.ncard) :
+    ∃ e ∈ J, e ∉ I ∧ P.ToIndepPredicate E (e ᕃ I) := by
+  unfold ToIndepPredicate at hI hJ
   by_contra heJ
   push_neg at heJ
 
-  let hKmin : ∃ K, P.CircuitToIndep E K ∧ K ⊆ I ∪ J ∧ I.ncard < K.ncard ∧
-      (∀ K', (P.CircuitToIndep E K' ∧ K' ⊆ I ∪ J ∧ I.ncard < K'.ncard) → (I \ K).ncard ≤ (I \ K').ncard) := by
+  let hKmin : ∃ K, P.ToIndepPredicate E K ∧ K ⊆ I ∪ J ∧ I.ncard < K.ncard ∧
+      (∀ K', (P.ToIndepPredicate E K' ∧ K' ⊆ I ∪ J ∧ I.ncard < K'.ncard) → (I \ K).ncard ≤ (I \ K').ncard) := by
     sorry
   obtain ⟨K, hK⟩ := hKmin
   let hImKnonempty : (I \ K).Nonempty := sorry
@@ -318,13 +314,13 @@ structure CircuitMatroid (α : Type*) where
   /-- The ground set -/
   (E : Set α)
   /-- The circuit predicate -/
-  (CircuitPred : SetPredicate α)
+  (CircuitPred : CircuitPredicate α)
   /-- Empty set is not a circuit -/
   (not_circuit_empty : CircuitPred.not_circuit_empty)
   /-- No circuit is a subset of another circuit -/
   (circuit_not_subset : CircuitPred.circuit_not_subset)
   /-- Condition (C3) from Bruhn et al. -/
-  (circuit_c3 : CircuitPred.C3)
+  (circuit_c3 : CircuitPred.axiom_c3)
   /-- Corresponding family of independent sets satisfies has the maximal subset property -/
   (circuit_maximal : CircuitPred.circuit_maximal E)
   /-- Every circuit is a subset of the ground set -/
@@ -333,23 +329,23 @@ structure CircuitMatroid (α : Type*) where
 -- Shortcuts to independence predicate and its axioms in circuit matroid construction
 def CircuitMatroid.IndepPred {α : Type*} (M : CircuitMatroid α) :
     Set α → Prop :=
-  M.CircuitPred.CircuitToIndep M.E
+  M.CircuitPred.ToIndepPredicate M.E
 
 def CircuitMatroid.indep_empty {α : Type*} (M : CircuitMatroid α) :
     M.IndepPred ∅ :=
-  SetPredicate.CircuitToIndep.indep_empty M.not_circuit_empty M.E
+  CircuitPredicate.ToIndepPredicate.indep_empty M.not_circuit_empty M.E
 
 def CircuitMatroid.indep_subset {α : Type*} (M : CircuitMatroid α) {I J : Set α} :
     M.IndepPred I → J ⊆ I → M.IndepPred J :=
-  SetPredicate.CircuitToIndep.indep_subset
+  CircuitPredicate.ToIndepPredicate.indep_subset
 
 def CircuitMatroid.indep_aug {α : Type*} (M : CircuitMatroid α) {I B : Set α} :
     M.IndepPred I → ¬Maximal M.IndepPred I → Maximal M.IndepPred B → ∃ x ∈ B \ I, M.IndepPred (x ᕃ I) :=
-  SetPredicate.CircuitToIndep.indep_aug M.circuit_maximal M.circuit_c3
+  CircuitPredicate.ToIndepPredicate.indep_aug M.circuit_maximal M.circuit_c3
 
 def CircuitMatroid.indep_maximal {α : Type*} (M : CircuitMatroid α) :
     ∀ X ⊆ M.E, Matroid.ExistsMaximalSubsetProperty M.IndepPred X :=
-  SetPredicate.CircuitToIndep.indep_maximal
+  CircuitPredicate.ToIndepPredicate.indep_maximal
 
 def CircuitMatroid.indep_subset_ground {α : Type*} (M : CircuitMatroid α) {I : Set α} :
     M.IndepPred I → I ⊆ M.E :=
@@ -358,7 +354,7 @@ def CircuitMatroid.indep_subset_ground {α : Type*} (M : CircuitMatroid α) {I :
 /-- `IndepMatroid` corresponding to circuit matroid. -/
 def CircuitMatroid.IndepMatroid {α : Type*} (M : CircuitMatroid α) : IndepMatroid α where
   E := M.E
-  Indep := M.CircuitPred.CircuitToIndep M.E
+  Indep := M.CircuitPred.ToIndepPredicate M.E
   indep_empty := M.indep_empty
   indep_subset _ _ := M.indep_subset
   indep_aug _ _ := M.indep_aug
@@ -376,17 +372,17 @@ lemma CircuitMatroid.Maximal_iff {α : Type*} (M : CircuitMatroid α) (B : Set �
   ⟨fun hB => ⟨hB.left.left, fun _ hA hBA => hB.right ⟨hA, hA.left⟩ hBA⟩,
    fun hB => ⟨⟨hB.left, hB.left.left⟩, fun _ hA => hB.right hA.left⟩⟩
 
-@[simp]
-lemma CircuitMatroid.E_eq {α : Type*}
-  (M : CircuitMatroid α) : M.matroid.E = M.E := rfl
+@[simp] lemma CircuitMatroid.E_eq {α : Type*} (M : CircuitMatroid α) : M.matroid.E = M.E := rfl
 
-@[simp]
-lemma CircuitMatroid.indep_eq {α : Type*}
-  (M : CircuitMatroid α) : M.matroid.Indep = M.IndepPred := rfl
+@[simp] lemma CircuitMatroid.indep_eq {α : Type*} (M : CircuitMatroid α) : M.matroid.Indep = M.IndepPred := rfl
 
-@[simp]
-lemma CircuitMatroid.circuit_eq {α : Type*}
-  (M : CircuitMatroid α) : M.matroid.Circuit = M.CircuitPred := sorry
+@[simp] lemma CircuitMatroid.circuit_iff {α : Type*} (M : CircuitMatroid α) {C : Set α} :
+    M.matroid.Circuit C ↔ M.CircuitPred C := by
+  constructor
+  · intro hC
+    sorry
+  · intro hC
+    sorry
 
 /-- Registered conversion from `CircuitMatroid` to `Matroid`. -/
 instance {α : Type*} : Coe (CircuitMatroid α) (Matroid α) where
@@ -394,53 +390,57 @@ instance {α : Type*} : Coe (CircuitMatroid α) (Matroid α) where
 
 
 
-section FiniteCircuitMatroid
+-- section FiniteCircuitMatroid
 
--- note: Peter Nelson's repository already implements this
+-- -- note: Peter Nelson's repository already implements this
+-- -- ideally we want to subsume this definition by construction above
+-- -- (which is more general, because it works for infinite matroids and not just finite ones)
 
-/-- If `E` is finite, then weak circuit elimination is sufficient to define circuit matroid. -/
-def CircuitMatroid.ofFinite {α : Type*} {E : Set α} (hE : E.Finite) (P : SetPredicate α)
-    (not_circuit_empty : P.not_circuit_empty)
-    (circuit_not_subset : P.circuit_not_subset)
-    (circuit_weak_elim : P.WeakCircuitElim)
-    (subset_ground : P.subset_ground E) :
-  CircuitMatroid α where
-    E := E
-    CircuitPred := P
-    not_circuit_empty := not_circuit_empty
-    circuit_not_subset := circuit_not_subset
-    circuit_c3 := sorry -- todo: prove
-    circuit_maximal := sorry -- todo: prove
-    subset_ground := subset_ground
+-- /-- If `E` is finite, then weak circuit elimination is sufficient to define circuit matroid. -/
+-- def CircuitMatroid.ofFinite {α : Type*} {E : Set α} (hE : E.Finite) (P : CircuitPredicate α)
+--     (not_circuit_empty : P.not_circuit_empty)
+--     (circuit_not_subset : P.circuit_not_subset)
+--     (circuit_weak_elim : P.WeakCircuitElim)
+--     (subset_ground : P.subset_ground E) :
+--   CircuitMatroid α where
+--     E := E
+--     CircuitPred := P
+--     not_circuit_empty := not_circuit_empty
+--     circuit_not_subset := circuit_not_subset
+--     circuit_c3 := sorry -- todo: prove
+--     circuit_maximal := sorry -- todo: prove
+--     subset_ground := subset_ground
 
-@[simp] theorem CircuitMatroid.ofFinite_E {α : Type*} {E : Set α} hE CircuitPred
-    not_circuit_empty circuit_not_subset circuit_weak_elim subset_ground :
-    (CircuitMatroid.ofFinite (hE : E.Finite) CircuitPred
-  not_circuit_empty circuit_not_subset circuit_weak_elim subset_ground).E = E := rfl
+-- @[simp] theorem CircuitMatroid.ofFinite_E {α : Type*} {E : Set α} hE CircuitPred
+--     not_circuit_empty circuit_not_subset circuit_weak_elim subset_ground :
+--     (CircuitMatroid.ofFinite (hE : E.Finite) CircuitPred
+--   not_circuit_empty circuit_not_subset circuit_weak_elim subset_ground).E = E := rfl
 
-@[simp] theorem CircuitMatroid.ofFinite_CircuitPred {α : Type*} {E : Set α} hE CircuitPred
-    not_circuit_empty circuit_not_subset circuit_weak_elim subset_ground :
-    (CircuitMatroid.ofFinite (hE : E.Finite) CircuitPred
-  not_circuit_empty circuit_not_subset circuit_weak_elim subset_ground).CircuitPred = CircuitPred := rfl
+-- @[simp] theorem CircuitMatroid.ofFinite_CircuitPred {α : Type*} {E : Set α} hE CircuitPred
+--     not_circuit_empty circuit_not_subset circuit_weak_elim subset_ground :
+--     (CircuitMatroid.ofFinite (hE : E.Finite) CircuitPred
+--   not_circuit_empty circuit_not_subset circuit_weak_elim subset_ground).CircuitPred = CircuitPred := rfl
 
-instance CircuitMatroid.ofFinite_finite {α : Type*} {E : Set α} hE CircuitPred
-    not_circuit_empty circuit_not_subset circuit_weak_elim subset_ground :
-    (CircuitMatroid.ofFinite (hE : E.Finite) CircuitPred
-  not_circuit_empty circuit_not_subset circuit_weak_elim subset_ground).matroid.Finite := ⟨hE⟩
+-- instance CircuitMatroid.ofFinite_finite {α : Type*} {E : Set α} hE CircuitPred
+--     not_circuit_empty circuit_not_subset circuit_weak_elim subset_ground :
+--     (CircuitMatroid.ofFinite (hE : E.Finite) CircuitPred
+--   not_circuit_empty circuit_not_subset circuit_weak_elim subset_ground).matroid.Finite := ⟨hE⟩
 
-lemma greater_ncard_diff_nonempty {α : Type*} {A B : Set α} (hA : A.Finite) (hB : B.Finite)
-    (hAB : A.ncard < B.ncard) : ∃ e, e ∈ B \ A :=
-  sorry
+-- lemma greater_ncard_diff_nonempty {α : Type*} {A B : Set α} (hA : A.Finite) (hB : B.Finite)
+--     (hAB : A.ncard < B.ncard) : ∃ e, e ∈ B \ A :=
+--   sorry
 
-def IndepMatroid.ofFiniteCircuit {α : Type*} {E : Set α} (hE : E.Finite) (P : SetPredicate α)
-    (not_circuit_empty : P.not_circuit_empty)
-    (circuit_not_subset : P.circuit_not_subset)
-    (circuit_weak_elim : P.WeakCircuitElim)
-    (subset_ground : P.subset_ground E) :
-  IndepMatroid α := IndepMatroid.ofFinite
-    (hE := hE)
-    (Indep := P.CircuitToIndep E)
-    (indep_empty := SetPredicate.CircuitToIndep.indep_empty not_circuit_empty E)
-    (indep_subset := fun _ _ => SetPredicate.CircuitToIndep.indep_subset)
-    (indep_aug := fun _ _ => SetPredicate.CircuitToIndep.finite_weak_circuit_elim_indep_aug hE)
-    (subset_ground := fun _ => And.left)
+-- def IndepMatroid.ofFiniteCircuit {α : Type*} {E : Set α} (hE : E.Finite) (P : CircuitPredicate α)
+--     (not_circuit_empty : P.not_circuit_empty)
+--     (circuit_not_subset : P.circuit_not_subset)
+--     (circuit_weak_elim : P.WeakCircuitElim)
+--     (subset_ground : P.subset_ground E) :
+--   IndepMatroid α := IndepMatroid.ofFinite
+--     (hE := hE)
+--     (Indep := P.ToIndepPredicate E)
+--     (indep_empty := CircuitPredicate.ToIndepPredicate.indep_empty not_circuit_empty E)
+--     (indep_subset := fun _ _ => CircuitPredicate.ToIndepPredicate.indep_subset)
+--     (indep_aug := fun _ _ => CircuitPredicate.ToIndepPredicate.finite_weak_circuit_elim_indep_aug hE)
+--     (subset_ground := fun _ => And.left)
+
+-- -- todo: `CircuitMatroid` constructed from `Circuit`'s of a `Matroid` produces the same `Matroid`

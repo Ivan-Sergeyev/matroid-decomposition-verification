@@ -22,7 +22,6 @@ lemma disjoint_nonempty_not_ssubset {α : Type*} {A B : Set α}
   tauto
 
 lemma disjoint_empty_inter {α : Type*} {A B : Set α} (h : Disjoint A B) : A ∩ B = ∅ := by
-
   exact Disjoint.inter_eq h
 
 /-- todo: desc -/
