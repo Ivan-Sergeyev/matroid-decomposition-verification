@@ -78,7 +78,8 @@ lemma toMatrixSumSum_toMatrixUnionUnion (C : Matrix (T₁ ∪ T₂).Elem (S₁ �
   simp_all [Matrix.toMatrixUnionUnion, Matrix.toMatrixSumSum, toSum_toUnion]
 
 /-- A totally unimodular block matrix stays totally unimodular after converting to a matrix over set unions. -/
-lemma Matrix.IsTotallyUnimodular.toMatrixUnionUnion {C : Matrix (T₁ ⊕ T₂) (S₁ ⊕ S₂) ℚ} (hC : C.IsTotallyUnimodular) :
+lemma Matrix.IsTotallyUnimodular.toMatrixUnionUnion [CommRing β] {C : Matrix (T₁ ⊕ T₂) (S₁ ⊕ S₂) β}
+    (hC : C.IsTotallyUnimodular) :
     C.toMatrixUnionUnion.IsTotallyUnimodular := by
   rw [Matrix.isTotallyUnimodular_iff] at hC ⊢
   intros

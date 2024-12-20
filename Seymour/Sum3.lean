@@ -183,7 +183,8 @@ lemma StandardRepresentation.Is3sumOf.indep (hM : M.Is3sumOf M₁ M₂) :
             (j.property.elim (by simp_all) hj₂).elim
           )
         )
-      ).IndepCols = M.toMatroid.Indep := by
+      ).IndepCols =
+    M.toMatroid.Indep := by
   obtain ⟨x₁, x₂, x₃, y₁, y₂, y₃, hXX, hYY, _, _, hMM, -⟩ := hM
   have hxxx₁ : {x₁, x₂, x₃} ⊆ M₁.X := hXX.symm.subset.trans Set.inter_subset_left
   have hxxx₂ : {x₁, x₂, x₃} ⊆ M₂.X := hXX.symm.subset.trans Set.inter_subset_right

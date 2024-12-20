@@ -1,4 +1,3 @@
-import Mathlib.Logic.Equiv.Defs
 import Mathlib.Tactic
 
 /-!
@@ -12,8 +11,7 @@ variable {α β₁ β₂ : Type*}
 /-- Given `f : α → β₁ ⊕ β₂` decompose `α` into two preïmages. -/
 @[simp]
 def Function.decomposeSum (f : α → β₁ ⊕ β₂) :
-    α ≃ { x₁ : α × β₁ // f x₁.fst = Sum.inl x₁.snd } ⊕ { x₂ : α × β₂ // f x₂.fst = Sum.inr x₂.snd }
-    where
+    α ≃ { x₁ : α × β₁ // f x₁.fst = Sum.inl x₁.snd } ⊕ { x₂ : α × β₂ // f x₂.fst = Sum.inr x₂.snd } where
   toFun a :=
     (match hfa : f a with
       | .inl b₁ => Sum.inl ⟨(a, b₁), hfa⟩
@@ -22,9 +20,9 @@ def Function.decomposeSum (f : α → β₁ ⊕ β₂) :
   invFun x :=
     x.casesOn (·.val.fst) (·.val.fst)
   left_inv a := by
-    match hfa : f a with
-    | .inl b₁ => aesop
-    | .inr b₂ => aesop
+    cases f a with
+    | inl => aesop
+    | inr => aesop
   right_inv x := by
     cases x with
     | inl => aesop

@@ -21,7 +21,7 @@ def StandardRepresentation.IsCographic (M : StandardRepresentation α) : Prop :=
 def MatroidR10 : StandardRepresentation α :=
   sorry -- inside we have some `Fin 10 ↪ α` whose image is `E`
 
-/-- Given matroid can be constructed from graphic matroids, cographics matroids, and R10 using 1-sums, 2-sums, and 3-sums. -/
+/-- Given matroid can be constructed from graphic matroids & cographics matroids & R10 using 1-sums & 2-sums & 3-sums. -/
 inductive StandardRepresentation.IsGood : StandardRepresentation α → Prop
 -- leaf constructors
 | graphic {M : StandardRepresentation α} (hM : M.IsGraphic) : M.IsGood

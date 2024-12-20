@@ -76,23 +76,27 @@ def Matrix.toIndepMatroid (B : Matrix X Y Z2) : IndepMatroid α where
 def Matrix.toMatroid (B : Matrix X Y Z2) : Matroid α := B.toIndepMatroid.matroid
 
 /-- Convert `StandardRepresentation` to `Matroid`. -/
-def StandardRepresentation.toMatroid (M : StandardRepresentation α) : Matroid α := M.B.toMatroid
+def StandardRepresentation.toMatroid (M : StandardRepresentation α) : Matroid α :=
+  M.B.toMatroid
 
 @[simp] -- API
-lemma StandardRepresentation.E_eq (M : StandardRepresentation α) : M.toMatroid.E = M.X ∪ M.Y := rfl
+lemma StandardRepresentation.E_eq (M : StandardRepresentation α) : M.toMatroid.E = M.X ∪ M.Y :=
+  rfl
 
 @[simp] -- API
-lemma StandardRepresentation.indep_eq (M : StandardRepresentation α) : M.toMatroid.Indep = M.B.IndepCols := rfl
+lemma StandardRepresentation.indep_eq (M : StandardRepresentation α) : M.toMatroid.Indep = M.B.IndepCols :=
+  rfl
 
 /-- Registered conversion from `StandardRepresentation` to `Matroid`. -/
-instance : Coe (StandardRepresentation α) (Matroid α) where coe := StandardRepresentation.toMatroid
+instance : Coe (StandardRepresentation α) (Matroid α) where
+  coe := StandardRepresentation.toMatroid
 
 
 /-- The binary matroid is regular iff the standard representation matrix has a totally unimodular signing. -/
 def StandardRepresentation.IsRegular (M : StandardRepresentation α) : Prop :=
   ∃ B' : Matrix M.X M.Y ℚ, -- signed version of the standard representation matrix
-    B'.IsTotallyUnimodular ∧ -- the signed standard representation matrix is totally unimodular
-    ∀ i : M.X, ∀ j : M.Y, if M.B i j = 0 then B' i j = 0 else B' i j = 1 ∨ B' i j = -1 -- in absolulute values `B = B'`
+    B'.IsTotallyUnimodular ∧ -- the signed standard representation matrix is TU
+    ∀ i : M.X, ∀ j : M.Y, if M.B i j = 0 then B' i j = 0 else B' i j = 1 ∨ B' i j = -1 -- basically `|B| = |B'|`
 
 /-- The binary matroid is regular iff the entire matrix has a totally unimodular signing. -/
 lemma StandardRepresentation.isRegular_iff (M : StandardRepresentation α) :
