@@ -138,8 +138,8 @@ lemma StandardRepresentation_2sum_isRegular {a : α} (ha : M₁.X ∩ M₂.Y = {
   constructor
   · apply Matrix.IsTotallyUnimodular.toMatrixUnionUnion
     apply Matrix_2sumComposition_IsTotallyUnimodular
-    · sorry -- FIXME `apply hB₁.comp_rows`
-    · sorry -- FIXME `apply hB₂.comp_cols`
+    · apply hB₁.comp_rows
+    · apply hB₂.comp_cols
   · intro i j
     simp only [hB, Matrix.toMatrixUnionUnion, Function.comp_apply]
     cases hi : i.toSum with

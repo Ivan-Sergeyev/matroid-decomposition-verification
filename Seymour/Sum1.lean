@@ -53,10 +53,10 @@ lemma StandardRepresentation_1sum_as_disjoint_sum {hXY : M₁.X ⫗ M₂.Y} {hYX
 lemma StandardRepresentation_1sum_comm {hXY : M₁.X ⫗ M₂.Y} {hYX : M₁.Y ⫗ M₂.X}
     (valid : (StandardRepresentation_1sum hXY hYX).snd) :
     (StandardRepresentation_1sum hXY hYX).fst.toMatroid = (StandardRepresentation_1sum hYX.symm hXY.symm).fst.toMatroid := by
-  rw [StandardRepresentation_1sum_as_disjoint_sum valid, StandardRepresentation_1sum_as_disjoint_sum, Matroid.disjointSum_comm]
-  constructor
-  · exact valid.left.symm
-  · exact valid.right.symm
+  rw [
+    StandardRepresentation_1sum_as_disjoint_sum valid,
+    StandardRepresentation_1sum_as_disjoint_sum ⟨valid.left.symm, valid.right.symm⟩,
+    Matroid.disjointSum_comm]
 
 variable {M : StandardRepresentation α}
 

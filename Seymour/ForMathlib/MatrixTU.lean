@@ -4,6 +4,20 @@ import Seymour.ForMathlib.FunctionDecompose
 
 variable {X₁ X₂ Y₁ Y₂ R : Type*}
 
+lemma Matrix.IsTotallyUnimodular.comp_rows [CommRing R] {A : Matrix X₁ Y₁ R}
+    (hA : A.IsTotallyUnimodular) (e : X₂ → X₁) :
+    Matrix.IsTotallyUnimodular (A ∘ e) := by
+  rw [Matrix.isTotallyUnimodular_iff] at hA ⊢
+  intro k f g
+  exact hA k (e ∘ f) g
+
+lemma Matrix.IsTotallyUnimodular.comp_cols [CommRing R] {A : Matrix X₁ Y₁ R}
+    (hA : A.IsTotallyUnimodular) (e : Y₂ → Y₁) :
+    Matrix.IsTotallyUnimodular (A · ∘ e) := by
+  rw [Matrix.isTotallyUnimodular_iff] at hA ⊢
+  intro k f g
+  exact hA k f (e ∘ g)
+
 lemma Matrix.fromBlocks_submatrix [Zero R] (A₁ : Matrix X₁ Y₁ R) (A₂ : Matrix X₂ Y₂ R)
     {α : Type*} (f : α → X₁ ⊕ X₂) (g : α → Y₁ ⊕ Y₂) :
     (fromBlocks A₁ 0 0 A₂).submatrix f g =
