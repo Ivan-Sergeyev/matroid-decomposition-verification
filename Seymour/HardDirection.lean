@@ -21,7 +21,7 @@ def BinaryMatroid.IsCographic (M : BinaryMatroid α) : Prop :=
 def MatroidR10 : BinaryMatroid α :=
   sorry -- inside we have some `Fin 10 ↪ α` whose image is `E`
 
-/-- Given matroid can be constructed from graphic matroids, cographics matroids, and R10 using 1-sums, 2-sums, and 3-sums. -/
+/-- Given matroid can be constructed from graphic matroids & cographic matroids & R10 using 1-sums & 2-sums & 3-sums. -/
 inductive BinaryMatroid.IsGood : BinaryMatroid α → Prop
 -- leaf constructors
 | graphic {M : BinaryMatroid α} (hM : M.IsGraphic) : M.IsGood

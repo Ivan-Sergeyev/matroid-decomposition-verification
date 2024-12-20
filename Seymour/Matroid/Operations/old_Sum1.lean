@@ -49,18 +49,14 @@ lemma BinaryMatroid_1sum_as_disjoint_sum {hXY : M₁.X ⫗ M₂.Y} {hYX : M₁.Y
   · intro I hI
     sorry -- TODO
 
-lemma Matroid.disjointSum_comm {α : Type*} {M N : Matroid α} (hMN : Disjoint M.E N.E) :
-    Matroid.disjointSum M N hMN = Matroid.disjointSum N M hMN.symm := by
-  sorry
-
 /-- A valid 1-sum of binary matroids is commutative. -/
 lemma BinaryMatroid_1sum_comm {hXY : M₁.X ⫗ M₂.Y} {hYX : M₁.Y ⫗ M₂.X}
     (valid : (BinaryMatroid_1sum hXY hYX).snd) :
     (BinaryMatroid_1sum hXY hYX).fst.matroid = (BinaryMatroid_1sum hYX.symm hXY.symm).fst.matroid := by
-  rw [BinaryMatroid_1sum_as_disjoint_sum valid, BinaryMatroid_1sum_as_disjoint_sum, Matroid.disjointSum_comm]
-  constructor
-  · exact valid.left.symm
-  · exact valid.right.symm
+    rw [
+      BinaryMatroid_1sum_as_disjoint_sum valid,
+      BinaryMatroid_1sum_as_disjoint_sum ⟨valid.left.symm, valid.right.symm⟩,
+      Matroid.disjointSum_comm]
 
 variable {M : BinaryMatroid α}
 
@@ -74,7 +70,7 @@ lemma BinaryMatroid_1sum_Regular [Fintype M₁.X] [Fintype M₁.Y] [Fintype M₂
   let B' := Matrix_1sumComposition B₁ B₂ -- the signing is obtained using the same function but for `ℚ`
   use B'.toMatrixUnionUnion
   constructor
-  · exact (Matrix.fromBlocks_TU hB₁ hB₂).toMatrixUnionUnion
+  · exact (Matrix.fromBlocks_isTotallyUnimodular hB₁ hB₂).toMatrixUnionUnion
   · intro i j
     simp only [hB, B', Matrix.toMatrixUnionUnion, Function.comp_apply]
     cases i.toSum with

@@ -79,19 +79,19 @@ lemma BinaryMatroid.Is2sumOf.indep (hM : M.Is2sumOf M₁ M₂) :
   rewrite [hMM]
   sorry -- todo: rfl used to solve this
 
-lemma Matrix_2sumComposition_TU {X₁ Y₁ X₂ Y₂ : Set α} {A₁ : Matrix X₁ Y₁ ℚ} {A₂ : Matrix X₂ Y₂ ℚ}
-    (hA₁ : A₁.TU) (hA₂ : A₂.TU) (x : Y₁ → ℚ) (y : X₂ → ℚ) :
-    (Matrix_2sumComposition A₁ x A₂ y).TU := by
+lemma Matrix_2sumComposition_IsTotallyUnimodular {X₁ Y₁ X₂ Y₂ : Set α} {A₁ : Matrix X₁ Y₁ ℚ} {A₂ : Matrix X₂ Y₂ ℚ}
+    (hA₁ : A₁.IsTotallyUnimodular) (hA₂ : A₂.IsTotallyUnimodular) (x : Y₁ → ℚ) (y : X₂ → ℚ) :
+    (Matrix_2sumComposition A₁ x A₂ y).IsTotallyUnimodular := by
   sorry
 
-lemma Matrix_2sumComposition_TU_left {X₁ Y₁ X₂ Y₂ : Set α} {A₁ : Matrix X₁ Y₁ ℚ} {A₂ : Matrix X₂ Y₂ ℚ}
-    {x : Y₁ → ℚ} {y : X₂ → ℚ} (hA : (Matrix_2sumComposition A₁ x A₂ y).TU) :
-    A₁.TU := by
+lemma Matrix_2sumComposition_IsTotallyUnimodular_left {X₁ Y₁ X₂ Y₂ : Set α} {A₁ : Matrix X₁ Y₁ ℚ} {A₂ : Matrix X₂ Y₂ ℚ}
+    {x : Y₁ → ℚ} {y : X₂ → ℚ} (hA : (Matrix_2sumComposition A₁ x A₂ y).IsTotallyUnimodular) :
+    A₁.IsTotallyUnimodular := by
   sorry
 
-lemma Matrix_2sumComposition_TU_right {X₁ Y₁ X₂ Y₂ : Set α} {A₁ : Matrix X₁ Y₁ ℚ} {A₂ : Matrix X₂ Y₂ ℚ}
-    {x : Y₁ → ℚ} {y : X₂ → ℚ} (hA : (Matrix_2sumComposition A₁ x A₂ y).TU) :
-    A₂.TU := by
+lemma Matrix_2sumComposition_IsTotallyUnimodular_right {X₁ Y₁ X₂ Y₂ : Set α} {A₁ : Matrix X₁ Y₁ ℚ} {A₂ : Matrix X₂ Y₂ ℚ}
+    {x : Y₁ → ℚ} {y : X₂ → ℚ} (hA : (Matrix_2sumComposition A₁ x A₂ y).IsTotallyUnimodular) :
+    A₂.IsTotallyUnimodular := by
   sorry
 
 lemma BinaryMatroid_2sum_B {a : α} (ha : M₁.X ∩ M₂.Y = {a}) (hXY : M₂.X ⫗ M₁.Y) :
@@ -135,8 +135,8 @@ lemma BinaryMatroid_2sum_isRegular {a : α} (ha : M₁.X ∩ M₂.Y = {a}) (hXY 
   let B' := Matrix_2sumComposition A₁' x' A₂' y' -- the signing is obtained using the same function but for `ℚ`
   use B'.toMatrixUnionUnion
   constructor
-  · apply Matrix.TU.toMatrixUnionUnion
-    apply Matrix_2sumComposition_TU
+  · apply Matrix.IsTotallyUnimodular.toMatrixUnionUnion
+    apply Matrix_2sumComposition_IsTotallyUnimodular
     · apply hB₁.comp_rows
     · apply hB₂.comp_cols
   · intro i j

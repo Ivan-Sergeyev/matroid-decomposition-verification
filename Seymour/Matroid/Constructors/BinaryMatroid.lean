@@ -27,7 +27,7 @@ def BinaryMatroid.E {α : Type*} [DecidableEq α]
 /-- Full representation matrix of binary matroid is `[I | B]`. -/
 def BinaryMatroid.A {α : Type*} [DecidableEq α]
     (M : BinaryMatroid α) : Matrix M.X (M.X ∪ M.Y).Elem Z2 :=
-  (Matrix.fromColumns 1 M.B).GlueColumns
+  (Matrix.fromCols 1 M.B).GlueColumns
 
 /-- Binary matroid converted to `VectorMatroid`. -/
 def BinaryMatroid.VectorMatroid {α : Type*} [DecidableEq α]
@@ -35,17 +35,16 @@ def BinaryMatroid.VectorMatroid {α : Type*} [DecidableEq α]
   ⟨M.X ∪ M.Y, M.A⟩
 
 /-- Binary matroid converted to `Matroid`. -/
-def BinaryMatroid.matroid {α : Type*} [DecidableEq α]
-    (M : BinaryMatroid α) : Matroid α :=
+def BinaryMatroid.matroid {α : Type*} [DecidableEq α] (M : BinaryMatroid α) : Matroid α :=
   M.VectorMatroid.matroid
 
-@[simp]
-lemma BinaryMatroid.E_eq {α : Type*} [DecidableEq α]
-  (M : BinaryMatroid α) : M.matroid.E = M.X ∪ M.Y := rfl
+@[simp] -- API
+lemma BinaryMatroid.E_eq {α : Type*} [DecidableEq α] (M : BinaryMatroid α) : M.matroid.E = M.X ∪ M.Y :=
+  rfl
 
-@[simp]
-lemma BinaryMatroid.indep_eq {α : Type*} [DecidableEq α]
-  (M : BinaryMatroid α) : M.matroid.Indep = M.VectorMatroid.IndepCols := rfl
+@[simp] -- API
+lemma BinaryMatroid.indep_eq {α : Type*} [DecidableEq α] (M : BinaryMatroid α) : M.matroid.Indep = M.VectorMatroid.IndepCols :=
+  rfl
 
 /-- Registered conversion from `BinaryMatroid` to `Matroid`. -/
 instance {α : Type*} [DecidableEq α] : Coe (BinaryMatroid α) (Matroid α) where

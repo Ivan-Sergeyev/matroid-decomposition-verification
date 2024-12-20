@@ -1,8 +1,55 @@
-import Mathlib.Order.SymmDiff
-import Mathlib.Order.Disjoint
 import Mathlib.Data.Set.SymmDiff
-import Seymour.Mathlib.Sets
+import Mathlib.Order.CompletePartialOrder
+import Mathlib.Order.Disjoint
+import Mathlib.Order.SymmDiff
+import Mathlib.Tactic
 
+
+/-!
+This provides lemmas about sets (mostly dealing with disjointness) that are missing in Mathlib.
+We do not use out custom notation here because this file is higher than `Basic.lean` in the import hierarchy.
+-/
+
+/-- todo: desc -/
+lemma setminus_inter_union_eq_union {α : Type*} {X Y : Set α} : X \ (X ∩ Y) ∪ Y = X ∪ Y := by
+  ext a
+  constructor
+  · intro ha
+    cases ha with
+    | inl ha' =>
+      left
+      exact Set.mem_of_mem_diff ha'
+    | inr haY =>
+      right
+      exact haY
+  · simp
+
+/-- todo: desc -/
+lemma Disjoint.ni_of_in {α : Type*} {X Y : Set α} {a : α} (hXY : Disjoint X Y) (ha : a ∈ X) : a ∉ Y := by
+  intro ha'
+  simpa [hXY.inter_eq] using Set.mem_inter ha ha'
+
+/-- todo: desc -/
+lemma disjoint_of_singleton_intersection_left_wo {α : Type*} {X Y : Set α} {a : α} (hXY : X ∩ Y = {a}) : Disjoint (X \ {a}) Y := by
+  rw [Set.disjoint_iff_forall_ne]
+  intro u huXa v hvY huv
+  have hua : u ≠ a
+  · aesop
+  have huX : u ∈ X
+  · aesop
+  have huXY := Set.mem_inter huX (huv ▸ hvY)
+  rw [hXY, Set.mem_singleton_iff] at huXY
+  exact hua huXY
+
+/-- todo: desc -/
+lemma disjoint_of_singleton_intersection_right_wo {α : Type*} {X Y : Set α} {a : α} (hXY : X ∩ Y = {a}) : Disjoint X (Y \ {a}) := by
+  rw [disjoint_comm]
+  rw [Set.inter_comm] at hXY
+  exact disjoint_of_singleton_intersection_left_wo hXY
+
+/-- todo: desc -/
+lemma disjoint_of_singleton_intersection_both_wo {α : Type*} {X Y : Set α} {a : α} (hXY : X ∩ Y = {a}) : Disjoint (X \ {a}) (Y \ {a}) :=
+  Disjoint.disjoint_sdiff_left (disjoint_of_singleton_intersection_right_wo hXY)
 
 /-- todo: desc -/
 lemma disjoint_nonempty_not_subset {α : Type*} {A B : Set α}

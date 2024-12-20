@@ -1,4 +1,4 @@
-import Seymour.Mathlib.Sets
+import Seymour.ForMathlib.SetTheory
 import Seymour.ForMathlib.MatrixTU
 
 /-!
@@ -81,8 +81,9 @@ lemma toMatrixSumSum_toMatrixUnionUnion (C : Matrix (T₁ ∪ T₂).Elem (S₁ �
   simp_all [Matrix.toMatrixUnionUnion, Matrix.toMatrixSumSum, toSum_toUnion]
 
 /-- A totally unimodular block matrix stays totally unimodular after converting to a matrix over set unions. -/
-lemma Matrix.TU.toMatrixUnionUnion {C : Matrix (T₁ ⊕ T₂) (S₁ ⊕ S₂) ℚ} (hC : C.TU) :
-    C.toMatrixUnionUnion.TU := by
-  rw [Matrix.TU_iff] at hC ⊢
+lemma Matrix.IsTotallyUnimodular.toMatrixUnionUnion [CommRing β] {C : Matrix (T₁ ⊕ T₂) (S₁ ⊕ S₂) β}
+    (hC : C.IsTotallyUnimodular) :
+    C.toMatrixUnionUnion.IsTotallyUnimodular := by
+  rw [Matrix.isTotallyUnimodular_iff] at hC ⊢
   intros
   apply hC
