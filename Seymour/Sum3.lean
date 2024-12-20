@@ -15,7 +15,7 @@ noncomputable abbrev Matrix_3sumComposition {β : Type*} [CommRing β] {X₁ Y�
   let D₁₂ : Matrix X₂ Y₁ β := D₂ * D⁻¹ * D₁
   Matrix.fromBlocks
     (Matrix.fromRows A₁ (Matrix.row Unit (Sum.elim z₁ ![1, 1]))) 0
-    (Matrix.fromBlocks D₁ D D₁₂ D₂) (Matrix.fromColumns (Matrix.col Unit (Sum.elim ![1, 1] z₂)) A₂)
+    (Matrix.fromBlocks D₁ D D₁₂ D₂) (Matrix.fromCols (Matrix.col Unit (Sum.elim ![1, 1] z₂)) A₂)
 
 variable [DecidableEq α] {M₁ M₂ : StandardRepresentation α}
 

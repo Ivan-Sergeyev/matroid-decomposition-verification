@@ -31,7 +31,7 @@ variable {α : Type*} [DecidableEq α] {X Y : Set α} [∀ a, Decidable (a ∈ X
 /-- Given matrix `B`, is the set of columns `S` in the (standard) representation [`1 | B`] `Z2`-independent? -/
 def Matrix.IndepCols (B : Matrix X Y Z2) (S : Set α) : Prop :=
   ∃ hs : S ⊆ X ∪ Y,
-    LinearIndependent Z2 ((Matrix.fromColumns 1 B).submatrix id (Subtype.toSum ∘ hs.elem)).transpose
+    LinearIndependent Z2 ((Matrix.fromCols 1 B).submatrix id (Subtype.toSum ∘ hs.elem)).transpose
 
 
 /-- The empty set of columns is linearly independent. -/
@@ -44,7 +44,7 @@ theorem Matrix.IndepCols_subset {B : Matrix X Y Z2} (I J : Set α) (hBJ : B.Inde
     B.IndepCols I := by
   obtain ⟨hJ, hB⟩ := hBJ
   use hIJ.trans hJ
-  show LinearIndependent Z2 (fun i x => Matrix.fromColumns 1 B x ((hJ.elem (Subtype.map id hIJ i)).toSum))
+  show LinearIndependent Z2 (fun i x => Matrix.fromCols 1 B x ((hJ.elem (Subtype.map id hIJ i)).toSum))
   apply hB.comp
   intro _ _ hf
   apply Subtype.eq
@@ -91,16 +91,16 @@ instance : Coe (StandardRepresentation α) (Matroid α) where coe := StandardRep
 /-- The binary matroid is regular iff the standard representation matrix has a totally unimodular signing. -/
 def StandardRepresentation.IsRegular (M : StandardRepresentation α) : Prop :=
   ∃ B' : Matrix M.X M.Y ℚ, -- signed version of the standard representation matrix
-    B'.TU ∧ -- the signed standard representation matrix is totally unimodular
+    B'.IsTotallyUnimodular ∧ -- the signed standard representation matrix is totally unimodular
     ∀ i : M.X, ∀ j : M.Y, if M.B i j = 0 then B' i j = 0 else B' i j = 1 ∨ B' i j = -1 -- in absolulute values `B = B'`
 
 /-- The binary matroid is regular iff the entire matrix has a totally unimodular signing. -/
 lemma StandardRepresentation.isRegular_iff (M : StandardRepresentation α) :
     M.IsRegular ↔ ∃ B' : Matrix M.X M.Y ℚ,
-      (Matrix.fromColumns (1 : Matrix M.X M.X ℚ) B').TU ∧ ∀ i : M.X, ∀ j : M.Y,
+      (Matrix.fromCols (1 : Matrix M.X M.X ℚ) B').IsTotallyUnimodular ∧ ∀ i : M.X, ∀ j : M.Y,
         if M.B i j = 0 then B' i j = 0 else B' i j = 1 ∨ B' i j = -1
     := by
-  simp [StandardRepresentation.IsRegular, Matrix.TU_adjoin_id_left_iff]
+  simp [StandardRepresentation.IsRegular, Matrix.one_fromCols_isTotallyUnimodular_iff]
 
 -- TODO very high priority!
 lemma StandardRepresentation_toMatroid_isRegular_iff {M₁ M₂ : StandardRepresentation α} (hM : M₁.toMatroid = M₂.toMatroid) :
