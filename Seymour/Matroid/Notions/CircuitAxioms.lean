@@ -42,13 +42,37 @@ def CircuitPredicate.ToIndepPredicate {α : Type*} (P : CircuitPredicate α) (E 
   fun I => I ⊆ E ∧ ∀ C, P C → ¬C ⊆ I
 
 /-- Independence predicate defines following circuit predicate: circuits are minimal dependent sets. -/
-def IndepPredicate.ToCircuitPredicate {α : Type*} (P : CircuitPredicate α) (E : Set α) : CircuitPredicate α :=
+def IndepPredicate.ToCircuitPredicate {α : Type*} (P : IndepPredicate α) (E : Set α) : CircuitPredicate α :=
   fun C => C ⊆ E ∧ ¬P C ∧ ∀ C', C' ⊂ C → P C'
 
+/-- Converting circuit predicate to independence predicate and then to circuit predicate
+    yields original independence predicate.-/
+lemma CircuitPredicate.ToIndep_ToCircuit_rfl {α : Type*} (P : CircuitPredicate α) (E : Set α) :
+    (P.ToIndepPredicate E).ToCircuitPredicate E = P := by
+  -- todo: need additional assumptions on P (see axioms)
+  sorry
+
 /-- Converting independence predicate to circuit predicate and then to independence predicate
-    yields the original independence predicate. -/
+    yields original independence predicate.-/
+lemma IndepPredicate.ToCircuit_ToIndep_rfl {α : Type*} (P : IndepPredicate α) (E : Set α) :
+    ∀ I, (P.ToCircuitPredicate E).ToIndepPredicate E I ↔ P I ∧ I ⊆ E := by
+  -- todo: need additional assumptions on P (see axioms)
+  intro I
+  constructor
+  · intro ⟨hIE, hIindep⟩
+    constructor
+    · sorry
+    · exact hIE
+  · intro ⟨hPI, hIE⟩
+    constructor
+    · exact hIE
+    · intro C ⟨hCE, hnpC, hCmin⟩ hCI
+      sorry
+
+/-- Converting independence predicate of matroid to circuit predicate and then to independence predicate
+    yields original independence predicate. -/
 lemma Matroid_Indep_ToCircuit_ToIndep_rfl {α : Type*} (M : Matroid α) :
-    ∀ I, I ⊆ M.E ∧ M.Indep I ↔ CircuitPredicate.ToIndepPredicate (IndepPredicate.ToCircuitPredicate M.Indep M.E) M.E I := by
+    ∀ I, I ⊆ M.E ∧ M.Indep I ↔ (IndepPredicate.ToCircuitPredicate M.Indep M.E).ToIndepPredicate M.E I := by
   intro I
   constructor
   · intro ⟨hIE, hIindep⟩

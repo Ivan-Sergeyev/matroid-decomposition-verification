@@ -1,3 +1,4 @@
+import Mathlib.Order.RelClasses
 import Mathlib.Data.Matroid.IndepAxioms
 
 import Seymour.Basic
@@ -74,17 +75,53 @@ lemma CircuitMatroid.Maximal_iff {α : Type*} (M : CircuitMatroid α) (B : Set �
   ⟨fun hB => ⟨hB.left.left, fun _ hA hBA => hB.right ⟨hA, hA.left⟩ hBA⟩,
    fun hB => ⟨⟨hB.left, hB.left.left⟩, fun _ hA => hB.right hA.left⟩⟩
 
-@[simp] lemma CircuitMatroid.E_eq {α : Type*} (M : CircuitMatroid α) : M.matroid.E = M.E := rfl
+@[simp] lemma CircuitMatroid.E_eq {α : Type*} (M : CircuitMatroid α) :
+  M.matroid.E = M.E := rfl
 
-@[simp] lemma CircuitMatroid.indep_eq {α : Type*} (M : CircuitMatroid α) : M.matroid.Indep = M.IndepPred := rfl
+@[simp] lemma CircuitMatroid.indep_eq {α : Type*} (M : CircuitMatroid α) :
+  M.matroid.Indep = M.IndepPred := rfl
+
+@[simp] lemma CircuitMatroid.indep_iff {α : Type*} (M : CircuitMatroid α) {I : Set α} :
+  M.matroid.Indep I ↔ M.IndepPred I := rfl.to_iff
 
 @[simp] lemma CircuitMatroid.circuit_iff {α : Type*} (M : CircuitMatroid α) {C : Set α} :
     M.matroid.Circuit C ↔ M.CircuitPred C := by
   constructor
   · intro hC
+    unfold Matroid.Circuit Matroid.Dep at hC
+    obtain ⟨⟨hCdep, hCE⟩, hCmin⟩ := hC
+    -- by_contra hCncirc
+    let hMax := M.circuit_maximal C hCE
+    specialize hMax ∅ (CircuitPredicate.ToIndepPredicate.indep_empty M.not_circuit_empty M.E) (Set.empty_subset C)
+    obtain ⟨D, ⟨_, ⟨⟨hDindep, hDC⟩, hDmax⟩⟩⟩ := hMax
+    let hDneqC : D ≠ C := by
+      by_contra hDeqC
+      rw [CircuitMatroid.indep_iff, ←hDeqC] at hCdep
+      exact hCdep hDindep
+    let hDssubC := Set.ssubset_iff_subset_ne.mpr ⟨hDC, hDneqC⟩
+    obtain ⟨x, hxC, hxnD⟩ := Set.exists_of_ssubset hDssubC
+    let hDextC : insert x D = C := sorry
     sorry
   · intro hC
-    sorry
+    unfold Matroid.Circuit Matroid.Dep
+    constructor
+    · simp
+      unfold IndepPred
+      constructor
+      · unfold CircuitPredicate.ToIndepPredicate
+        push_neg
+        intro hCE
+        use C
+      · exact M.subset_ground C hC
+    · intro D ⟨hDdep, hDE⟩ hDC
+      rw [CircuitMatroid.indep_iff] at hDdep
+      unfold IndepPred CircuitPredicate.ToIndepPredicate at hDdep
+      push_neg at hDdep
+      obtain ⟨C', hC', hC'D⟩ := hDdep hDE
+      let hC'C := hC'D.trans hDC
+      let hC'nssubC := M.circuit_not_subset C C' hC hC'
+      let hC'eqC := eq_of_subset_of_not_ssubset hC'C hC'nssubC
+      exact hC'eqC ▸ hC'D
 
 /-- Registered conversion from `CircuitMatroid` to `Matroid`. -/
 instance {α : Type*} : Coe (CircuitMatroid α) (Matroid α) where

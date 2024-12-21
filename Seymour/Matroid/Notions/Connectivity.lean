@@ -58,7 +58,35 @@ lemma Matroid.Separator.Coloop {α : Type*} {M : Matroid α} {x : α} (hx : M.Co
 /-- Every singleton separator is a loop or a coloop. -/
 lemma Matroid.Separator.Singleton {α : Type*} {M : Matroid α} {x : α}
     (hx : x ∈ M.E) : M.Separator {x} → M.Loop x ∨ M.Coloop x := by
-  sorry
+  intro hSep
+  by_contra h
+  push_neg at h
+  obtain ⟨hnLoop, hnColoop⟩ := h
+  rw [Matroid.Loop.iff_circuit] at hnLoop
+  rw [Matroid.Coloop.iff_in_no_circuit] at hnColoop
+  push_neg at hnColoop
+  specialize hnColoop hx
+  obtain ⟨C, hCcirc, hxC⟩ := hnColoop
+
+  let hf : ∃ f, f ∈ C ∧ f ≠ x := by
+    by_contra hf
+    push_neg at hf
+    let hCx : ∀ f ∈ C, f ∈ ({x} : Set α) := by
+      by_contra hg
+      push_neg at hg
+      obtain ⟨f', hf'⟩ := hg
+      specialize hf f' hf'.1
+      exact (hf ▸ hf'.2) rfl
+    let hCsubx : C ⊆ {x} := hf
+    let hxsubC : {x} ⊆ C := Set.singleton_subset_iff.mpr hxC
+    let hCeqx : {x} = C := Set.Subset.antisymm hxsubC hf
+    rw [hCeqx] at hnLoop
+    exact hnLoop hCcirc
+  obtain ⟨f, hfC, hfx⟩ := hf
+
+  let hCE := hCcirc.subset_ground
+  specialize hSep x rfl f (hCE hfC) (Or.inr (by use C))
+  exact hfx hSep
 
 /-- Equivalence statement. -/
 lemma Matroid.Separator.SingletonIff {α : Type*} {M : Matroid α} (x : α) :
