@@ -4,20 +4,17 @@ import Seymour.Matroid.Notions.Circuit
 
 /-- Loop is an element of the ground set that is not independent when viewed as a singleton set. -/
 def Matroid.Loop {α : Type*} (M : Matroid α) (a : α) : Prop :=
-  a ∈ M.E ∧ ¬M.Indep {a}
+  a ∈ M.E ∧ M.Dep {a}
 
 /-- An element is a loop iff its singleton set is a circuit. -/
-lemma Matroid.Loop.IffCircuit {α : Type*} (M : Matroid α) {a : α} :
-    M.Loop a ↔ M.Circuit {a} := by
-  constructor
-  · intro ha
-    exact ⟨
-      Set.singleton_subset_iff.mpr ha.1,
+lemma Matroid.Loop.iff_circuit {α : Type*} (M : Matroid α) {a : α} :
+    M.Loop a ↔ M.Circuit {a} :=
+  ⟨
+    fun ha => ⟨
       ha.2,
-      by
-        intro C' hC'
-        rw [Set.ssubset_singleton_iff.mp hC']
-        exact M.empty_indep
-    ⟩
-  · intro ha
-    exact ⟨ha.1 rfl, Circuit.NotIndep M ha⟩
+      fun T dT hTa => by cases Set.subset_singleton_iff_eq.mp hTa with
+        | inl hT => exact False.elim ((Matroid.Dep.not_indep (hT ▸ dT)) M.empty_indep)
+        | inr hT => exact le_of_eq_of_le hT.symm Set.Subset.rfl
+      ⟩,
+    fun ha => ⟨ha.1.2 rfl, Matroid.Circuit.dep M ha⟩
+  ⟩

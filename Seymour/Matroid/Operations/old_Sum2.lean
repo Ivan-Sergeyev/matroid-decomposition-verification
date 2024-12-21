@@ -1,4 +1,4 @@
-import Seymour.Matroid.Classes.Regular
+import Seymour.Matroid.Classes.IsRegular
 
 /-!
 This file contains everything about 2-sum of binary matroids.
@@ -107,8 +107,8 @@ lemma BinaryMatroid_2sum_B {a : α} (ha : M₁.X ∩ M₂.Y = {a}) (hXY : M₂.X
   ⟨Set.mem_of_mem_inter_left haXY, Set.mem_of_mem_inter_right haXY, rfl⟩
 
 lemma BinaryMatroid_2sum_isRegular {a : α} (ha : M₁.X ∩ M₂.Y = {a}) (hXY : M₂.X ⫗ M₁.Y)
-    (hM₁ : M₁.Regular) (hM₂ : M₂.Regular) :
-    (BinaryMatroid_2sum ha hXY).fst.Regular := by
+    (hM₁ : M₁.IsRegular) (hM₂ : M₂.IsRegular) :
+    (BinaryMatroid_2sum ha hXY).fst.IsRegular := by
   obtain ⟨B₁, hB₁, hBB₁⟩ := hM₁
   obtain ⟨B₂, hB₂, hBB₂⟩ := hM₂
   obtain ⟨haX₁, haY₂, hB⟩ := BinaryMatroid_2sum_B ha hXY
@@ -174,8 +174,8 @@ lemma BinaryMatroid_2sum_isRegular {a : α} (ha : M₁.X ∩ M₂.Y = {a}) (hXY 
         simp_all [x', y', A₁', A₂', B']
 
 lemma BinaryMatroid_2sum_isRegular_left {a : α} (ha : M₁.X ∩ M₂.Y = {a}) (hXY : M₂.X ⫗ M₁.Y)
-    (hM : (BinaryMatroid_2sum ha hXY).fst.Regular) :
-    M₁.Regular := by
+    (hM : (BinaryMatroid_2sum ha hXY).fst.IsRegular) :
+    M₁.IsRegular := by
   obtain ⟨B', hB', hBB'⟩ := hM
   obtain ⟨haX₁, haY₂, hB⟩ := BinaryMatroid_2sum_B ha hXY
   use B'.submatrix (fun i => ⟨i.val, by sorry⟩) (fun j => ⟨j.val, by sorry⟩)
@@ -184,31 +184,31 @@ lemma BinaryMatroid_2sum_isRegular_left {a : α} (ha : M₁.X ∩ M₂.Y = {a}) 
   · sorry
 
 lemma BinaryMatroid_2sum_isRegular_right {a : α} (ha : M₁.X ∩ M₂.Y = {a}) (hXY : M₂.X ⫗ M₁.Y)
-    (hM : (BinaryMatroid_2sum ha hXY).fst.Regular) :
-    M₂.Regular := by
+    (hM : (BinaryMatroid_2sum ha hXY).fst.IsRegular) :
+    M₂.IsRegular := by
   obtain ⟨B', hB', hBB'⟩ := hM
   obtain ⟨haX₁, haY₂, hB⟩ := BinaryMatroid_2sum_B ha hXY
   sorry
 
 /-- Any 2-sum of regular matroids is a regular matroid.
 This is the middle of the three parts of the easy direction of the Seymour's theorem. -/
-theorem BinaryMatroid.Is2sumOf.Regular [Fintype M₁.X] [Fintype M₁.Y] [Fintype M₂.X] [Fintype M₂.Y]
-    (hM : M.Is2sumOf M₁ M₂) (hM₁ : M₁.Regular) (hM₂ : M₂.Regular) :
-    M.Regular := by
+theorem BinaryMatroid.Is2sumOf.IsRegular [Fintype M₁.X] [Fintype M₁.Y] [Fintype M₂.X] [Fintype M₂.Y]
+    (hM : M.Is2sumOf M₁ M₂) (hM₁ : M₁.IsRegular) (hM₂ : M₂.IsRegular) :
+    M.IsRegular := by
   obtain ⟨a, ha, hXY, hMM, -⟩ := hM
   rw [BinaryMatroid_toMatroid_isRegular_iff hMM]
   exact BinaryMatroid_2sum_isRegular ha hXY hM₁ hM₂
 
 /-- If a regular matroid is a 2-sum, then the left summand of the 2-sum is regular. -/
-lemma BinaryMatroid.Is2sumOf.Regular_left (hMsum : M.Is2sumOf M₁ M₂) (hMreg : M.Regular) :
-    M₁.Regular := by
+lemma BinaryMatroid.Is2sumOf.IsRegular_left (hMsum : M.Is2sumOf M₁ M₂) (hMreg : M.IsRegular) :
+    M₁.IsRegular := by
   obtain ⟨a, ha, hXY, hMM, -⟩ := hMsum
   rw [BinaryMatroid_toMatroid_isRegular_iff hMM] at hMreg
   exact BinaryMatroid_2sum_isRegular_left ha hXY hMreg
 
 /-- If a regular matroid is a 2-sum, then the right summand of the 2-sum is regular. -/
-lemma BinaryMatroid.Is2sumOf.Regular_right (hMsum : M.Is2sumOf M₁ M₂) (hMreg : M.Regular) :
-    M₂.Regular := by
+lemma BinaryMatroid.Is2sumOf.IsRegular_right (hMsum : M.Is2sumOf M₁ M₂) (hMreg : M.IsRegular) :
+    M₂.IsRegular := by
   obtain ⟨a, ha, hXY, hMM, -⟩ := hMsum
   rw [BinaryMatroid_toMatroid_isRegular_iff hMM] at hMreg
   exact BinaryMatroid_2sum_isRegular_right ha hXY hMreg

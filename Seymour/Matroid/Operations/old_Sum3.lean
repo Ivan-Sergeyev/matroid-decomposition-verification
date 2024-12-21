@@ -1,4 +1,4 @@
-import Seymour.Matroid.Classes.Regular
+import Seymour.Matroid.Classes.IsRegular
 
 /-!
 This file contains everything about 3-sum of binary matroids.
@@ -206,17 +206,17 @@ lemma BinaryMatroid.Is3sumOf.indep (hM : M.Is3sumOf M₁ M₂) :
 
 /-- Any 3-sum of regular matroids is a regular matroid.
 This is the last of the three parts of the easy direction of the Seymour's theorem. -/
-theorem BinaryMatroid.Is3sumOf.Regular [Fintype M₁.X] [Fintype M₁.Y] [Fintype M₂.X] [Fintype M₂.Y]
-    (hM : M.Is3sumOf M₁ M₂) (hM₁ : M₁.Regular) (hM₂ : M₂.Regular) :
-    M.Regular := by
+theorem BinaryMatroid.Is3sumOf.IsRegular [Fintype M₁.X] [Fintype M₁.Y] [Fintype M₂.X] [Fintype M₂.Y]
+    (hM : M.Is3sumOf M₁ M₂) (hM₁ : M₁.IsRegular) (hM₂ : M₂.IsRegular) :
+    M.IsRegular := by
   sorry
 
 /-- If a regular matroid is a 3-sum, then the left summand of the 3-sum is regular. -/
-lemma BinaryMatroid.Is3sumOf.Regular_left (hMsum : M.Is3sumOf M₁ M₂) (hMreg : M.Regular) :
-    M₁.Regular := by
+lemma BinaryMatroid.Is3sumOf.IsRegular_left (hMsum : M.Is3sumOf M₁ M₂) (hMreg : M.IsRegular) :
+    M₁.IsRegular := by
   sorry
 
 /-- If a regular matroid is a 3-sum, then the right summand of the 3-sum is regular. -/
-lemma BinaryMatroid.Is3sumOf.Regular_right (hMsum : M.Is3sumOf M₁ M₂) (hMreg : M.Regular) :
-    M₂.Regular := by
+lemma BinaryMatroid.Is3sumOf.IsRegular_right (hMsum : M.Is3sumOf M₁ M₂) (hMreg : M.IsRegular) :
+    M₂.IsRegular := by
   sorry

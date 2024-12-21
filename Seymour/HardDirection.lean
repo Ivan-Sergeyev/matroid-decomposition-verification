@@ -32,5 +32,5 @@ inductive BinaryMatroid.IsGood : BinaryMatroid α → Prop
 | is2sum {M M₁ M₂ : BinaryMatroid α} (hM : M.Is2sumOf M₁ M₂) : M.IsGood
 | is3sum {M M₁ M₂ : BinaryMatroid α} (hM : M.Is3sumOf M₁ M₂) : M.IsGood
 
-theorem hardSeymour {M : BinaryMatroid α} (hM : M.Regular) : M.IsGood := by
+theorem hardSeymour {M : BinaryMatroid α} (hM : M.IsRegular) : M.IsGood := by
   sorry

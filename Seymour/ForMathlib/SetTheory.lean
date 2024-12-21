@@ -199,10 +199,8 @@ lemma diff_subset_parent {α : Type*} {X₁ X₂ E : Set α} (hX₁E : X₁ ⊆ 
 
 /-- Being a subset is preserved under taking intersections. -/
 lemma inter_subset_parent_left {α : Type*} {X₁ X₂ E : Set α} (hX₁E : X₁ ⊆ E) :
-    X₁ ∩ X₂ ⊆ E := by
-  have t1 : X₁ ∩ X₂ ⊆ E ∩ X₂ := Set.inter_subset_inter hX₁E fun ⦃a⦄ a => a
-  have t2 : E ∩ X₂ ⊆ E := Set.inter_subset_left
-  exact fun ⦃a⦄ a_1 => t2 (t1 a_1)
+    X₁ ∩ X₂ ⊆ E :=
+  (Set.inter_subset_inter_left X₂ hX₁E).trans Set.inter_subset_left
 
 /-- Being a subset is preserved under taking intersections. -/
 lemma inter_subset_parent_right {α : Type*} {X₁ X₂ E : Set α} (hX₂E : X₂ ⊆ E) :
@@ -214,3 +212,17 @@ lemma inter_subset_parent_right {α : Type*} {X₁ X₂ E : Set α} (hX₂E : X�
 lemma inter_subset_union {α : Type*} {X₁ X₂ : Set α} :
     X₁ ∩ X₂ ⊆ X₁ ∪ X₂ := by
   exact inter_subset_parent_left Set.subset_union_left
+
+-- /-- todo: desc -/
+-- lemma subset_not_ssubset_eq {α : Type*} {A B : Set α} (h : A ⊆ B) (h' : ¬A ⊂ B) : A = B := by
+--   rw [Set.ssubset_def] at h'
+--   push_neg at h'
+--   exact Set.Subset.antisymm h (h' h)
+
+/-- todo: desc -/
+lemma symmDiff_empty_eq {α : Type*} (X : Set α) : X = symmDiff X ∅ := by
+  rw [symmDiff_def_alt, Set.union_empty, Set.inter_empty, Set.diff_empty]
+
+/-- todo: desc -/
+lemma empty_symmDiff_eq {α : Type*} (X : Set α) : X = symmDiff ∅ X := by
+  rw [symmDiff_def_alt, Set.empty_union, Set.empty_inter, Set.diff_empty]

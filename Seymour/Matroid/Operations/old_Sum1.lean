@@ -1,5 +1,5 @@
 import Mathlib.Data.Matroid.Sum
-import Seymour.Matroid.Classes.Regular
+import Seymour.Matroid.Classes.IsRegular
 
 /-!
 This file contains everything about 1-sum of binary matroids.
@@ -61,8 +61,8 @@ lemma BinaryMatroid_1sum_comm {hXY : M₁.X ⫗ M₂.Y} {hYX : M₁.Y ⫗ M₂.X
 variable {M : BinaryMatroid α}
 
 lemma BinaryMatroid_1sum_Regular [Fintype M₁.X] [Fintype M₁.Y] [Fintype M₂.X] [Fintype M₂.Y]
-    (hXY : M₁.X ⫗ M₂.Y) (hYX : M₁.Y ⫗ M₂.X) (hM₁ : M₁.Regular) (hM₂ : M₂.Regular) :
-    (BinaryMatroid_1sum hXY hYX).fst.Regular := by
+    (hXY : M₁.X ⫗ M₂.Y) (hYX : M₁.Y ⫗ M₂.X) (hM₁ : M₁.IsRegular) (hM₂ : M₂.IsRegular) :
+    (BinaryMatroid_1sum hXY hYX).fst.IsRegular := by
   obtain ⟨B₁, hB₁, hBB₁⟩ := hM₁
   obtain ⟨B₂, hB₂, hBB₂⟩ := hM₂
   have hB : (BinaryMatroid_1sum hXY hYX).fst.B = (Matrix_1sumComposition M₁.B M₂.B).toMatrixUnionUnion
@@ -91,21 +91,21 @@ lemma BinaryMatroid_1sum_Regular [Fintype M₁.X] [Fintype M₁.Y] [Fintype M₂
 
 /-- Any 1-sum of regular matroids is a regular matroid.
 This is the first of the three parts of the easy direction of the Seymour's theorem. -/
-theorem BinaryMatroid.Is1sumOf.Regular [Fintype M₁.X] [Fintype M₁.Y] [Fintype M₂.X] [Fintype M₂.Y]
-    (hM : M.Is1sumOf M₁ M₂) (hM₁ : M₁.Regular) (hM₂ : M₂.Regular) :
-    M.Regular := by
+theorem BinaryMatroid.Is1sumOf.IsRegular [Fintype M₁.X] [Fintype M₁.Y] [Fintype M₂.X] [Fintype M₂.Y]
+    (hM : M.Is1sumOf M₁ M₂) (hM₁ : M₁.IsRegular) (hM₂ : M₂.IsRegular) :
+    M.IsRegular := by
   obtain ⟨hXY, hYX, hMM, -⟩ := hM
   rw [BinaryMatroid_toMatroid_isRegular_iff hMM]
   exact BinaryMatroid_1sum_Regular hXY hYX hM₁ hM₂
 
 /-- If a regular matroid is a 1-sum, then the left summand of the 1-sum is regular. -/
-lemma BinaryMatroid.Is1sumOf.Regular_left (hMsum : M.Is1sumOf M₁ M₂) (hMreg : M.Regular) :
-    M₁.Regular := by
+lemma BinaryMatroid.Is1sumOf.IsRegular_left (hMsum : M.Is1sumOf M₁ M₂) (hMreg : M.IsRegular) :
+    M₁.IsRegular := by
   obtain ⟨B', hB', hBB'⟩ := hMreg
   sorry
 
 /-- If a regular matroid is a 1-sum, then the right summand of the 1-sum is regular. -/
-lemma BinaryMatroid.Is1sumOf.Regular_right (hMsum : M.Is1sumOf M₁ M₂) (hMreg : M.Regular) :
-    M₂.Regular := by
+lemma BinaryMatroid.Is1sumOf.IsRegular_right (hMsum : M.Is1sumOf M₁ M₂) (hMreg : M.IsRegular) :
+    M₂.IsRegular := by
   obtain ⟨B', hB', hBB'⟩ := hMreg
   sorry

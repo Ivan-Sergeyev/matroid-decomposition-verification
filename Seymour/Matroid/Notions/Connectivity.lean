@@ -35,8 +35,8 @@ lemma Matroid.Separator.Loop {α : Type*} {M : Matroid α} {x : α} (hx : M.Loop
   | inr hfC =>
       obtain ⟨C, hCE, hCcirc, heC, hfC⟩ := hfC
       rw [hex, ←Set.singleton_subset_iff] at heC
-      rw [Matroid.Loop.IffCircuit] at hx
-      apply Matroid.Circuit.CircuitNotSsubsetCircuit hCcirc at hx
+      rw [Matroid.Loop.iff_circuit] at hx
+      apply Matroid.Circuit.not_ssubset_circuit hCcirc at hx
       rw [Set.ssubset_def] at hx
       push_neg at hx
       exact hx heC hfC
@@ -48,7 +48,7 @@ lemma Matroid.Separator.Coloop {α : Type*} {M : Matroid α} {x : α} (hx : M.Co
   cases hf with
   | inl hef => exact Set.mem_of_eq_of_mem hef.symm hex
   | inr hfC =>
-      rw [Matroid.Coloop.IffInNoCircuit] at hx
+      rw [Matroid.Coloop.iff_in_no_circuit] at hx
       obtain ⟨_hxE, hxC⟩ := hx
       obtain ⟨C, _hCE, hCcirc, heC, hfC⟩ := hfC
       rw [hex, ←Set.singleton_subset_iff] at heC
