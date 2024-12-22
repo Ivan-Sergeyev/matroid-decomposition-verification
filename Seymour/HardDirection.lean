@@ -1,36 +1,30 @@
 import Mathlib.Data.Matroid.Map
-import Seymour.Matroid.Operations.old_Sum1
-import Seymour.Matroid.Operations.old_Sum2
-import Seymour.Matroid.Operations.old_Sum3
+
+import Seymour.Matroid.Classes.IsRegular
+import Seymour.Matroid.Classes.IsGraphic
+import Seymour.Matroid.Constructors.ConcreteInstances
+import Seymour.Matroid.Operations.SumDelta
 
 /-!
-This file states the Seymour decomposition theorem. Proving `hardSeymour` is the ultimate goal of this project.
+This file states the "hard" (decomposition) direction of the Seymour decomposition theorem.
 -/
 
-variable {α : Type} [DecidableEq α]
+def BinaryMatroid.Is1sumOf {α : Type*} [DecidableEq α] (M M₁ M₂ : BinaryMatroid α) : Prop := sorry -- todo: move to SumDelta
+def BinaryMatroid.Is2sumOf {α : Type*} [DecidableEq α] (M M₁ M₂ : BinaryMatroid α) : Prop := sorry -- todo: move to SumDelta
+def BinaryMatroid.Is3sumOf {α : Type*} [DecidableEq α] (M M₁ M₂ : BinaryMatroid α) : Prop := sorry -- todo: move to SumDelta
 
-/-- TODO define graphics matroids. -/
-def BinaryMatroid.IsGraphic (M : BinaryMatroid α) : Prop :=
-  sorry
-
-/-- TODO define cographics matroids. -/
-def BinaryMatroid.IsCographic (M : BinaryMatroid α) : Prop :=
-  sorry
-
-/-- TODO define R10. -/
-def MatroidR10 : BinaryMatroid α :=
-  sorry -- inside we have some `Fin 10 ↪ α` whose image is `E`
-
-/-- Given matroid can be constructed from graphic matroids & cographic matroids & R10 using 1-sums & 2-sums & 3-sums. -/
-inductive BinaryMatroid.IsGood : BinaryMatroid α → Prop
+/-- Every regular matroid `M` can be constructed using direct sums, 2-sums, and 3-sums starting
+  with matroids each of which is either graphic, cographic, or isomorphic to R10,
+  and each of which is isomorphic to a minor of `M`. -/
+inductive BinaryMatroid.IsGood {α : Type} [DecidableEq α] : BinaryMatroid α → Prop
 -- leaf constructors
-| graphic {M : BinaryMatroid α} (hM : M.IsGraphic) : M.IsGood
-| cographic {M : BinaryMatroid α} (hM : M.IsCographic) : M.IsGood
-| theR10 {M : BinaryMatroid α} {e : α ≃ Fin 10} (hM : M.matroid.mapEquiv e = MatroidR10.matroid) : M.IsGood
+| graphic {M : BinaryMatroid α} (hM : M.matroid.IsGraphic) : M.IsGood
+| cographic {M : BinaryMatroid α} (hM : M.matroid.IsCographic) : M.IsGood
+| isomR10 {M : BinaryMatroid α} {e : α ≃ Fin 10} (hM : M.matroid.mapEquiv e = MatroidR10.matroid) : M.IsGood
 -- fork constructors
 | is1sum {M M₁ M₂ : BinaryMatroid α} (hM : M.Is1sumOf M₁ M₂) : M.IsGood
 | is2sum {M M₁ M₂ : BinaryMatroid α} (hM : M.Is2sumOf M₁ M₂) : M.IsGood
 | is3sum {M M₁ M₂ : BinaryMatroid α} (hM : M.Is3sumOf M₁ M₂) : M.IsGood
 
-theorem hardSeymour {M : BinaryMatroid α} (hM : M.IsRegular) : M.IsGood := by
+theorem hardSeymour {α : Type} [DecidableEq α] {M : BinaryMatroid α} (hM : M.IsRegular) : M.IsGood := by
   sorry

@@ -37,7 +37,7 @@ lemma DeltaSum.CircuitPred.empty_not_circuit {α : Type*} [DecidableEq α] (M₁
     Set.empty_subset, implies_true, and_imp, and_true, not_false_eq_true]
 
 /-- In circuit construction of Δ-sum, no circuit is strict subset of another circuit. -/
-lemma DeltaSum.CircuitPred.circuit_not_subset {α : Type*} [DecidableEq α] (M₁ M₂ : BinaryMatroid α)
+lemma DeltaSum.CircuitPred.circuit_not_ssubset {α : Type*} [DecidableEq α] (M₁ M₂ : BinaryMatroid α)
     {C C' : Set α } (hC : DeltaSum.CircuitPred M₁ M₂ C) (hC' : DeltaSum.CircuitPred M₁ M₂ C') : ¬(C' ⊂ C) := by
   sorry
 
@@ -62,7 +62,7 @@ def DeltaSum.CircuitMatroid {α : Type*} [DecidableEq α] (M₁ M₂ : BinaryMat
   E := DeltaSum.E M₁ M₂
   CircuitPred := DeltaSum.CircuitPred M₁ M₂
   not_circuit_empty := DeltaSum.CircuitPred.empty_not_circuit M₁ M₂
-  circuit_not_subset _ _ := fun hC hC' => DeltaSum.CircuitPred.circuit_not_subset M₁ M₂ hC hC'
+  circuit_not_ssubset _ _ := fun hC hC' => DeltaSum.CircuitPred.circuit_not_ssubset M₁ M₂ hC hC'
   circuit_c3 _ _ _ _ :=  DeltaSum.CircuitPred.circuit_c3 M₁ M₂
   circuit_maximal :=  DeltaSum.CircuitPred.circuit_maximal M₁ M₂
   subset_ground := DeltaSum.CircuitPred.subset_ground M₁ M₂
@@ -80,7 +80,7 @@ lemma DeltaSum.circuit_iff {α : Type*} [DecidableEq α] (M₁ M₂ : BinaryMatr
     (DeltaSum.matroid M₁ M₂).Circuit C ↔ DeltaSum.CircuitPred M₁ M₂ C := by
   unfold matroid
   rw [CircuitMatroid.circuit_iff]
-  rfl
+  exact ⟨fun ⟨_, hC⟩ => hC, fun hC => ⟨hC.subset_ground, hC⟩⟩
 
 
 section GeneralObservations
@@ -449,8 +449,15 @@ section SpecialCase2Sum
 /-- If `M₁.E ∩ M₂.E = {p}` and neither `M₁` nor `M₂` has `p` as loop or coloop, then `M₁ Δ M₂ = M₁ ⊕₂ M₂`. -/
 lemma DeltaSum.SpecialCase2Sum {α : Type*} [DecidableEq α] {p : α} {M₁ M₂ : BinaryMatroid α}
     (Assumptions : Matroid.TwoSum.Assumptions M₁.matroid M₂.matroid p) :
-    Matroid.TwoSum.matroid Assumptions = DeltaSum.matroid M₁ M₂ := by
+    Matroid.TwoSum.CircuitMatroid Assumptions = DeltaSum.CircuitMatroid M₁ M₂ := by
   sorry
+  -- constructor
+  -- · rw [DeltaSum.E_eq, symmDiff_def_alt, Matroid.TwoSum.E_eq, ←Assumptions.hp]
+  --   exact rfl
+  -- · intro C hC
+  --   rw [Matroid.TwoSum.matroid, CircuitMatroid.circuit_iff,
+  --       DeltaSum.matroid, CircuitMatroid.circuit_iff]
+  --   sorry
 
 
 section SpecialCase3Sum

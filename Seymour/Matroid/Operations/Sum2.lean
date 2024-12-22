@@ -279,7 +279,7 @@ def Matroid.TwoSum.CircuitMatroid {α : Type*} {M₁ M₂ : Matroid α} {p : α}
   E := Matroid.TwoSum.E M₁ M₂ p
   CircuitPred := Matroid.TwoSum.CircuitPred M₁ M₂ p
   not_circuit_empty := Matroid.TwoSum.NotCircuitEmpty Assumptions
-  circuit_not_subset := Matroid.TwoSum.CircuitNotSubsetCircuit Assumptions
+  circuit_not_ssubset := Matroid.TwoSum.CircuitNotSubsetCircuit Assumptions
   circuit_c3 := sorry -- todo: should simplify in finite case
   circuit_maximal := sorry -- todo: should simplify in finite case
   subset_ground := Matroid.TwoSum.CircuitGround M₁ M₂ p
@@ -297,7 +297,7 @@ lemma Matroid.TwoSum.E_eq {α : Type*} {M₁ M₂ : Matroid α} {p : α}
 @[simp]
 lemma Matroid.TwoSum.circuit_iff {α : Type*} {M₁ M₂ : Matroid α} {p : α}
     (Assumptions : Matroid.TwoSum.Assumptions M₁ M₂ p) {C : Set α} :
-    (Matroid.TwoSum.matroid Assumptions).Circuit C ↔ Matroid.TwoSum.CircuitPred M₁ M₂ p C := by
+    (Matroid.TwoSum.matroid Assumptions).Circuit C ↔ C ⊆ Matroid.TwoSum.E M₁ M₂ p ∧ Matroid.TwoSum.CircuitPred M₁ M₂ p C := by
   unfold matroid
   rw [CircuitMatroid.circuit_iff]
   rfl

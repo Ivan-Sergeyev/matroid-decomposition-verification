@@ -226,3 +226,7 @@ lemma symmDiff_empty_eq {α : Type*} (X : Set α) : X = symmDiff X ∅ := by
 /-- todo: desc -/
 lemma empty_symmDiff_eq {α : Type*} (X : Set α) : X = symmDiff ∅ X := by
   rw [symmDiff_def_alt, Set.empty_union, Set.empty_inter, Set.diff_empty]
+
+/-- todo: desc -/
+lemma subset_diff_empty_eq {α : Type*} {A B : Set α} (hAB : A ⊆ B) (hBdiffA : B \ A = ∅) : A = B :=
+  Set.union_empty A ▸ hBdiffA ▸ Set.union_diff_cancel hAB

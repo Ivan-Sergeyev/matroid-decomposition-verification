@@ -18,7 +18,7 @@ structure CircuitMatroid (α : Type*) where
   /-- Empty set is not a circuit -/
   (not_circuit_empty : CircuitPred.not_circuit_empty)
   /-- No circuit is a subset of another circuit -/
-  (circuit_not_subset : CircuitPred.circuit_not_subset)
+  (circuit_not_ssubset : CircuitPred.circuit_not_ssubset)
   /-- Condition (C3) from Bruhn et al. -/
   (circuit_c3 : CircuitPred.axiom_c3)
   /-- Corresponding family of independent sets satisfies has the maximal subset property -/
@@ -52,7 +52,7 @@ lemma CircuitMatroid.indep_maximal {α : Type*} (M : CircuitMatroid α) :
   CircuitPredicate.ToIndepPredicate.indep_maximal M.CircuitPred M.E
 
 /-- Corresponding independence predicate of circuit matroid satisfies (IE): independent sets are subsets of ground set. -/
-def CircuitMatroid.indep_subset_ground {α : Type*} (M : CircuitMatroid α) :
+lemma CircuitMatroid.indep_subset_ground {α : Type*} (M : CircuitMatroid α) :
     M.IndepPred.subset_ground M.E :=
   CircuitPredicate.ToIndepPredicate.subset_ground M.CircuitPred M.E
 
@@ -68,6 +68,10 @@ def CircuitMatroid.IndepMatroid {α : Type*} (M : CircuitMatroid α) : IndepMatr
 
 /-- Circuit matroid converted to `Matroid`. -/
 def CircuitMatroid.matroid {α : Type*} (M : CircuitMatroid α) : Matroid α := M.IndepMatroid.matroid
+
+/-- Registered conversion from `CircuitMatroid` to `Matroid`. -/
+instance {α : Type*} : Coe (CircuitMatroid α) (Matroid α) where
+  coe := CircuitMatroid.matroid
 
 -- question: unused API?
 lemma CircuitMatroid.Maximal_iff {α : Type*} (M : CircuitMatroid α) (B : Set α) :
@@ -85,9 +89,11 @@ lemma CircuitMatroid.Maximal_iff {α : Type*} (M : CircuitMatroid α) (B : Set �
   M.matroid.Indep I ↔ M.IndepPred I := rfl.to_iff
 
 @[simp] lemma CircuitMatroid.circuit_iff {α : Type*} (M : CircuitMatroid α) {C : Set α} :
-    M.matroid.Circuit C ↔ M.CircuitPred C := by
+    M.matroid.Circuit C ↔ (C ⊆ M.E ∧ M.CircuitPred C) := by
   constructor
   · intro hC
+    constructor
+    · exact hC.subset_ground
     unfold Matroid.Circuit Matroid.Dep at hC
     obtain ⟨⟨hCdep, hCE⟩, hCmin⟩ := hC
     -- by_contra hCncirc
@@ -101,28 +107,38 @@ lemma CircuitMatroid.Maximal_iff {α : Type*} (M : CircuitMatroid α) (B : Set �
     let hDssubC := Set.ssubset_iff_subset_ne.mpr ⟨hDC, hDneqC⟩
     obtain ⟨x, hxC, hxnD⟩ := Set.exists_of_ssubset hDssubC
     let hDextC : insert x D = C := sorry
-    sorry
-  · intro hC
-    unfold Matroid.Circuit Matroid.Dep
+    sorry -- todo: finish
+  · intro ⟨_, hC⟩
     constructor
-    · simp
-      unfold IndepPred
+    · unfold Matroid.Dep
+      rw [indep_iff]
       constructor
-      · unfold CircuitPredicate.ToIndepPredicate
+      · unfold IndepPred CircuitPredicate.ToIndepPredicate
         push_neg
-        intro hCE
+        intro _
         use C
       · exact M.subset_ground C hC
     · intro D ⟨hDdep, hDE⟩ hDC
       rw [CircuitMatroid.indep_iff] at hDdep
       unfold IndepPred CircuitPredicate.ToIndepPredicate at hDdep
       push_neg at hDdep
-      obtain ⟨C', hC', hC'D⟩ := hDdep hDE
+      obtain ⟨C', hC'D, hC'⟩ := hDdep hDE
       let hC'C := hC'D.trans hDC
-      let hC'nssubC := M.circuit_not_subset C C' hC hC'
+      let hC'nssubC := M.circuit_not_ssubset C C' hC hC'
       let hC'eqC := eq_of_subset_of_not_ssubset hC'C hC'nssubC
       exact hC'eqC ▸ hC'D
 
-/-- Registered conversion from `CircuitMatroid` to `Matroid`. -/
-instance {α : Type*} : Coe (CircuitMatroid α) (Matroid α) where
-  coe := CircuitMatroid.matroid
+/-- todo: desc -/
+lemma CircuitMatroid.CircuitPred_eq_iff {α : Type*} (M₁ M₂: CircuitMatroid α) :
+    M₁.CircuitPred = M₂.CircuitPred ↔ ∀ C, M₁.CircuitPred C = M₂.CircuitPred C :=
+  funext_iff
+
+/-- todo: desc -/
+lemma CircuitMatroid.eq_sufficient {α : Type*} (M₁ M₂: CircuitMatroid α) :
+    M₁.CircuitPred = M₂.CircuitPred → M₁.matroid = M₂.matroid :=
+  sorry
+
+/-- todo: desc -/
+lemma CircuitMatroid.eq_iff {α : Type*} (M₁ M₂: CircuitMatroid α) :
+    M₁.E = M₂.E ∧ (∀ C ⊆ M₁.E, M₁.CircuitPred = M₂.CircuitPred) ↔ M₁.matroid = M₂.matroid :=
+  sorry

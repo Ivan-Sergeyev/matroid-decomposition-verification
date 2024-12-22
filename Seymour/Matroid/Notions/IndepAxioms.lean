@@ -1,8 +1,11 @@
 import Mathlib.Data.Matroid.Basic
 
 
-/-- Independence predicate, defines which sets are circuits. -/
+/-- Independence predicate, defines which sets are independent. -/
 abbrev IndepPredicate (α : Type*) := Set α → Prop
+
+/-- Independence predicate of matroid. -/
+def Matroid.IndepPredicate {α : Type*} (M : Matroid α) : IndepPredicate α := M.Indep
 
 
 section IndepAxioms
@@ -34,25 +37,22 @@ section MatroidIndepAxioms
 
 /-- Independence predicate of matroid satisfies (I1): empty set is independent. -/
 lemma Matroid.indep_empty {α : Type*} (M : Matroid α) :
-    IndepPredicate.indep_empty M.Indep :=
+    M.IndepPredicate.indep_empty :=
   M.empty_indep
 
 /-- Independence predicate of matroid satisfies (I2): subset of independent set is independent. -/
 lemma Matroid.indep_subset {α : Type*} (M : Matroid α) :
-    IndepPredicate.indep_subset M.Indep :=
+    M.IndepPredicate.indep_subset :=
   fun _ _ => Matroid.Indep.subset
 
 /-- Independence predicate of matroid satisfies (I3): augmentation property. -/
 lemma Matroid.indep_aug {α : Type*} (M : Matroid α) :
-    IndepPredicate.indep_aug M.Indep :=
+    M.IndepPredicate.indep_aug :=
   fun _ _ hI hInmax hI'max => Indep.exists_insert_of_not_maximal M hI hInmax hI'max
-
-lemma subset_diff_empty_eq {α : Type*} {A B : Set α} (hAB : A ⊆ B) (hBdiffA : B \ A = ∅) : A = B :=
-  Set.union_empty A ▸ hBdiffA ▸ Set.union_diff_cancel hAB
 
 /-- (Alternative proof.) Independence predicate of matroid satisfies (I3): augmentation property. -/
 lemma Matroid.indep_aug_alt {α : Type*} (M : Matroid α) :
-    IndepPredicate.indep_aug M.Indep := by
+    M.IndepPredicate.indep_aug := by
   -- Follows part of proof from Theorem 4.1 (i) from Bruhn et al.
   intro I I' hI hInmax hI'max
   let ⟨B, hIB, hBmax⟩ := M.maximality M.E Set.Subset.rfl I hI (Matroid.Indep.subset_ground hI)
@@ -66,6 +66,7 @@ lemma Matroid.indep_aug_alt {α : Type*} (M : Matroid α) :
       ⟩
     else
       let hB : Maximal M.Indep B := ⟨hBmax.1.1, fun C hC hBC => hBmax.2 ⟨hC, Matroid.Indep.subset_ground hC⟩ hBC⟩
+      unfold Matroid.IndepPredicate at hI'max
       rw [←Matroid.base_iff_maximal_indep] at hI'max hB
       obtain ⟨y, hy, hybase⟩ := M.base_exchange B I' hB hI'max x (Set.mem_diff_of_mem (Set.mem_of_mem_diff hx) hxI')
       use y
@@ -81,10 +82,10 @@ lemma Matroid.indep_aug_alt {α : Type*} (M : Matroid α) :
 
 /-- Independence predicate of matroid satisfies (IM): set of all independent sets has the maximal subset property. -/
 lemma Matroid.indep_maximal {α : Type*} (M : Matroid α) :
-    IndepPredicate.indep_maximal M.Indep M.E :=
+    M.IndepPredicate.indep_maximal M.E :=
   M.maximality
 
 /-- Every independent set is a subset of the ground set. -/
 lemma Matroid.indep_subset_ground {α : Type*} (M : Matroid α) :
-    IndepPredicate.subset_ground M.Indep M.E :=
+    M.IndepPredicate.subset_ground M.E :=
   fun _ => Matroid.Indep.subset_ground
