@@ -23,10 +23,6 @@ lemma setminus_inter_union_eq_union : X \ (X ∩ Y) ∪ Y = X ∪ Y := by
 
 variable {a : α}
 
-lemma Disjoint.ni_of_in (hXY : Disjoint X Y) (ha : a ∈ X) : a ∉ Y := by
-  intro ha'
-  simpa [hXY.inter_eq] using Set.mem_inter ha ha'
-
 lemma disjoint_of_singleton_intersection_left_wo (hXY : X ∩ Y = {a}) : Disjoint (X \ {a}) Y := by
   rw [Set.disjoint_iff_forall_ne]
   intro u huXa v hvY huv

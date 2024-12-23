@@ -46,7 +46,8 @@ lemma toSum_toUnion {X Y : Set α} [∀ a, Decidable (a ∈ X)] [∀ a, Decidabl
 `X` and `Y` are disjoint. -/
 lemma toUnion_toSum {X Y : Set α} [∀ a, Decidable (a ∈ X)] [∀ a, Decidable (a ∈ Y)] (hXY : X ⫗ Y) (i : X.Elem ⊕ Y.Elem) :
     i.toUnion.toSum = i := by
-  cases i <;> simp [Subtype.toSum, Sum.toUnion, HasSubset.Subset.elem, hXY.symm.ni_of_in]
+  rw [Set.disjoint_right] at hXY
+  cases i <;> simp [Subtype.toSum, Sum.toUnion, HasSubset.Subset.elem, hXY]
 
 variable {T₁ T₂ S₁ S₂ : Set α} {β : Type*}
   [∀ a, Decidable (a ∈ T₁)]
